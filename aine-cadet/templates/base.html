@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+{% load static %}
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <title>{% block title %}{{ APP_NAME }} — Parrainage EMSP{% endblock %}</title>
+  {# Assets Editorial partagés avec la vitrine EMSP #}
+  <link rel="stylesheet" href="{% static 'css/fontawesome-all.min.css' %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,400italic,600italic|Roboto+Slab:400,700" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap" />
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/emsp-custom.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/aine-cadet.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/ac-brand.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/ac-premium.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/ac-dashboard.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/aine-cadet-forms.css' %}" />
+  <link rel="icon" href="{% static 'images/aine-cadet-logo.svg' %}" type="image/svg+xml" />
+  <meta name="theme-color" content="#147c71" />
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="is-preload aine-cadet-app" data-email-domain="{{ SCHOOL_EMAIL_DOMAIN|default:'emsp.int' }}">
+  <a href="#main" class="ac-skip-link">Aller au contenu</a>
+
+  <div id="wrapper">
+
+    <div id="main">
+      <div class="inner">
+
+        {% include "partials/_header.html" %}
+        {% include "partials/_messages.html" %}
+
+        {% block content %}{% endblock %}
+
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <div class="inner">
+        {% include "partials/_sidebar.html" %}
+      </div>
+    </div>
+
+  </div>
+
+  <script src="{% static 'js/jquery.min.js' %}"></script>
+  <script src="{% static 'js/browser.min.js' %}"></script>
+  <script src="{% static 'js/breakpoints.min.js' %}"></script>
+  <script src="{% static 'js/util.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/aine-cadet-motion.js' %}"></script>
+  <script src="{% static 'js/ac-forms.js' %}"></script>
+  <script src="{% static 'js/ac-toast.js' %}"></script>
+  <script src="{% static 'js/ac-animations.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

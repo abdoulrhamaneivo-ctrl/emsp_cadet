@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Mon espace Aine - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-hero-panel">
+  <span class="ac-kicker">Espace Aine</span>
+  <h1>Bonjour, {{ utilisateur.first_name|default:"Aine" }}</h1>
+  <p>Pilotez vos demandes, vos Cadets, vos rendez-vous et votre visibilite dans l'annuaire depuis une seule page.</p>
+  <div class="ac-action-strip">
+    <a href="{% url 'accounts:profil' %}" class="button primary">Completer mon profil Aine</a>
+    <a href="{% url 'parrainage:evenement_creer' %}" class="button">Organiser un evenement</a>
+    <a href="{% url 'parrainage:annuaire' %}" class="button">Voir l'annuaire</a>
+  </div>
+  <div class="ac-stat-grid">
+    <div class="ac-stat-tile"><strong>{{ filleuls_actifs }}/{{ capacite_max }}</strong><span>Cadets accompagnes</span></div>
+    <div class="ac-stat-tile"><strong>{{ demandes_recues|length }}</strong><span>demandes a traiter</span></div>
+    <div class="ac-stat-tile"><strong>{{ rdv_prochains|length }}</strong><span>RDV a venir</span></div>
+    <div class="ac-stat-tile"><strong>{{ score_fiabilite }}</strong><span>score fiabilite</span></div>
+  </div>
+</section>
+
+{% if badges %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Badges et reconnaissance</h2>
+      <p>Vos contributions visibles dans le programme Aine & Cadet.</p>
+    </div>
+  </div>
+  <div class="ac-card-meta">
+    {% for att in badges %}
+    <span title="{{ att.badge.description }}">{{ att.badge.libelle }}</span>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if demandes_recues %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Demandes en attente</h2>
+      <p>Repondez vite pour que les Cadets sachent ou ils en sont.</p>
+    </div>
+  </div>
+  <div class="ac-dashboard-grid">
+    {% for d in demandes_recues %}
+    <article class="ac-dashboard-card">
+      <h3>{{ d.filleul.get_full_name }}</h3>
+      <div class="ac-card-meta">
+        <span>{{ d.filleul.filiere|default:"Filiere non renseignee" }}</span>
+        <span>{{ d.filleul.classe|default:"Niveau non renseigne" }}</span>
+      </div>
+      {% if d.message_introduction %}<p><em>{{ d.message_introduction }}</em></p>{% endif %}
+      <div class="ac-action-strip">
+        <a href="{% url 'parrainage:demande_repondre' d.pk 'accepter' %}" class="button primary small">Accepter</a>
+        <a href="{% url 'parrainage:demande_repondre' d.pk 'refuser' %}" class="button small">Refuser</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if parrainages_actifs %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Mes Cadets actifs</h2>
+      <p>Acces rapide aux messages, rendez-vous et fins d'accompagnement.</p>
+    </div>
+  </div>
+  <div class="ac-dashboard-grid">
+    {% for p in parrainages_actifs %}
+    <article class="ac-dashboard-card">
+      <h3>{{ p.filleul.get_full_name }}</h3>
+      <p>{{ p.filleul.filiere|default:"Filiere non renseignee" }} - depuis le {{ p.date_reponse|date:"d/m/Y" }}</p>
+      <div class="ac-action-strip">
+        <a href="{% url 'parrainage:messages' p.pk %}" class="button primary small">Messagerie</a>
+        <a href="{% url 'parrainage:rdv_proposer' p.pk %}" class="button small">RDV</a>
+      </div>
+      <form method="post" action="{% url 'parrainage:parrainage_terminer' p.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="button small">Terminer</button>
+      </form>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% else %}
+<section class="ac-dashboard-card">
+  <h2>Votre visibilite compte</h2>
+  <p>Aucun Cadet actif pour le moment. Completez vos ambitions, motivations et centres d'interet pour apparaitre dans les meilleures suggestions.</p>
+  <a href="{% url 'accounts:profil' %}" class="button primary small">Ameliorer mon profil</a>
+</section>
+{% endif %}
+
+{% if evenements %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Evenements collectifs</h2>
+      <p>Animez la communaute et creez des temps forts utiles aux Cadets.</p>
+    </div>
+    <div class="ac-action-strip">
+      <a href="{% url 'parrainage:evenements_liste' %}" class="button small">Tout voir</a>
+      <a href="{% url 'parrainage:evenement_creer' %}" class="button primary small">Organiser</a>
+    </div>
+  </div>
+  <div class="ac-carousel">
+    {% for evt in evenements %}
+    <article class="ac-event-card">
+      <span class="ac-date-pill">{{ evt.date_heure|date:"d M" }}<small>{{ evt.date_heure|date:"H:i" }}</small></span>
+      <h3>{{ evt.titre }}</h3>
+      <p>{{ evt.lieu|default:"Lieu a confirmer" }}</p>
+      <a href="{% url 'parrainage:evenement_detail' evt.pk %}" class="button small">Voir</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if rdv_prochains %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Prochains rendez-vous</h2>
+      <p>Les prochains points d'accompagnement planifies.</p>
+    </div>
+  </div>
+  <ul class="ac-timeline-list">
+    {% for rdv in rdv_prochains %}
+    <li>
+      <span class="ac-date-pill">{{ rdv.date_heure|date:"d M" }}<small>{{ rdv.date_heure|date:"H:i" }}</small></span>
+      <div><strong>{{ rdv.titre }}</strong><br>{{ rdv.lieu|default:"Lieu a confirmer" }} avec {{ rdv.parrainage.filleul.get_full_name }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if rdv_a_traiter %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Rendez-vous a traiter</h2>
+      <p>Validez, refusez ou proposez un autre horaire.</p>
+    </div>
+  </div>
+  <div class="ac-dashboard-grid">
+    {% for rdv in rdv_a_traiter %}
+    <article class="ac-dashboard-card">
+      <h3>{{ rdv.titre }}</h3>
+      <p>{{ rdv.date_heure|date:"d/m/Y H:i" }} - {{ rdv.lieu|default:"Lieu a confirmer" }}</p>
+      <p>Propose par {{ rdv.organisateur.get_full_name }}</p>
+      <div class="ac-action-strip">
+        <a href="{% url 'parrainage:rdv_repondre' rdv.parrainage.pk rdv.pk 'accepter' %}" class="button primary small">Accepter</a>
+        <a href="{% url 'parrainage:rdv_repondre' rdv.parrainage.pk rdv.pk 'refuser' %}" class="button small">Refuser</a>
+        <a href="{% url 'parrainage:rdv_repondre' rdv.parrainage.pk rdv.pk 'contre-proposer' %}" class="button small">Contre-proposer</a>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if avis_en_attente %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Retours d'experience en attente</h2>
+      <p>Cloturez proprement vos accompagnements termines.</p>
+    </div>
+  </div>
+  <div class="ac-dashboard-grid">
+    {% for p in avis_en_attente %}
+    <article class="ac-dashboard-card">
+      <p>Parrainage avec {{ p.filleul.get_full_name }} termine le {{ p.date_fin|date:"d/m/Y" }}</p>
+      <a href="{% url 'parrainage:avis_creer' p.pk %}" class="button primary small">Laisser un avis</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

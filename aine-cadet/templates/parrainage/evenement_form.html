@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un événement — {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section>
+  <header class="main">
+    <h1>Nouvel événement collectif</h1>
+    <p>Atelier, sortie ou session ouverte à plusieurs Cadets.</p>
+  </header>
+
+  <div class="ac-form-section ac-form-section--wide">
+    <form method="post" class="ac-form" novalidate>
+      {% csrf_token %}
+      {% include "partials/_form_fields.html" with form=form %}
+      <ul class="actions">
+        <li><button type="submit" class="button primary">Publier l'événement</button></li>
+        <li><a href="{% url 'parrainage:evenements_liste' %}" class="button">Annuler</a></li>
+      </ul>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+# Ainé & Cadet — dépendances Python (Phase 1)
+Django>=5.0,<6.0
+python-dotenv>=1.0.0
+Pillow>=10.0.0
+django-cors-headers>=4.0.0
+django-anymail[brevo]>=12.0
+
+# PostgreSQL (production — si DATABASE_URL=postgres)
+psycopg2-binary>=2.9.0
+
+# MySQL (dev Windows — PyMySQL + patch dans config/__init__.py)
+PyMySQL>=1.1.0
+
+# django-storages>=1.14.0

@@ -1,0 +1,12 @@
+{% comment %}
+Avatar Ainé — photo réelle ou initiales sur gradient EMSP.
+Variables : user (User), css_class (optionnel, défaut ac-profile-card__avatar)
+{% endcomment %}
+{% load parrainage_extras %}
+{% with css_class|default:"ac-profile-card__avatar" as avatar_cls %}
+  {% if user.photo %}
+    <img src="{{ user.photo.url }}" alt="Photo de {{ user.get_full_name }}" class="{{ avatar_cls }}" width="64" height="64" loading="lazy" />
+  {% else %}
+    <div class="{{ avatar_cls }}-ph" aria-hidden="true">{{ user|initiales }}</div>
+  {% endif %}
+{% endwith %}

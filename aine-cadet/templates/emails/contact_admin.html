@@ -1,0 +1,10 @@
+{% extends "emails/base.html" %}
+{% block title %}Nouveau message contact{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:16px;">Message reçu depuis la vitrine EMSP</p>
+<table role="presentation" width="100%" style="font-size:14px;line-height:1.6;">
+  <tr><td style="padding:4px 0;color:#5a726e;width:100px;">De</td><td><strong>{{ nom }}</strong> &lt;{{ email_expediteur }}&gt;</td></tr>
+  <tr><td style="padding:4px 0;color:#5a726e;">Objet</td><td>{{ objet }}</td></tr>
+</table>
+<div style="margin-top:20px;padding:16px;background:#f4f7f6;border-left:4px solid #147c71;border-radius:4px;white-space:pre-wrap;line-height:1.6;">{{ message }}</div>
+{% endblock %}

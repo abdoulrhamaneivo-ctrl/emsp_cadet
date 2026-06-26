@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Mon profil Cadet — {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section>
+  <header class="main">
+    <h1>Mon profil Cadet</h1>
+    <p>Complétez vos informations pour trouver le bon Ainé.</p>
+  </header>
+
+  <div class="ac-form-section">
+    <form method="post" enctype="multipart/form-data" class="ac-form" novalidate>
+      {% csrf_token %}
+      {% include "partials/_form_fields.html" with form=form %}
+      <ul class="actions">
+        <li><button type="submit" class="button primary">Enregistrer</button></li>
+        <li><a href="{% url 'parrainage:dashboard' %}" class="button">Retour</a></li>
+      </ul>
+    </form>
+  </div>
+</section>
+{% endblock %}

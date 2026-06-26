@@ -1,0 +1,1 @@
+"""Applications métier Ainé & Cadet."""

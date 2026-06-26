@@ -1,0 +1,7 @@
+Bonjour {{ nom }},
+
+Nous avons bien reçu votre message concernant « {{ objet }} ».
+
+L'équipe EMSP vous répondra dans les meilleurs délais.
+
+— EMSP / Ainé & Cadet

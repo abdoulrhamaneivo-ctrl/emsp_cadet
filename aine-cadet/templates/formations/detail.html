@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}{{ filiere.nom }} - EMSP{% endblock %}
+
+{% block content %}
+<section class="ac-hero-panel ac-reveal"{% if filiere.image_hero %} style="background: radial-gradient(circle at 82% 12%, rgba(240,180,41,.22), transparent 28%), linear-gradient(135deg, rgba(20,124,113,.92), rgba(38,71,25,.9)), url('{{ filiere.image_hero.url }}') center/cover;"{% endif %}>
+  <span class="ac-kicker">{{ filiere.get_type_formation_display }}</span>
+  <h1>{{ filiere.nom }}</h1>
+  <p>{{ filiere.resume }}</p>
+  <div class="ac-card-meta">
+    {% if filiere.code %}<span>{{ filiere.code }}</span>{% endif %}
+    {% if filiere.duree %}<span>{{ filiere.duree }}</span>{% endif %}
+    <span>Mis a jour le {{ filiere.date_mise_a_jour|date:"d/m/Y" }}</span>
+  </div>
+  <div class="ac-action-strip">
+    <a href="{% url 'concours:inscription' %}" class="button primary">S'inscrire au concours</a>
+    <a href="{% url 'formations:liste' %}" class="button">Toutes les formations</a>
+  </div>
+</section>
+
+<section class="ac-filiere-overview">
+  <article class="ac-feature-card ac-feature-card--highlight ac-reveal">
+    <h2>Presentation</h2>
+    {% if filiere.description %}
+    <p>{{ filiere.description|linebreaks }}</p>
+    {% else %}
+    <p>La presentation detaillee sera completee par l'administration.</p>
+    {% endif %}
+  </article>
+
+  <aside class="ac-filiere-side ac-reveal">
+    <article class="ac-feature-card">
+      <h3>Reperes rapides</h3>
+      <div class="ac-card-meta">
+        {% if filiere.code %}<span>{{ filiere.code }}</span>{% endif %}
+        <span>{{ filiere.get_type_formation_display }}</span>
+        {% if filiere.duree %}<span>{{ filiere.duree }}</span>{% endif %}
+      </div>
+      <a href="{% url 'concours:inscription' %}" class="button primary small">Candidater</a>
+    </article>
+    {% if filiere.image %}
+    <article class="ac-feature-card">
+      <span class="image fit"><img src="{{ filiere.image.url }}" alt="{{ filiere.nom }}" /></span>
+    </article>
+    {% endif %}
+    {% if filiere.conditions_admission %}
+    <article class="ac-feature-card">
+      <h3>Admission</h3>
+      <p>{{ filiere.conditions_admission|linebreaks }}</p>
+    </article>
+    {% endif %}
+  </aside>
+</section>
+
+{% if specialites %}
+<section>
+  <div class="ac-section-heading ac-reveal">
+    <div>
+      <h2>Specialites de la filiere</h2>
+      <p>Une mosaïque pour distinguer rapidement objectif, metiers et programme de chaque specialite.</p>
+    </div>
+  </div>
+  <div class="ac-specialite-mosaic">
+    {% for s in specialites %}
+    <article class="ac-formation-card ac-reveal">
+      <div class="ac-card-meta">
+        <span>{{ s.code }}</span>
+        <span>Specialite</span>
+      </div>
+      <h3>{{ s.nom }}</h3>
+      {% if s.description %}<p>{{ s.description|linebreaksbr }}</p>{% endif %}
+      {% if s.debouches %}
+      <h4>Debouches</h4>
+      <p>{{ s.debouches|linebreaksbr }}</p>
+      {% endif %}
+      {% if s.cours %}
+      <details>
+        <summary>Voir le programme</summary>
+        <p>{{ s.cours|linebreaksbr }}</p>
+      </details>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if filiere.cours and not specialites %}
+<section>
+  <div class="ac-section-heading ac-reveal">
+    <div>
+      <h2>Programme de formation</h2>
+      <p>Modules et matieres du parcours.</p>
+    </div>
+  </div>
+  <article class="ac-feature-card ac-reveal">
+    <p>{{ filiere.cours|linebreaksbr }}</p>
+  </article>
+</section>
+{% endif %}
+
+{% if filiere.debouches and not specialites %}
+<section class="ac-feature-card ac-reveal">
+  <h2>Debouches</h2>
+  <p>{{ filiere.debouches|linebreaks }}</p>
+</section>
+{% endif %}
+
+<ul class="actions">
+  <li><a href="{% url 'formations:liste' %}" class="button">Toutes les formations</a></li>
+  <li><a href="{% url 'concours:inscription' %}" class="button primary">S'inscrire au concours</a></li>
+</ul>
+{% endblock %}

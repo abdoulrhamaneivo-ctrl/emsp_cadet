@@ -1,0 +1,35 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local environment and databases
+.env
+*.env
+!*.env.example
+db.sqlite3
+*.sqlite3
+
+# Django generated/runtime files
+staticfiles/
+media/
+*.log
+server-*.out.log
+server-*.err.log
+
+# Local tooling / cache
+.qodo/
+output/
+.DS_Store
+Thumbs.db
+
+# Large mirrored/reference website dump
+www.emsp.int/

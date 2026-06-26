@@ -1,0 +1,8 @@
+{% extends "emails/base.html" %}
+{% block title %}Accusé de réception{% endblock %}
+{% block content %}
+<p style="margin:0 0 16px;font-size:16px;">Bonjour {{ nom }},</p>
+<p style="margin:0 0 16px;line-height:1.6;">Nous avons bien reçu votre message concernant « <strong>{{ objet }}</strong> ».</p>
+<p style="margin:0 0 16px;line-height:1.6;">L'équipe EMSP vous répondra dans les meilleurs délais.</p>
+<p style="margin:0;line-height:1.6;color:#5a726e;font-size:14px;">Merci de votre intérêt pour l'École Multinationale Supérieure des Postes.</p>
+{% endblock %}

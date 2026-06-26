@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Formations EMSP - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-hero-panel ac-reveal">
+  <span class="ac-kicker">Parcours EMSP</span>
+  <h1>Formations EMSP</h1>
+  <p>Explorez les cycles, filieres et specialites avec une lecture claire: objectifs, duree, debouches et acces concours.</p>
+  <div class="ac-action-strip">
+    <a href="{% url 'concours:inscription' %}" class="button primary">S'inscrire au concours</a>
+    <a href="{% url 'bibliotheque:liste' %}" class="button">Voir la mediatheque</a>
+  </div>
+</section>
+
+{% if filieres %}
+<section>
+  <div class="ac-section-heading ac-reveal">
+    <div>
+      <h2>Choisir sa filiere</h2>
+      <p>Une lecture par priorite: le parcours mis en avant d'abord, puis les autres options en comparaison rapide.</p>
+    </div>
+  </div>
+
+  <div class="ac-formation-layout">
+    {% for f in filieres %}
+      {% if forloop.first %}
+      <article class="ac-formation-feature ac-reveal"{% if f.image %} style="background: linear-gradient(180deg, rgba(9,35,30,.12), rgba(9,35,30,.88)), url('{{ f.image.url }}') center/cover;"{% endif %}>
+        <div>
+          <div class="ac-card-meta">
+            {% if f.code %}<span>{{ f.code }}</span>{% endif %}
+            <span>{{ f.get_type_formation_display }}</span>
+            {% if f.duree %}<span>{{ f.duree }}</span>{% endif %}
+          </div>
+          <h3>{{ f.nom }}</h3>
+          <p>{{ f.resume|truncatewords:42 }}</p>
+        </div>
+        <a href="{{ f.get_absolute_url }}" class="button primary small">Explorer cette filiere</a>
+      </article>
+      <div class="ac-formation-side">
+      {% else %}
+      <article class="ac-formation-card ac-reveal">
+        <div class="ac-card-meta">
+          {% if f.code %}<span>{{ f.code }}</span>{% endif %}
+          <span>{{ f.get_type_formation_display }}</span>
+          {% if f.duree %}<span>{{ f.duree }}</span>{% endif %}
+        </div>
+        <h3>{{ f.nom }}</h3>
+        <p>{{ f.resume|truncatewords:24 }}</p>
+        <a href="{{ f.get_absolute_url }}" class="button small">Voir la filiere</a>
+      </article>
+      {% endif %}
+      {% if forloop.last and not forloop.first %}</div>{% endif %}
+    {% endfor %}
+    {% if filieres|length == 1 %}<div class="ac-formation-side"><article class="ac-dashboard-card ac-reveal"><h3>Autres parcours</h3><p>Les nouvelles filieres publiees par l'administration apparaitront ici.</p></article></div>{% endif %}
+  </div>
+</section>
+{% else %}
+<section class="ac-dashboard-card ac-reveal">
+  <h2>Aucune filiere publiee</h2>
+  <p>Ajoutez les filieres depuis l'administration ou executez la commande d'initialisation.</p>
+  {% if user.is_staff %}<a href="/admin/formations/filiere/add/" class="button primary small">Ajouter une filiere</a>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

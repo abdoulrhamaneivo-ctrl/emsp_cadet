@@ -1,0 +1,92 @@
+CAHIER DES CHARGES
+Plateforme de parrainage etudiant
+Nom du projet : Parr'Innov
+Technologie : Python / Django
+Date : Juin 2026
+1. Contexte et objectifs
+Dans les grandes ecoles, l'integration des nouveaux etudiants de premiere annee (L1) est un enjeu important. Arrivant souvent de parcours differents, ces etudiants font face a plusieurs difficultes : methodologie de travail, orientation, vie associative, adaptation au rythme universitaire.
+Les etudiants plus avances (devanciers) ont l'experience necessaire pour les accompagner, mais il manque aujourd'hui un outil centralise pour organiser cet accompagnement de maniere simple et equitable.
+Objectifs
+Faciliter l'integration des nouveaux etudiants grace a un accompagnement personnalise.
+Valoriser l'engagement des devanciers en leur donnant un espace pour partager leur experience.
+Remplacer les processus manuels (papier, attribution au hasard) par une plateforme web simple et fiable.
+Suivre dans le temps la qualite des accompagnements grace a des retours d'experience.
+2. Les acteurs du systeme
+Le filleul (etudiant L1)
+Cree et modifie son profil (classe, filiere, photo, attentes).
+Consulte l'annuaire des parrains disponibles.
+Envoie une demande de parrainage.
+Discute avec son parrain et planifie des rendez-vous une fois la demande acceptee.
+Laisse un avis sur l'accompagnement recu en fin de parcours.
+Le parrain (etudiant devancier)
+Cree un profil detaille (ambitions, projets, points forts, points faibles).
+Recoit, accepte ou refuse les demandes de parrainage.
+Accompagne jusqu'a 5 filleuls maximum.
+Discute et planifie des rendez-vous avec ses filleuls.
+Recoit des badges de reconnaissance selon son engagement.
+L'administrateur
+Gere les comptes et modere les contenus signales.
+Consulte les statistiques d'utilisation (parrainages actifs, etudiants en attente).
+Suspend ou supprime un compte si necessaire.
+3. Fonctionnalites detaillees
+3.1 Inscription et authentification
+Inscription avec nom, prenom, email de l'ecole, mot de passe, classe, filiere et role.
+Seuls les emails du domaine de l'ecole sont acceptes.
+Connexion et deconnexion securisees.
+3.2 Annuaire et recherche
+Liste des parrains disponibles, avec filtres par filiere, classe ou mots-cles.
+Fiche detaillee de chaque parrain : ambitions, projets, points forts et points faibles.
+Suggestion automatique : le systeme propose en priorite les parrains de la meme filiere ou ayant des centres d'interet proches du filleul.
+3.3 Mise en relation
+Le filleul envoie une demande a un parrain disponible.
+Le parrain accepte ou refuse la demande depuis son tableau de bord.
+En cas d'acceptation, la messagerie et la prise de rendez-vous s'activent automatiquement.
+3.4 Messagerie
+Chat prive entre un parrain et son filleul, uniquement apres acceptation.
+Indicateur de messages non lus.
+3.5 Rendez-vous
+Formulaire de proposition de rendez-vous (titre, date, heure, lieu).
+L'invite peut accepter, refuser ou proposer un autre moment.
+Rappel automatique avant chaque rendez-vous valide.
+3.6 Suivi et retours d'experience (nouveaute proposee)
+A la fin du parrainage, chaque participant note l'experience et laisse un commentaire.
+Ces notes alimentent un score de fiabilite visible sur le profil du parrain.
+Permet a l'administration de detecter les binomes en difficulte.
+3.7 Evenements collectifs (nouveaute proposee)
+Possibilite pour un parrain ou l'administration de creer un evenement ouvert a plusieurs filleuls (atelier, sortie, session de revision).
+Les filleuls s'inscrivent directement depuis la plateforme.
+Renforce la dimension communautaire du dispositif, au-dela du binome unique.
+3.8 Badges et reconnaissance (nouveaute proposee)
+Des badges simples (par exemple : premier parrainage, 5 filleuls accompagnes, evenement organise) valorisent l'engagement des parrains.
+Affiches sur le profil public du parrain.
+4. Regles de gestion
+Un filleul ne peut avoir qu'un seul parrain actif a la fois.
+Un parrain ne peut pas depasser 5 filleuls actifs simultanement.
+Quand un parrain atteint sa limite, son profil disparait de l'annuaire jusqu'a ce qu'une place se libere.
+Seul un email du domaine de l'ecole permet de s'inscrire.
+Le role d'un utilisateur (filleul ou parrain) ne peut etre modifie que par un administrateur.
+Un parrainage termine (par abandon ou fin d'annee) libere une place et declenche la demande de retour d'experience.
+5. Principales donnees a gerer
+Utilisateur : identite, role, classe, filiere, photo.
+Profil parrain : ambitions, motivations, projets, points forts et faibles.
+Demande de parrainage : filleul, parrain, statut (en attente, accepte, refuse).
+Message : expediteur, destinataire, contenu, date, statut de lecture.
+Rendez-vous : organisateur, invite, date, lieu, statut.
+Avis : note, commentaire, auteur, parrainage concerne.
+Evenement : titre, date, lieu, organisateur, liste des inscrits.
+6. Exigences techniques
+Langage : Python, framework Django.
+Base de donnees : SQLite en developpement, PostgreSQL en production.
+Interface adaptee aux mobiles, la majorite des etudiants naviguant depuis leur telephone.
+Stockage des photos via un service externe en production pour eviter toute perte de donnees.
+Protection des donnees : mots de passe chiffres, acces restreint aux membres connectes et verifies.
+Chaque utilisateur peut demander la suppression de son compte et de ses donnees.
+7. Phases de developpement
+Phase 1 : Socle
+Inscription, connexion, profils, annuaire, demandes de parrainage simples.
+Phase 2 : Communication
+Messagerie, prise de rendez-vous, notifications.
+Phase 3 : Communaute et qualite
+Retours d'experience, badges, evenements collectifs.
+Phase 4 : Mise en production
+Tests des regles de gestion, hebergement, lancement auprès des premiers parrains avant l'arrivee des nouveaux L1.

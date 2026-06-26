@@ -1,0 +1,369 @@
+/**
+ * ac-brand.css — Identité visuelle EMSP / Ainé & Cadet (application Django)
+ * Aligné sur emsp-custom.css (vitrine) : vert sarcelle #147c71, or #ef9c00
+ */
+
+:root {
+  --emsp-green: #147c71;
+  --emsp-green-dark: #0a3d38;
+  --emsp-green-mid: #1faa98;
+  --emsp-yellow: #ef9c00;
+  --emsp-blue: #1a5276;
+  --emsp-white: #ffffff;
+  --ac-ink: #18312e;
+  --ac-muted: #5f746f;
+  --ac-surface: #ffffff;
+  --ac-surface-soft: #f4f9f8;
+  --ac-border: #d9e8e5;
+  --ac-brand-gradient: linear-gradient(135deg, #0a3d38 0%, #147c71 50%, #1faa98 100%);
+  --ac-brand-gold-line: 3px solid var(--emsp-yellow);
+}
+
+/* Fond application — motif discret EMSP */
+body.aine-cadet-app {
+  background-color: #f4f9f8;
+  background-image:
+    radial-gradient(ellipse at 0% 0%, rgba(20, 124, 113, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(239, 156, 0, 0.05) 0%, transparent 50%);
+}
+
+body.aine-cadet-app #main > .inner {
+  position: relative;
+}
+
+/* Bandeau identité en-tête */
+#header.ac-brand-header {
+  border-bottom: var(--ac-brand-gold-line);
+  padding-bottom: 0.75em;
+  margin-bottom: 1.5em;
+}
+
+#header.ac-brand-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.65em;
+  border: none !important;
+}
+
+#header.ac-brand-header .logo img {
+  height: 42px;
+  width: auto;
+}
+
+#header.ac-brand-header .logo strong {
+  color: var(--emsp-green);
+  font-size: 1.05em;
+}
+
+#header.ac-brand-header .logo span.ac-brand-sub {
+  color: var(--emsp-green-dark);
+  font-weight: 600;
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+#header.ac-brand-header .icons a {
+  color: var(--emsp-green) !important;
+}
+
+#header.ac-brand-header .icons a:hover {
+  color: var(--emsp-yellow) !important;
+}
+
+/* Sidebar — renforcement charte */
+body.aine-cadet-app #logo-section {
+  border-bottom: var(--ac-brand-gold-line);
+}
+
+body.aine-cadet-app #menu ul li a:hover {
+  color: var(--emsp-green) !important;
+}
+
+body.aine-cadet-app .button.primary,
+body.aine-cadet-app input[type="submit"].primary,
+body.aine-cadet-app button.primary {
+  background-color: var(--emsp-green) !important;
+  border-color: var(--emsp-green) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 24px rgba(20, 124, 113, 0.22);
+}
+
+body.aine-cadet-app .button.primary:hover,
+body.aine-cadet-app button.primary:hover {
+  background-color: var(--emsp-green-dark) !important;
+  border-color: var(--emsp-green-dark) !important;
+  color: #fff !important;
+}
+
+body.aine-cadet-app .button:not(.primary) {
+  background-color: #fff !important;
+  border-color: rgba(20, 124, 113, 0.38) !important;
+  color: var(--emsp-green-dark) !important;
+}
+
+body.aine-cadet-app .button:not(.primary):hover {
+  border-color: var(--emsp-yellow) !important;
+  color: var(--emsp-green-dark) !important;
+  background-color: #fffaf0 !important;
+}
+
+body.aine-cadet-app h1,
+body.aine-cadet-app h2.major {
+  color: var(--emsp-green-dark);
+}
+
+/* Barre de progression identité (pages premium) */
+.ac-brand-strip {
+  height: 4px;
+  background: var(--ac-brand-gradient);
+  border-radius: var(--ac-radius-full, 9999px);
+  margin-bottom: 1.5em;
+}
+
+.ac-public-nav {
+  margin-top: 1.5rem;
+}
+
+.ac-public-nav a {
+  color: var(--ac-muted) !important;
+}
+
+.ac-public-nav a:hover {
+  color: var(--emsp-green) !important;
+}
+
+/* Auth : formulaires alignes sur la vitrine EMSP */
+.ac-auth-shell {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(320px, 1fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: start;
+  margin-top: 1.5rem;
+}
+
+.ac-auth-shell--wide {
+  grid-template-columns: minmax(260px, 0.75fr) minmax(360px, 1.15fr);
+}
+
+.ac-auth-intro {
+  position: sticky;
+  top: 1.5rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-left: 5px solid var(--emsp-yellow);
+  background:
+    linear-gradient(135deg, rgba(10, 61, 56, 0.95), rgba(20, 124, 113, 0.9)),
+    url("../images/backgrounds/hero-pattern-green.jpg") center/cover;
+  color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 18px 48px rgba(10, 61, 56, 0.22);
+  overflow: hidden;
+}
+
+.ac-auth-intro::after {
+  content: "";
+  position: absolute;
+  inset: auto -20% -35% 25%;
+  height: 220px;
+  background: radial-gradient(circle, rgba(239, 156, 0, 0.24), transparent 68%);
+  pointer-events: none;
+}
+
+.ac-auth-intro h1,
+.ac-auth-intro p,
+.ac-auth-intro a {
+  position: relative;
+  z-index: 1;
+}
+
+.ac-auth-intro h1 {
+  color: #fff;
+  margin: 0 0 0.55rem;
+  line-height: 1.05;
+}
+
+.ac-auth-intro p:not(.emsp-hero-tag) {
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 34rem;
+}
+
+.ac-auth-public-link {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.8rem;
+  border-bottom: 1px solid rgba(239, 156, 0, 0.85);
+  color: #fff !important;
+  font-weight: 700;
+}
+
+.ac-auth-panel {
+  max-width: none;
+  margin: 0;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--ac-border);
+  border-radius: 8px;
+  box-shadow: 0 16px 44px rgba(20, 124, 113, 0.12);
+}
+
+@media screen and (max-width: 980px) {
+  .ac-auth-shell,
+  .ac-auth-shell--wide {
+    grid-template-columns: 1fr;
+  }
+
+  .ac-auth-intro {
+    position: relative;
+    top: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.aine-cadet-app * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Page accueil Ainé & Cadet ── */
+.ac-accueil-hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  align-items: center;
+  padding: 2rem 2.25rem;
+  margin-bottom: 2rem;
+  border-radius: var(--ac-radius-lg, 1.25rem);
+  background: var(--ac-brand-gradient, linear-gradient(135deg, #0a3d38 0%, #147c71 55%, #1faa98 100%));
+  color: var(--emsp-white);
+  box-shadow: var(--ac-shadow-lg, 0 10px 40px rgba(20, 124, 113, 0.18));
+  overflow: hidden;
+  position: relative;
+}
+
+.ac-accueil-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 20%, rgba(239, 156, 0, 0.25), transparent 45%);
+  pointer-events: none;
+}
+
+.ac-accueil-hero__content {
+  position: relative;
+  z-index: 1;
+}
+
+.ac-accueil-hero .emsp-hero-tag {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.ac-accueil-hero .emsp-hero-title {
+  color: #fff;
+  margin-bottom: 0.5em;
+}
+
+.ac-accueil-hero .emsp-hero-title span {
+  color: var(--emsp-yellow);
+}
+
+.ac-accueil-hero__lead {
+  font-size: 1.05em;
+  opacity: 0.95;
+  max-width: 36em;
+}
+
+.ac-accueil-hero__visual {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.2));
+}
+
+.ac-accueil-hero__visual img {
+  display: block;
+  animation: ac-spin-slow 24s linear infinite;
+}
+
+.ac-accueil-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.ac-accueil-feature {
+  background: var(--ac-glass-bg, rgba(255, 255, 255, 0.85));
+  border: 1px solid rgba(20, 124, 113, 0.12);
+  border-radius: var(--ac-radius-md, 0.75rem);
+  padding: 1.35rem 1.5rem;
+  box-shadow: var(--ac-shadow-sm);
+  transition: transform var(--ac-transition-md), box-shadow var(--ac-transition-md);
+}
+
+.ac-accueil-feature:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ac-shadow-md);
+}
+
+.ac-accueil-feature__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--ac-radius-full, 9999px);
+  background: var(--ac-gradient-stat, linear-gradient(135deg, #147c71, #1faa98));
+  color: #fff;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.ac-accueil-feature h3 {
+  color: var(--emsp-green-dark);
+  margin-bottom: 0.35em;
+}
+
+.ac-accueil-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding: 1.25rem 1.5rem;
+  border-left: 4px solid var(--emsp-yellow);
+  background: linear-gradient(90deg, rgba(239, 156, 0, 0.08), transparent);
+  border-radius: var(--ac-radius-md);
+}
+
+.ac-accueil-cta__icon {
+  font-size: 1.75rem;
+  color: var(--emsp-yellow);
+}
+
+.ac-accueil-cta h4 {
+  margin: 0 0 0.2em;
+  color: var(--emsp-green-dark);
+}
+
+@media screen and (max-width: 736px) {
+  .ac-accueil-hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .ac-accueil-hero__visual {
+    margin: 0 auto;
+  }
+
+  .ac-accueil-hero__visual img {
+    width: 140px;
+    height: auto;
+  }
+
+  .ac-accueil-hero .actions {
+    justify-content: center;
+  }
+}

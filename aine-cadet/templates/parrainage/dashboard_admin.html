@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Administration - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-hero-panel">
+  <span class="ac-kicker">Pilotage EMSP</span>
+  <h1>Espace administrateur</h1>
+  <p>Controlez les parrainages, les profils, les inscriptions concours, les evenements et les avis recus depuis un tableau de bord concret.</p>
+  <div class="ac-action-strip">
+    <a href="/admin/" class="button primary">Django admin</a>
+    <a href="/admin/concours/inscriptionconcours/" class="button">Inscriptions concours</a>
+    <a href="{% url 'parrainage:evenement_creer' %}" class="button">Creer un evenement</a>
+    <a href="{% url 'parrainage:archives' %}" class="button">Archives</a>
+  </div>
+  <div class="ac-stat-grid">
+    <div class="ac-stat-tile"><strong>{{ parrainages_actifs }}</strong><span>Parrainages actifs</span></div>
+    <div class="ac-stat-tile"><strong>{{ cadets_en_attente }}</strong><span>Cadets sans Ainé</span></div>
+    <div class="ac-stat-tile"><strong>{{ demandes_en_attente }}</strong><span>Demandes en attente</span></div>
+    <div class="ac-stat-tile"><strong>{{ aines_disponibles }}</strong><span>Ainés disponibles</span></div>
+    <div class="ac-stat-tile"><strong>{{ inscriptions_concours_en_attente }}</strong><span>Dossiers concours a traiter</span></div>
+    <div class="ac-stat-tile"><strong>{{ evenements_a_venir }}</strong><span>Evénements à venir</span></div>
+  </div>
+</section>
+
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Acces rapides</h2>
+      <p>Les zones qui declenchent le plus souvent les operations admin.</p>
+    </div>
+  </div>
+  <div class="ac-dashboard-grid">
+    <article class="ac-dashboard-card">
+      <h3>Comptes et profils</h3>
+      <p>Creer, suspendre, verifier les roles et completer les profils Aine/Cadet.</p>
+      <a href="/admin/accounts/user/" class="button small">Gerer les utilisateurs</a>
+    </article>
+    <article class="ac-dashboard-card">
+      <h3>Inscriptions concours</h3>
+      <p>{{ inscriptions_concours_total }} candidature(s) recues, dont {{ inscriptions_concours_en_attente }} en attente.</p>
+      <a href="/admin/concours/inscriptionconcours/" class="button primary small">Voir les dossiers</a>
+    </article>
+    <article class="ac-dashboard-card">
+      <h3>Formations</h3>
+      <p>Structurer filieres et specialites visibles sur le site public.</p>
+      <a href="/admin/formations/filiere/" class="button small">Gerer les filieres</a>
+    </article>
+    <article class="ac-dashboard-card">
+      <h3>Mediatheque</h3>
+      <p>Publier les ressources, documents et medias consultables par les etudiants.</p>
+      <a href="/admin/bibliotheque/ressourcedocument/" class="button small">Gerer les ressources</a>
+    </article>
+  </div>
+</section>
+
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Inscriptions concours recues</h2>
+      <p>Derniers dossiers envoyes depuis le site public.</p>
+    </div>
+    <a href="/admin/concours/inscriptionconcours/" class="button small">Tout gerer</a>
+  </div>
+  {% if dernieres_inscriptions_concours %}
+  <div class="ac-table-wrap">
+    <table class="ac-table">
+      <thead><tr><th>Candidat</th><th>Choix 1</th><th>Moyenne</th><th>Statut</th><th>Date</th></tr></thead>
+      <tbody>
+        {% for ins in dernieres_inscriptions_concours %}
+        <tr>
+          <td><a href="/admin/concours/inscriptionconcours/{{ ins.pk }}/change/">{{ ins.prenom }} {{ ins.nom }}</a><br><small>{{ ins.email|default:"Email non renseigne" }}</small></td>
+          <td>{{ ins.get_filiere_choix_1_display }}</td>
+          <td>{{ ins.moyenne_examen }}</td>
+          <td>{{ ins.get_statut_display }}</td>
+          <td>{{ ins.date_inscription|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <article class="ac-dashboard-card"><p>Aucune inscription concours recue pour le moment.</p></article>
+  {% endif %}
+</section>
+
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Demandes de parrainage a traiter</h2>
+      <p>Cadets qui attendent une reponse d'un Aine.</p>
+    </div>
+    <a href="/admin/parrainage/demandeparrainage/" class="button small">Voir toutes les demandes</a>
+  </div>
+  {% if dernieres_demandes_parrainage %}
+  <div class="ac-dashboard-grid">
+    {% for d in dernieres_demandes_parrainage %}
+    <article class="ac-dashboard-card">
+      <h3>{{ d.filleul.get_full_name }}</h3>
+      <p>Demande envoyee a <strong>{{ d.parrain.get_full_name }}</strong></p>
+      <div class="ac-card-meta"><span>{{ d.filleul.filiere|default:"Filiere non renseignee" }}</span><span>{{ d.date_creation|date:"d/m/Y" }}</span></div>
+      {% if d.message_introduction %}<p>{{ d.message_introduction|truncatewords:24 }}</p>{% endif %}
+      <a href="/admin/parrainage/demandeparrainage/{{ d.pk }}/change/" class="button small">Ouvrir</a>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <article class="ac-dashboard-card"><p>Aucune demande en attente.</p></article>
+  {% endif %}
+</section>
+
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Inscriptions aux evenements</h2>
+      <p>Dernieres participations confirmees par les Cadets.</p>
+    </div>
+    <a href="/admin/parrainage/inscriptionevenement/" class="button small">Gerer les inscriptions</a>
+  </div>
+  {% if dernieres_inscriptions_evenements %}
+  <div class="ac-dashboard-grid">
+    {% for ins in dernieres_inscriptions_evenements %}
+    <article class="ac-dashboard-card">
+      <h3>{{ ins.participant.get_full_name }}</h3>
+      <p>{{ ins.evenement.titre }}</p>
+      <div class="ac-card-meta"><span>{{ ins.evenement.date_heure|date:"d/m/Y H:i" }}</span><span>{{ ins.date_inscription|date:"d/m/Y" }}</span></div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <article class="ac-dashboard-card"><p>Aucune inscription evenement recente.</p></article>
+  {% endif %}
+</section>
+
+{% if avis_recents_faibles %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Rapports et avis recus a surveiller</h2>
+      <p>Notes faibles qui demandent un controle humain.</p>
+    </div>
+    <a href="/admin/parrainage/avis/" class="button small">Voir tous les avis</a>
+  </div>
+  <div class="ac-table-wrap">
+    <table class="ac-table">
+      <thead><tr><th>Aine</th><th>Auteur</th><th>Note</th><th>Commentaire</th><th>Date</th></tr></thead>
+      <tbody>
+        {% for avis in avis_recents_faibles %}
+        <tr>
+          <td>{{ avis.parrainage.parrain.get_full_name }}</td>
+          <td>{{ avis.auteur.get_full_name }}</td>
+          <td>{{ avis.note }}/5</td>
+          <td>{{ avis.commentaire|default:"Aucun commentaire"|truncatewords:18 }}</td>
+          <td>{{ avis.date_creation|date:"d/m/Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+{% if evenements_admin %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Evenements a venir</h2>
+      <p>Vue rapide sur les ateliers et places.</p>
+    </div>
+    <a href="{% url 'parrainage:evenements_liste' %}" class="button small">Page publique</a>
+  </div>
+  <div class="ac-carousel">
+    {% for evt in evenements_admin %}
+    <article class="ac-event-card">
+      <span class="ac-date-pill">{{ evt.date_heure|date:"d M" }}<small>{{ evt.date_heure|date:"H:i" }}</small></span>
+      <h3>{{ evt.titre }}</h3>
+      <p>{{ evt.lieu|default:"Lieu a confirmer" }}</p>
+      {% if evt.places_max %}<p>{{ evt.nb_inscrits }}/{{ evt.places_max }} inscrits</p>{% endif %}
+      <a href="/admin/parrainage/evenement/{{ evt.pk }}/change/" class="button small">Modifier</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

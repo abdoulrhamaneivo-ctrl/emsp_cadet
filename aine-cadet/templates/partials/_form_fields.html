@@ -1,0 +1,17 @@
+{# Rendu standard des champs de formulaire — labels au-dessus, erreurs en français #}
+{% for field in form %}
+<div class="field{% if field.field.widget.input_type == 'radio' or field.name == 'role' %} ac-field-radio{% endif %}" data-field-name="{{ field.name }}">
+  {% if field.field.widget.input_type != 'radio' and field.name != 'role' %}
+  <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="ac-required" aria-hidden="true">*</span>{% endif %}</label>
+  {% else %}
+  <span class="ac-field-label">{{ field.label }}{% if field.field.required %} <span class="ac-required" aria-hidden="true">*</span>{% endif %}</span>
+  {% endif %}
+  {{ field }}
+  {% if field.help_text %}<p class="helptext">{{ field.help_text }}</p>{% endif %}
+  {% if field.errors %}
+  <ul class="errorlist" role="alert">
+    {% for e in field.errors %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}

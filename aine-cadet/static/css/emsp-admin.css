@@ -1,0 +1,249 @@
+:root {
+  --primary: #147c71;
+  --secondary: #0a3d38;
+  --accent: #ef9c00;
+  --primary-fg: #ffffff;
+  --body-bg: #f4f9f8;
+  --body-fg: #18312e;
+  --body-quiet-color: #607772;
+  --body-loud-color: #0a3d38;
+  --header-bg: #0a3d38;
+  --header-color: #ffffff;
+  --breadcrumbs-bg: #11695f;
+  --breadcrumbs-fg: #e9fffb;
+  --link-fg: #147c71;
+  --link-hover-color: #0a3d38;
+  --button-bg: #147c71;
+  --button-hover-bg: #0a3d38;
+  --default-button-bg: #ef9c00;
+  --default-button-hover-bg: #d88900;
+  --delete-button-bg: #b42318;
+  --delete-button-hover-bg: #8f1b13;
+  --object-tools-bg: #147c71;
+  --object-tools-hover-bg: #0a3d38;
+  --border-color: #d8e8e4;
+  --hairline-color: #e5f0ed;
+}
+
+html[data-theme="dark"] {
+  --primary: #38b8aa;
+  --secondary: #071f1d;
+  --accent: #f3ac2e;
+  --body-bg: #0f1716;
+  --body-fg: #eef7f5;
+  --body-quiet-color: #b8c9c5;
+  --body-loud-color: #ffffff;
+  --header-bg: #061615;
+  --breadcrumbs-bg: #0d5248;
+  --link-fg: #6ee2d5;
+  --link-hover-color: #ffffff;
+  --border-color: #26423e;
+  --hairline-color: #1d3531;
+}
+
+body {
+  font-family: "Outfit", "Segoe UI", Arial, sans-serif;
+  letter-spacing: 0;
+}
+
+#header {
+  min-height: 68px;
+  box-shadow: 0 8px 28px rgba(10, 61, 56, 0.18);
+}
+
+.emsp-admin-brand a {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+}
+
+.emsp-admin-brand__mark {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background: #ef9c00;
+  color: #0a3d38;
+  font-weight: 800;
+}
+
+.emsp-admin-brand strong,
+.emsp-admin-brand small {
+  display: block;
+  line-height: 1.1;
+}
+
+.emsp-admin-brand small {
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.emsp-admin-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.emsp-admin-shortcuts a {
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 700;
+}
+
+.emsp-admin-shortcuts a:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+#content {
+  padding: 28px 32px;
+}
+
+.emsp-admin-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: center;
+  margin: 0 0 26px;
+  padding: 24px;
+  border-radius: 10px;
+  background:
+    linear-gradient(135deg, rgba(10, 61, 56, 0.96), rgba(20, 124, 113, 0.9)),
+    url("../images/backgrounds/hero-pattern-green.jpg") center/cover;
+  color: #fff;
+  box-shadow: 0 18px 48px rgba(20, 124, 113, 0.18);
+}
+
+.emsp-admin-hero h1 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-size: clamp(1.55rem, 2.4vw, 2.4rem);
+  line-height: 1.05;
+}
+
+.emsp-admin-hero p {
+  margin: 0;
+  max-width: 58rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.emsp-admin-kicker {
+  margin-bottom: 8px !important;
+  color: #ffd98a !important;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.emsp-admin-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.emsp-admin-actions a {
+  padding: 10px 13px;
+  border-radius: 8px;
+  background: #fff;
+  color: #0a3d38;
+  font-weight: 800;
+}
+
+.module,
+.inline-group,
+#changelist,
+#content-related {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 12px 34px rgba(20, 124, 113, 0.08);
+}
+
+.module h2,
+.module caption,
+.inline-group h2,
+#changelist-filter h2 {
+  background: #147c71;
+  color: #fff;
+  font-weight: 800;
+}
+
+table thead th {
+  background: rgba(20, 124, 113, 0.08);
+  color: var(--body-loud-color);
+}
+
+tbody tr:hover {
+  background: rgba(20, 124, 113, 0.07);
+}
+
+input,
+textarea,
+select,
+.vTextField {
+  border-radius: 8px;
+  border-color: var(--border-color);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #147c71;
+  box-shadow: 0 0 0 3px rgba(20, 124, 113, 0.14);
+}
+
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.object-tools a,
+.object-tools button {
+  border-radius: 999px;
+  font-weight: 800;
+}
+
+#nav-sidebar {
+  border-right-color: var(--border-color);
+}
+
+#nav-sidebar .module th,
+#nav-sidebar .module td {
+  padding: 10px 12px;
+}
+
+#changelist-filter {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+#changelist-filter h3 {
+  color: var(--body-loud-color);
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  #content {
+    padding: 20px 16px;
+  }
+
+  .emsp-admin-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .emsp-admin-actions {
+    justify-content: flex-start;
+  }
+}

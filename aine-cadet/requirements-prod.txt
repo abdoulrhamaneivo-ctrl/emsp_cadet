@@ -1,0 +1,2 @@
+# Gunicorn — serveur WSGI production Ainé & Cadet
+gunicorn>=22.0.0

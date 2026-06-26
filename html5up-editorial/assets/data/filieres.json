@@ -1,0 +1,68 @@
+[
+  {
+    "slug": "fsp",
+    "nom": "Formations Supérieures Postales (FSP / FCP)",
+    "code": "FSP",
+    "duree": "10 mois (3 cycles × 9 mois cours + 1 mois stage/projet)",
+    "resume": "Former les administrateurs, inspecteurs et contrôleurs des Postes et Services Financiers des 8 pays membres.",
+    "url": "/formations/fsp/",
+    "image": null,
+    "specialites": []
+  },
+  {
+    "slug": "fs-menum",
+    "nom": "FS MENUM — Management de l'Économie Numérique",
+    "code": "FS MENUM",
+    "duree": "10 semestres (système LMD)",
+    "resume": "Licence professionnelle en 5 spécialités numériques, avec poursuite possible en Master professionnel.",
+    "url": "/formations/fs-menum/",
+    "image": null,
+    "specialites": [
+      {
+        "code": "LNUM",
+        "nom": "Logistique & Numérique",
+        "description": "Chargé de logistique, supply chain, e-commerce, transit/douane…"
+      },
+      {
+        "code": "FDIG",
+        "nom": "Finance Digitale",
+        "description": "Comptabilité, services financiers, fintech, inclusion financière."
+      },
+      {
+        "code": "MDIG",
+        "nom": "Marketing Digital",
+        "description": "Ventes en ligne, accompagnement e-commerce des entreprises."
+      },
+      {
+        "code": "DSER",
+        "nom": "Digitalisation des Services",
+        "description": "Transformation digitale, IA, cybersécurité, cloud."
+      },
+      {
+        "code": "GARE",
+        "nom": "Gestion des Activités Réglementées",
+        "description": "Conformité réglementaire sectorielle publique/privée."
+      }
+    ]
+  },
+  {
+    "slug": "ms-regnum",
+    "nom": "MS RegNUM — Mastère Spécialisé Régulation du Numérique",
+    "code": "RegNUM",
+    "duree": "18 mois en alternance",
+    "resume": "Formation en partenariat avec Télécom Paris — régulation des télécoms et du numérique.",
+    "url": "/formations/ms-regnum/",
+    "image": null,
+    "specialites": []
+  },
+  {
+    "slug": "formation-continue",
+    "nom": "Formations Continues Qualifiantes (FCQ)",
+    "code": "FCQ",
+    "duree": "1 jour à 3 mois (e-learning à la carte)",
+    "resume": "FCD (1 j–2 sem.), FMD (1–3 mois), e-learning et formations non francophones.",
+    "url": "/formations/formation-continue/",
+    "image": null,
+    "specialites": []
+  }
+]

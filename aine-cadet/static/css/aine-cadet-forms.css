@@ -1,0 +1,363 @@
+/**
+ * Ainé & Cadet — formulaires Editorial
+ * Centrage, selects/radios, overflow, animations légères.
+ */
+
+/* --- Prévention débordement horizontal --- */
+html.aine-cadet-app,
+body.aine-cadet-app {
+  overflow-x: hidden;
+}
+
+body.aine-cadet-app #wrapper {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body.aine-cadet-app #main .inner {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+/* --- Conteneur formulaire centré --- */
+.ac-form-section {
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ac-form-section.ac-form-section--wide {
+  max-width: 780px;
+}
+
+.ac-form {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ac-form .fields {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -0.75em;
+}
+
+.ac-form .fields .field {
+  padding: 0 0.75em;
+  box-sizing: border-box;
+}
+
+.ac-form .fields .field.half {
+  flex: 0 0 50%;
+  max-width: 50%;
+}
+
+@media screen and (max-width: 736px) {
+  .ac-form .fields .field.half {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* --- Champs --- */
+.ac-form .field {
+  margin-bottom: 1.35em;
+}
+
+.ac-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4em;
+  color: var(--emsp-green-dark, #1a3a2a);
+}
+
+.ac-form .ac-field-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+  color: var(--emsp-green-dark, #1a3a2a);
+}
+
+.ac-form .ac-required {
+  color: #c0392b;
+  font-weight: 700;
+}
+
+.ac-form input[type="text"],
+.ac-form input[type="email"],
+.ac-form input[type="password"],
+.ac-form input[type="file"],
+.ac-form input[type="number"],
+.ac-form input[type="datetime-local"],
+.ac-form select,
+.ac-form textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 6px;
+  border: solid 1px var(--ac-border, #d9e8e5);
+  padding: 0.75em 0.9em;
+  background: #fff;
+  color: var(--ac-ink, #18312e);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.ac-form input:focus,
+.ac-form select:focus,
+.ac-form textarea:focus {
+  border-color: var(--emsp-green, #147c71);
+  box-shadow: 0 0 0 3px rgba(20, 124, 113, 0.16);
+  outline: none;
+}
+
+.ac-form textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.ac-form textarea.ac-textarea-sm {
+  min-height: 80px;
+  max-height: 160px;
+}
+
+.ac-form textarea.ac-textarea-md {
+  min-height: 120px;
+  max-height: 240px;
+}
+
+.ac-form .helptext {
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 0.35em;
+  line-height: 1.45;
+}
+
+.ac-form .errorlist {
+  color: #c0392b;
+  list-style: none;
+  padding: 0;
+  margin: 0.35em 0 0;
+  font-size: 0.85em;
+}
+
+.ac-form .errorlist li {
+  margin-bottom: 0.15em;
+}
+
+/* --- Boutons radio (rôle Cadet / Ainé) --- */
+.ac-form .ac-radio-group,
+.ac-form ul[id*="role"] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65em;
+}
+
+.ac-form .ac-radio-group li,
+.ac-form ul[id*="role"] li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55em;
+  padding: 0.75em 1em;
+  border: solid 1px var(--ac-border, #d9e8e5);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ac-form .ac-radio-group li:hover,
+.ac-form ul[id*="role"] li:hover {
+  border-color: var(--emsp-green, #147c71);
+  background: #f4f9f8;
+}
+
+.ac-form .ac-radio-group li.is-selected,
+.ac-form ul[id*="role"] li.is-selected {
+  border-color: var(--emsp-green, #147c71);
+  background: #eef8f6;
+  box-shadow: inset 4px 0 0 var(--emsp-yellow, #ef9c00), 0 0 0 2px rgba(20, 124, 113, 0.12);
+}
+
+.ac-form .ac-radio-group input[type="radio"],
+.ac-form ul[id*="role"] input[type="radio"] {
+  width: auto;
+  margin-top: 0.2em;
+  flex-shrink: 0;
+  accent-color: var(--emsp-green, #2d8659);
+}
+
+.ac-form .ac-radio-group label,
+.ac-form ul[id*="role"] label {
+  margin: 0;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+}
+
+/* --- Actions formulaire --- */
+.ac-form .actions {
+  margin-top: 1.5em;
+  flex-wrap: wrap;
+}
+
+.ac-form .actions .button {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.ac-form .actions .button:hover {
+  transform: translateY(-1px);
+}
+
+.ac-form .actions .button:active {
+  transform: translateY(0);
+}
+
+/* --- Tables responsive --- */
+.ac-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1.5em;
+}
+
+.ac-table-wrap .ac-table {
+  min-width: 480px;
+}
+
+/* --- Animations d'apparition --- */
+@keyframes ac-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ac-chat-appear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.ac-animate-in {
+  animation: ac-fade-in-up 0.45s ease both;
+}
+
+.ac-animate-in-delay-1 {
+  animation-delay: 0.08s;
+}
+
+.ac-animate-in-delay-2 {
+  animation-delay: 0.16s;
+}
+
+.ac-chat-bubble {
+  animation: ac-chat-appear 0.35s ease both;
+}
+
+/* Respecter la préférence utilisateur */
+@media (prefers-reduced-motion: reduce) {
+  .ac-animate-in,
+  .ac-chat-bubble,
+  .ac-form .actions .button {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+/* --- Breakpoints mobile --- */
+@media screen and (max-width: 480px) {
+  .ac-form-section {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .ac-form input[type="text"],
+  .ac-form input[type="email"],
+  .ac-form input[type="password"],
+  .ac-form select,
+  .ac-form textarea {
+    font-size: 16px; /* évite zoom iOS */
+  }
+}
+
+.ac-role-card.is-selected,
+.ac-form ul[id*="role"] li.is-selected {
+  border-color: var(--emsp-green, #147c71);
+  background: #eef6f4;
+}
+
+.ac-field-hint { font-size: 0.85em; margin-top: 0.35em; }
+.ac-hint-ok { color: var(--emsp-green, #147c71); }
+.ac-hint-error { color: #b03a2e; }
+
+/* Indicateur de force du mot de passe (ac-forms.js) */
+.ac-password-strength {
+  margin-top: 0.5em;
+}
+
+.ac-password-strength__track {
+  height: 4px;
+  background: #e8ecea;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.ac-password-strength__bar {
+  height: 100%;
+  width: 0;
+  border-radius: 2px;
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.ac-password-strength__label {
+  display: block;
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 0.35em;
+}
+
+#ac-toast-container {
+  position: fixed; top: 1rem; right: 1rem; z-index: 9999;
+  display: flex; flex-direction: column; gap: 0.5rem; max-width: min(360px, 90vw);
+}
+.ac-toast {
+  display: flex; align-items: flex-start; gap: 0.5rem;
+  padding: 0.85em 1em; border-radius: 0.375em;
+  background: #fff; border-left: 4px solid var(--emsp-green, #147c71);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  opacity: 0; transform: translateX(1rem); transition: opacity 0.3s, transform 0.3s;
+}
+.ac-toast.is-visible { opacity: 1; transform: translateX(0); }
+.ac-toast-success { border-left-color: #27ae60; }
+.ac-toast-error { border-left-color: #c0392b; }
+.ac-toast__close { background: none; border: none; font-size: 1.25em; cursor: pointer; }
+
+.ac-skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 10000;
+  padding: 0.75em 1em; background: #264719; color: #fff;
+}
+.ac-skip-link:focus { left: 0; }
+
+.ac-back-to-top {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 1000;
+  width: 2.75rem; height: 2.75rem; border-radius: 50%; border: none;
+  background: var(--emsp-green, #147c71); color: #fff; font-size: 1.25rem;
+  cursor: pointer; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+}
+.ac-back-to-top.is-visible { opacity: 1; pointer-events: auto; }
+
+.ac-badge-alert { background: #b03a2e; color: #fff; font-weight: 700; }
+.ac-char-counter { font-size: 0.8em; color: #666; text-align: right; }

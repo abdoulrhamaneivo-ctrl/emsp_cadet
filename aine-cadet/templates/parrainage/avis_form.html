@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Retour d'expérience — {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section>
+  <header class="main">
+    <h1>Retour d'expérience</h1>
+    <p>Parrainage avec <strong>{{ partenaire.get_full_name }}</strong> (terminé)</p>
+  </header>
+
+  <div class="ac-form-section">
+    <form method="post" class="ac-form" novalidate>
+      {% csrf_token %}
+      {% include "partials/_form_fields.html" with form=form %}
+      <ul class="actions">
+        <li><button type="submit" class="button primary">Envoyer mon avis</button></li>
+        <li><a href="{% url 'parrainage:dashboard' %}" class="button">Plus tard</a></li>
+      </ul>
+    </form>
+  </div>
+</section>
+{% endblock %}

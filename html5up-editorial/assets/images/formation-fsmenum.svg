@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="700" viewBox="0 0 600 700">
+  <defs>
+    <!-- Dégradé de fond EMSP (Vert forêt profond vers Bleu marine) -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d241f" />
+      <stop offset="100%" style="stop-color:#081620" />
+    </linearGradient>
+
+    <!-- Filtre de lueur (Glow) -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <style>
+      @keyframes rotateClockwise { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @keyframes rotateCounter { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+      @keyframes pulseGlow { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.05); } }
+      @keyframes floatIllustration { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+      @keyframes slideUpCard { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+      
+      .orbit-cw { transform-origin: 300px 280px; animation: rotateClockwise 25s linear infinite; }
+      .orbit-ccw { transform-origin: 300px 280px; animation: rotateCounter 18s linear infinite; }
+      .core-glow { transform-origin: 300px 280px; animation: pulseGlow 4s infinite ease-in-out; }
+      .main-content { animation: slideUpCard 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      .floating-hub { animation: floatIllustration 5s infinite ease-in-out; }
+      .tech-network { opacity: 0.15; }
+    </style>
+  </defs>
+
+  <!-- Arrière-plan avec dégradé EMSP -->
+  <rect width="600" height="700" fill="url(#bgGrad)"/>
+
+  <!-- Réseau de fond et points technologiques -->
+  <g class="tech-network" stroke="#147c71" stroke-width="0.5" fill="none">
+    <circle cx="300" cy="280" r="180" stroke-dasharray="2 6" />
+    <circle cx="300" cy="280" r="230" stroke-dasharray="1 10" />
+    <line x1="100" y1="80" x2="200" y2="180" />
+    <line x1="500" y1="480" x2="400" y2="380" />
+    <circle cx="100" cy="80" r="2.5" fill="#ef9c00" />
+    <circle cx="500" cy="480" r="2.5" fill="#ef9c00" />
+  </g>
+
+  <!-- Zone Centrale : Le Hub du Management Numérique -->
+  <g class="floating-hub">
+    <!-- Orbites de données rotatives -->
+    <circle cx="300" cy="280" r="110" fill="none" stroke="#ffffff" stroke-width="0.5" stroke-dasharray="12 6" class="orbit-cw" />
+    <circle cx="300" cy="280" r="130" fill="none" stroke="#ef9c00" stroke-width="0.5" stroke-dasharray="6 18" class="orbit-ccw" />
+
+    <!-- Le Cœur (Core) avec lueur -->
+    <circle cx="300" cy="280" r="85" fill="rgba(255,255,255,0.03)" stroke="#ef9c00" stroke-width="1.5" class="core-glow" style="filter: url(#neonGlow);" />
+    
+    <!-- Symboles hybrides : Code, Croissance & Stratégie -->
+    <text x="300" y="272" text-anchor="middle" fill="#ef9c00" font-family="monospace" font-size="44" font-weight="bold" style="filter: url(#neonGlow);">&lt;/&gt;</text>
+    
+    <!-- Flèche de croissance (Management/Stratégie) -->
+    <path d="M280 305 H320 M290 295 L300 285 L310 295" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8" />
+    
+    <text x="300" y="322" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="10" font-weight="bold" style="letter-spacing: 2px;">STRATEGY</text>
+  </g>
+
+  <!-- Bloc de Texte Inférieur (Boîte en verre dépoli) -->
+  <g class="main-content" style="opacity: 0;">
+    <!-- Rectangle de fond "Glassmorphism" -->
+    <rect x="50" y="440" width="500" height="200" rx="20" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" />
+
+    <!-- Titre Principal -->
+    <text x="300" y="490" text-anchor="middle" fill="#ef9c00" font-family="sans-serif" font-size="38" font-weight="900" style="letter-spacing: 2px;">FS MENUM</text>
+    
+    <!-- Ligne de séparation -->
+    <rect x="250" y="505" width="100" height="2" fill="#ffffff" opacity="0.2" />
+
+    <!-- Sous-titre -->
+    <text x="300" y="540" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="18" font-weight="300">
+      Management de l'Économie Numérique
+    </text>
+
+    <!-- Badges d'Expertise (Reprenant la couleur des autres filières de l'EMSP) -->
+    <!-- Badge Turquoise (FSP/Ingénierie) -->
+    <g transform="translate(145, 575)">
+      <rect width="140" height="30" rx="15" fill="#147c71" />
+      <text x="70" y="19" text-anchor="middle" fill="white" font-family="sans-serif" font-size="11" font-weight="bold" style="letter-spacing: 0.5px;">INGÉNIERIE</text>
+    </g>
+    <!-- Badge Bleu/Orange (RegNUM/Management) -->
+    <g transform="translate(315, 575)">
+      <rect width="140" height="30" rx="15" fill="#1a5276" stroke="#ef9c00" stroke-width="1" />
+      <text x="70" y="19" text-anchor="middle" fill="white" font-family="sans-serif" font-size="11" font-weight="bold" style="letter-spacing: 0.5px;">MANAGEMENT</text>
+    </g>
+  </g>
+
+  <!-- Pied de page -->
+  <text x="300" y="680" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="13" font-weight="bold" opacity="0.4" style="letter-spacing: 1.5px;">
+    EMSP • L'EXCELLENCE À L'ÈRE DU DIGITAL
+  </text>
+</svg>

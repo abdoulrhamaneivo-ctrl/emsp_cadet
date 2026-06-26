@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ ressource.titre }} — Bibliothèque EMSP{% endblock %}
+
+{% block content %}
+<section>
+  <header class="main" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h1>{{ ressource.titre }}</h1>
+      <p>
+        <span class="ac-badge">{{ ressource.get_categorie_display }}</span>
+        {% if ressource.reserve_etudiants %}
+          <span class="ac-badge ac-badge-alert" style="margin-left: 0.5rem;">Réservé étudiants</span>
+        {% endif %}
+      </p>
+    </div>
+    {% if user.is_staff or user.role == 'admin' %}
+      <a href="/admin/bibliotheque/ressourcedocument/{{ ressource.pk }}/change/" class="button small" target="_blank">✏️ Modifier</a>
+    {% endif %}
+  </header>
+
+  {% if ressource.resume %}
+    <div class="ac-card" style="margin-bottom: 2rem; padding: 1.5rem 2rem; border-left: 4px solid var(--ac-primary-500); background: rgba(255,255,255,0.03);">
+      <p style="margin: 0; line-height: 1.8; font-size: 1.05rem;">{{ ressource.resume }}</p>
+    </div>
+  {% endif %}
+
+  <ul class="actions" style="flex-wrap: wrap; gap: 0.75rem;">
+    <li>
+      <a href="{{ ressource.url_telechargement }}" class="button primary" target="_blank" rel="noopener">
+        {% if ressource.fichier %}📄 Télécharger le PDF{% else %}🔗 Ouvrir le lien{% endif %}
+      </a>
+    </li>
+    <li>
+      <a href="{% url 'bibliotheque:liste' %}" class="button">← Retour à la bibliothèque</a>
+    </li>
+  </ul>
+</section>
+{% endblock %}

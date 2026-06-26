@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Messagerie — {{ partenaire.get_full_name }} — {{ APP_NAME }}{% endblock %}
+
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+<section>
+  <header class="main">
+    <h1>Conversation avec {{ partenaire.get_full_name }}</h1>
+    <p>
+      {% if utilisateur.est_filleul %}
+      Votre Ainé
+      {% else %}
+      Votre Cadet
+      {% endif %}
+      — accompagnement actif
+    </p>
+  </header>
+
+  <ul class="actions">
+    <li><a href="{% url 'parrainage:dashboard' %}" class="button small">Retour à mon espace</a></li>
+    <li><a href="{% url 'parrainage:rdv_proposer' parrainage.pk %}" class="button primary small">Proposer un RDV</a></li>
+  </ul>
+</section>
+
+<section>
+  <header class="major">
+    <h2>Messages</h2>
+  </header>
+
+  {# Fil de conversation avec scroll mobile-first #}
+  <div class="ac-chat-container" id="ac-chat-fil">
+    {% for msg in fil_messages %}
+    <div class="ac-chat-bubble {% if msg.expediteur_id == utilisateur.pk %}ac-chat-mine{% else %}ac-chat-theirs{% endif %}">
+      <div class="ac-chat-meta">
+        <strong>{{ msg.expediteur.get_full_name }}</strong>
+        <span>{{ msg.date_envoi|date:"d/m/Y H:i" }}</span>
+        {% if msg.expediteur_id != utilisateur.pk and not msg.lu %}
+        <span class="ac-chat-unread-dot" title="Non lu"></span>
+        {% endif %}
+      </div>
+      <p>{{ msg.contenu|linebreaksbr }}</p>
+    </div>
+    {% empty %}
+    <p class="ac-chat-empty">Aucun message pour l'instant. Lancez la conversation !</p>
+    {% endfor %}
+  </div>
+
+  {# Formulaire d'envoi (CSRF) #}
+  <div class="ac-form-section">
+    <form method="post" class="ac-form ac-chat-form" novalidate>
+    {% csrf_token %}
+    {{ form.contenu }}
+    {% if form.contenu.errors %}
+    <ul class="errorlist">{% for e in form.contenu.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+    {% endif %}
+    <ul class="actions">
+      <li><button type="submit" class="button primary">Envoyer</button></li>
+    </ul>
+    </form>
+  </div>
+</section>
+
+{% if rdv_liste %}
+<section>
+  <header class="major">
+    <h2>Rendez-vous récents</h2>
+  </header>
+  {% for rdv in rdv_liste %}
+  <div class="box ac-rdv-card">
+    <h3>{{ rdv.titre }}</h3>
+    <p>{{ rdv.date_heure|date:"d/m/Y H:i" }} — {{ rdv.lieu }}</p>
+    <p>
+      <span class="ac-badge">{{ rdv.get_statut_display }}</span>
+      {% if rdv.organisateur_id == utilisateur.pk %}
+      <em>Proposé par vous</em>
+      {% else %}
+      <em>Proposé par {{ rdv.organisateur.get_full_name }}</em>
+      {% endif %}
+    </p>
+    {% if rdv.statut == "propose" and rdv.organisateur_id != utilisateur.pk %}
+    <div class="ac-actions-row">
+      <a href="{% url 'parrainage:rdv_repondre' parrainage.pk rdv.pk 'accepter' %}" class="button primary small">Accepter</a>
+      <a href="{% url 'parrainage:rdv_repondre' parrainage.pk rdv.pk 'refuser' %}" class="button small">Refuser</a>
+      <a href="{% url 'parrainage:rdv_repondre' parrainage.pk rdv.pk 'contre-proposer' %}" class="button small">Contre-proposer</a>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Scroll automatique vers le dernier message
+  (function () {
+    var fil = document.getElementById("ac-chat-fil");
+    if (fil) {
+      fil.scrollTop = fil.scrollHeight;
+    }
+  })();
+</script>
+{% endblock %}

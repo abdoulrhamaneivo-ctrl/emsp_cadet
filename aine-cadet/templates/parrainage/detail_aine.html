@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static parrainage_extras %}
+
+{% block title %}{{ parrain.get_full_name }} — Ainé{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ac-premium.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section class="ac-premium-scope">
+  <div class="ac-brand-strip" aria-hidden="true"></div>
+
+  {# ── Hero immersif ── #}
+  <div class="ac-profile-hero" data-ac-reveal>
+    <div class="ac-profile-hero__bg" aria-hidden="true"></div>
+    {% if parrain.photo %}
+    <img src="{{ parrain.photo.url }}" alt="" class="ac-profile-hero__bg-img" aria-hidden="true" />
+    {% endif %}
+    <div class="ac-profile-hero__overlay" aria-hidden="true"></div>
+
+    <div class="ac-profile-hero__content">
+      <div class="ac-profile-hero__avatar">
+        {% if parrain.photo %}
+        <img src="{{ parrain.photo.url }}" alt="Photo de {{ parrain.get_full_name }}" class="ac-profile-hero__avatar-img" width="110" height="110" />
+        {% else %}
+        <div class="ac-profile-hero__avatar-ph" aria-hidden="true">{{ parrain|initiales }}</div>
+        {% endif %}
+      </div>
+
+      <div class="ac-profile-hero__info">
+        <h1 class="ac-profile-hero__name">{{ parrain.get_full_name }}</h1>
+        <div class="ac-profile-hero__badges">
+          <span class="ac-tag ac-tag--aine"><i class="fas fa-star" aria-hidden="true"></i> Ainé</span>
+          {% if parrain.filiere %}<span class="ac-tag ac-tag--info">{{ parrain.filiere }}</span>{% endif %}
+          {% if parrain.classe %}<span class="ac-tag ac-tag--neutral">{{ parrain.classe }}</span>{% endif %}
+        </div>
+
+        {% if parrain.profil_parrain.score_fiabilite %}
+        <div class="ac-profile-hero__score">
+          <span data-star-rating="{{ parrain.profil_parrain.score_fiabilite }}" data-star-max="5" aria-label="Score {{ parrain.profil_parrain.score_fiabilite }} sur 5"></span>
+          <span class="ac-profile-hero__score-label">{{ parrain.profil_parrain.score_fiabilite|floatformat:1 }}/5 · Score de fiabilité</span>
+        </div>
+        {% else %}
+        <p class="ac-profile-hero__score-label"><span class="ac-tag ac-tag--success">Nouveau sur la plateforme</span></p>
+        {% endif %}
+      </div>
+
+      {% if utilisateur.est_filleul %}
+      <div class="ac-profile-hero__cta">
+        <a href="{% url 'parrainage:demande_creer' parrain.pk %}" class="button primary">Demander un parrainage</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── Stats parrainage ── #}
+  <div class="ac-stats-grid" data-ac-reveal>
+    <div class="ac-stat-card">
+      <div class="ac-stat-card__icon"><i class="fas fa-user-friends" aria-hidden="true"></i></div>
+      <div class="ac-stat-card__value" data-ac-counter>{{ filleuls_actifs }}/{{ capacite_max }}</div>
+      <div class="ac-stat-card__label">Cadets accompagnés</div>
+    </div>
+    <div class="ac-stat-card">
+      <div class="ac-stat-card__icon"><i class="fas fa-door-open" aria-hidden="true"></i></div>
+      <div class="ac-stat-card__value" data-ac-counter>{{ places_restantes }}</div>
+      <div class="ac-stat-card__label">Place{{ places_restantes|pluralize }} restante{{ places_restantes|pluralize }}</div>
+    </div>
+    {% if parrain.profil_parrain.score_fiabilite %}
+    <div class="ac-stat-card">
+      <div class="ac-stat-card__icon"><i class="fas fa-award" aria-hidden="true"></i></div>
+      <div class="ac-stat-card__value" data-ac-counter>{{ parrain.profil_parrain.score_fiabilite|floatformat:1 }}</div>
+      <div class="ac-stat-card__label">Score fiabilité /5</div>
+    </div>
+    {% endif %}
+    {% if badges %}
+    <div class="ac-stat-card">
+      <div class="ac-stat-card__icon"><i class="fas fa-medal" aria-hidden="true"></i></div>
+      <div class="ac-stat-card__value" data-ac-counter>{{ badges|length }}</div>
+      <div class="ac-stat-card__label">Badge{{ badges|length|pluralize }} parcours</div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# ── Sections profil (grille bento) ── #}
+  {% if parrain.profil_parrain %}
+  <div class="ac-detail-grid">
+    {% if parrain.profil_parrain.ambitions %}
+    <article class="ac-detail-section" data-ac-reveal>
+      <header class="ac-detail-section__header">
+        <span class="ac-detail-section__icon"><i class="fas fa-rocket" aria-hidden="true"></i></span>
+        <h2 class="ac-detail-section__title">Ambitions</h2>
+      </header>
+      <p class="ac-detail-section__text">{{ parrain.profil_parrain.ambitions|linebreaksbr }}</p>
+    </article>
+    {% endif %}
+
+    {% if parrain.profil_parrain.motivations %}
+    <article class="ac-detail-section" data-ac-reveal>
+      <header class="ac-detail-section__header">
+        <span class="ac-detail-section__icon"><i class="fas fa-fire" aria-hidden="true"></i></span>
+        <h2 class="ac-detail-section__title">Motivations</h2>
+      </header>
+      <p class="ac-detail-section__text">{{ parrain.profil_parrain.motivations|linebreaksbr }}</p>
+    </article>
+    {% endif %}
+
+    {% if parrain.profil_parrain.projets %}
+    <article class="ac-detail-section" data-ac-reveal>
+      <header class="ac-detail-section__header">
+        <span class="ac-detail-section__icon"><i class="fas fa-project-diagram" aria-hidden="true"></i></span>
+        <h2 class="ac-detail-section__title">Projets en cours</h2>
+      </header>
+      <p class="ac-detail-section__text">{{ parrain.profil_parrain.projets|linebreaksbr }}</p>
+    </article>
+    {% endif %}
+
+    {% if parrain.profil_parrain.points_forts %}
+    <article class="ac-detail-section" data-ac-reveal>
+      <header class="ac-detail-section__header">
+        <span class="ac-detail-section__icon"><i class="fas fa-shield-alt" aria-hidden="true"></i></span>
+        <h2 class="ac-detail-section__title">Points forts</h2>
+      </header>
+      <p class="ac-detail-section__text">{{ parrain.profil_parrain.points_forts|linebreaksbr }}</p>
+    </article>
+    {% endif %}
+
+    {% if parrain.profil_parrain.centres_interet %}
+    <article class="ac-detail-section ac-detail-section--wide" data-ac-reveal>
+      <header class="ac-detail-section__header">
+        <span class="ac-detail-section__icon"><i class="fas fa-heart" aria-hidden="true"></i></span>
+        <h2 class="ac-detail-section__title">Centres d'intérêt</h2>
+      </header>
+      <div class="ac-interest-tags">
+        {% for tag in parrain.profil_parrain.centres_interet|split_csv %}
+        <span class="ac-interest-tag">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    </article>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── Badges parcours ── #}
+  {% if badges %}
+  <header class="major" data-ac-reveal>
+    <h2>Badges parcours</h2>
+  </header>
+  <ul class="ac-badge-list" data-ac-reveal>
+    {% for att in badges %}
+    <li>
+      <span class="ac-badge-item" title="{{ att.badge.description }}">
+        <i class="fas fa-trophy" aria-hidden="true"></i> {{ att.badge.libelle }}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  <ul class="actions" data-ac-reveal>
+    {% if utilisateur.est_filleul %}
+    <li><a href="{% url 'parrainage:demande_creer' parrain.pk %}" class="button primary">Demander un parrainage</a></li>
+    {% endif %}
+    <li><a href="{% url 'parrainage:annuaire' %}" class="button">Retour à l'annuaire</a></li>
+  </ul>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/ac-animations.js' %}"></script>
+{% endblock %}

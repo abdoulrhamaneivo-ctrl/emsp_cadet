@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Inscription - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-auth-shell ac-auth-shell--wide">
+  <div class="ac-auth-intro">
+    <p class="emsp-hero-tag">Aine & Cadet</p>
+    <h1>Creer un compte</h1>
+    <p>Choisissez votre role, renseignez votre niveau et rejoignez le programme de parrainage EMSP.</p>
+    <a href="{{ EMSP_VITRINE_URL }}/index.html" class="ac-auth-public-link">Retour au site public EMSP</a>
+  </div>
+
+  <div class="ac-form-section ac-auth-panel">
+    <form method="post" class="ac-form" novalidate>
+      {% csrf_token %}
+      {% include "partials/_form_fields.html" with form=form %}
+      <ul class="actions">
+        <li><button type="submit" class="button primary">S'inscrire</button></li>
+        <li><a href="{% url 'accounts:login' %}" class="button">Deja inscrit ?</a></li>
+      </ul>
+    </form>
+  </div>
+</section>
+{% endblock %}

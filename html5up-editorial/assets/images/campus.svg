@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#446324"/>
+      <stop offset="100%" style="stop-color:#147c71"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect x="200" y="180" width="400" height="200" rx="8" fill="rgba(255,255,255,0.15)"/>
+  <polygon points="400,120 520,180 280,180" fill="rgba(239,156,0,0.6)"/>
+  <text x="400" y="400" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="16" opacity="0.85">Campus EMSP  Abidjan</text>
+</svg>

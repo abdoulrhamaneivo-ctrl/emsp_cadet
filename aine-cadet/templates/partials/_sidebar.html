@@ -1,0 +1,64 @@
+{% load static %}
+<section id="logo-section" class="ac-logo-section">
+  <a href="{% url 'parrainage:accueil' %}" class="logo-link">
+    <img src="{% static 'images/aine-cadet-logo.svg' %}" alt="Logo {{ APP_NAME }}" />
+  </a>
+  <p class="logo-tagline">Parrainage etudiant EMSP</p>
+</section>
+
+<nav id="menu">
+  <header class="major">
+    <h2>Aine & Cadet</h2>
+  </header>
+  <ul>
+    <li><a href="{% url 'parrainage:accueil' %}">Accueil application</a></li>
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'parrainage:dashboard' %}">Mon espace</a></li>
+      <li><a href="{% url 'parrainage:annuaire' %}">Annuaire des Aines</a></li>
+      <li><a href="{% url 'parrainage:evenements_liste' %}">Evenements</a></li>
+      {% if messages_non_lus %}
+      <li>
+        <a href="{% url 'parrainage:dashboard' %}">
+          Messages
+          <span class="ac-badge ac-badge-alert">{{ messages_non_lus }}</span>
+        </a>
+      </li>
+      {% endif %}
+      <li><a href="{% url 'accounts:profil' %}">Mon profil</a></li>
+      <li>
+        <form method="post" action="{% url 'accounts:logout' %}" class="ac-menu-logout-form">
+          {% csrf_token %}
+          <button type="submit" class="ac-menu-logout-button">Deconnexion</button>
+        </form>
+      </li>
+    {% else %}
+      <li><a href="{% url 'accounts:login' %}">Connexion</a></li>
+      <li><a href="{% url 'accounts:inscription' %}">Inscription</a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+<nav class="ac-public-nav" aria-label="Site public EMSP">
+  <header class="major">
+    <h2>Site public</h2>
+  </header>
+  <ul>
+    <li><a href="{{ EMSP_VITRINE_URL }}/index.html">Accueil EMSP</a></li>
+    <li><a href="{{ EMSP_VITRINE_URL }}/formations-regnum.html">Formations</a></li>
+    <li><a href="{{ EMSP_VITRINE_URL }}/concours.html">Concours</a></li>
+    <li><a href="{{ EMSP_VITRINE_URL }}/contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<section>
+  <header class="major">
+    <h2>A propos</h2>
+  </header>
+  <p><strong>Aine</strong> = etudiant devancier parrain.<br>
+  <strong>Cadet</strong> = etudiant L1 filleul.<br>
+  Un accompagnement personnalise pour faciliter l'integration.</p>
+</section>
+
+<footer id="footer">
+  <p class="copyright">&copy; EMSP - {{ APP_NAME }}.</p>
+</footer>

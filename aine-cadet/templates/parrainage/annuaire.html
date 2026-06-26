@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% load static parrainage_extras %}
+
+{% block title %}Annuaire des Ainés — {{ APP_NAME }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ac-premium.css' %}" />
+{% endblock %}
+
+{% block content %}
+<section class="ac-premium-scope">
+  <div class="ac-brand-strip" aria-hidden="true"></div>
+  <header class="main ac-annuaire-hero" data-ac-reveal>
+    <h1>Annuaire des Ainés</h1>
+    <p>Trouvez un devancier disponible pour vous accompagner dans votre parcours EMSP.</p>
+  </header>
+
+  <div class="ac-form-section ac-form-section--wide" data-ac-reveal>
+    <form method="get" class="ac-form" data-ac-autofilter id="ac-annuaire-filtres">
+      <div class="fields">
+        <div class="field half">
+          <label for="id_filiere"><i class="fas fa-graduation-cap" aria-hidden="true"></i> {{ form.filiere.label }}</label>
+          {{ form.filiere }}
+        </div>
+        <div class="field half">
+          <label for="id_classe"><i class="fas fa-layer-group" aria-hidden="true"></i> {{ form.classe.label }}</label>
+          {{ form.classe }}
+        </div>
+        <div class="field">
+          <label for="id_q"><i class="fas fa-search" aria-hidden="true"></i> {{ form.q.label }}</label>
+          {{ form.q }}
+        </div>
+      </div>
+      <ul class="actions">
+        <li><button type="submit" class="button primary">Filtrer</button></li>
+        <li><a href="{% url 'parrainage:annuaire' %}" class="button">Réinitialiser</a></li>
+      </ul>
+    </form>
+  </div>
+</section>
+
+<section class="ac-premium-scope">
+  {% if parrains %}
+  <p class="ac-annuaire-count"><strong>{{ page_obj.paginator.count }}</strong> Ainé{{ page_obj.paginator.count|pluralize }} disponible{{ page_obj.paginator.count|pluralize }}</p>
+
+  <div class="ac-profile-grid">
+    {% for aine in parrains %}
+    <article class="ac-profile-card" data-ac-reveal style="animation-delay: {{ forloop.counter0|add:0 }}00ms">
+      <div class="ac-profile-card__banner">
+        <div class="ac-profile-card__avatar-wrap">
+          {% include "parrainage/partials/_avatar_aine.html" with user=aine %}
+        </div>
+      </div>
+
+      <div class="ac-profile-card__body">
+        <h3 class="ac-profile-card__name">{{ aine.get_full_name }}</h3>
+        <p class="ac-profile-card__meta">
+          <span class="ac-tag ac-tag--aine">Ainé</span>
+          {% if aine.filiere %}<span class="ac-tag ac-tag--info">{{ aine.filiere }}</span>{% endif %}
+          {% if aine.classe %}<span class="ac-tag ac-tag--neutral">{{ aine.classe }}</span>{% endif %}
+        </p>
+
+        {% if aine.profil_parrain.centres_interet %}
+        <p class="ac-profile-card__interests">{{ aine.profil_parrain.centres_interet|truncatechars:72 }}</p>
+        {% endif %}
+
+        <div class="ac-profile-card__score">
+          {% if aine.profil_parrain.score_fiabilite %}
+          <span class="ac-profile-card__score-stars" data-star-rating="{{ aine.profil_parrain.score_fiabilite }}" data-star-max="5" aria-label="Score {{ aine.profil_parrain.score_fiabilite }} sur 5"></span>
+          <span class="ac-profile-card__score-num">{{ aine.profil_parrain.score_fiabilite|floatformat:1 }}/5</span>
+          {% else %}
+          <span class="ac-tag ac-tag--success">Nouveau</span>
+          {% endif %}
+        </div>
+
+        <p class="ac-profile-card__meta">
+          <i class="fas fa-users" aria-hidden="true"></i>
+          {{ aine.filleuls_actifs }}/{{ capacite_max }} Cadet{{ aine.filleuls_actifs|pluralize }} actif{{ aine.filleuls_actifs|pluralize }}
+        </p>
+
+        <div class="ac-profile-card__actions">
+          <a href="{% url 'parrainage:detail_aine' aine.pk %}" class="button small">Voir le profil</a>
+          {% if utilisateur.est_filleul %}
+          <a href="{% url 'parrainage:demande_creer' aine.pk %}" class="button primary small">Demander parrainage</a>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+
+  {% include "partials/_pagination.html" with page_obj=page_obj query_string=query_string %}
+  {% else %}
+  <div class="box" data-ac-reveal>
+    <p>Aucun Ainé disponible pour le moment. Réessayez plus tard ou modifiez vos filtres.</p>
+    <ul class="actions">
+      <li><a href="{% url 'parrainage:annuaire' %}" class="button">Réinitialiser les filtres</a></li>
+    </ul>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/ac-animations.js' %}"></script>
+{% endblock %}

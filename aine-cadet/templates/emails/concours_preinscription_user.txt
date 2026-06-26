@@ -1,0 +1,12 @@
+Bonjour {{ prenom }},
+
+Votre pré-inscription au concours FS MENUM (session {{ session_annee }}) a bien été enregistrée.
+
+Parcours choisi : {{ parcours_libelle }}
+
+Prochaines étapes :
+- Constituez votre dossier complet sur la page concours
+- Surveillez votre boîte e-mail pour les convocations
+- Consultez les dates limites sur www.emsp.int/concours
+
+— EMSP / Admissions

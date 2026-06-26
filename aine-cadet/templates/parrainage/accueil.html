@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Accueil — {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-premium-scope">
+  <div class="ac-brand-strip" aria-hidden="true"></div>
+
+  <div class="ac-accueil-hero" data-ac-reveal>
+    <div class="ac-accueil-hero__content">
+      <p class="emsp-hero-tag">Intégration L1 · EMSP</p>
+      <h1 class="emsp-hero-title">Bienvenue sur <span>{{ APP_NAME }}</span></h1>
+      <p class="ac-accueil-hero__lead">La plateforme de parrainage étudiant de l'EMSP : les <strong>Ainés</strong> accompagnent les <strong>Cadets</strong> dans leur parcours.</p>
+      <ul class="actions">
+        <li><a href="{% url 'accounts:inscription' %}" class="button big primary">S'inscrire</a></li>
+        <li><a href="{% url 'accounts:login' %}" class="button big">Se connecter</a></li>
+      </ul>
+    </div>
+    <div class="ac-accueil-hero__visual" aria-hidden="true">
+      <img src="{% static 'images/aine-cadet-logo.svg' %}" alt="" width="220" height="220" />
+    </div>
+  </div>
+
+  <header class="major" data-ac-reveal>
+    <h2>Comment ça marche ?</h2>
+  </header>
+
+  <div class="ac-accueil-features" data-ac-reveal>
+    <article class="ac-accueil-feature">
+      <span class="ac-accueil-feature__icon"><i class="fas fa-user-graduate" aria-hidden="true"></i></span>
+      <h3>Cadets (L1)</h3>
+      <p>Consultez l'annuaire immersif des Ainés et envoyez une demande de parrainage en quelques clics.</p>
+    </article>
+    <article class="ac-accueil-feature">
+      <span class="ac-accueil-feature__icon"><i class="fas fa-hands-helping" aria-hidden="true"></i></span>
+      <h3>Ainés (devanciers)</h3>
+      <p>Partagez votre expérience, acceptez jusqu'à 5 Cadets et valorisez votre engagement EMSP.</p>
+    </article>
+    <article class="ac-accueil-feature">
+      <span class="ac-accueil-feature__icon"><i class="fas fa-shield-alt" aria-hidden="true"></i></span>
+      <h3>Sécurisé &amp; équitable</h3>
+      <p>Inscription réservée aux emails EMSP. Mise en relation encadrée par des règles claires.</p>
+    </article>
+  </div>
+
+  <div class="ac-accueil-cta" data-ac-reveal>
+    <span class="ac-accueil-cta__icon"><i class="fas fa-rocket" aria-hidden="true"></i></span>
+    <div>
+      <h4>Prêt à commencer ?</h4>
+      <p>Rejoignez {{ APP_NAME }} avec votre adresse email institutionnelle.</p>
+    </div>
+    <a href="{% url 'accounts:inscription' %}" class="button primary">Créer un compte</a>
+  </div>
+</section>
+{% endblock %}

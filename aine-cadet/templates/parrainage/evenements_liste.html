@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Evenements collectifs - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-hero-panel ac-reveal">
+  <span class="ac-kicker">Communaute EMSP</span>
+  <h1>Evenements collectifs</h1>
+  <p>Ateliers, revisions, rencontres Aines-Cadets et temps forts pour avancer avec le bon groupe au bon moment.</p>
+  <div class="ac-action-strip">
+    {% if peut_creer %}
+    <a href="{% url 'parrainage:evenement_creer' %}" class="button primary">Creer un evenement</a>
+    {% endif %}
+    <a href="{% url 'parrainage:dashboard' %}" class="button">Retour au tableau de bord</a>
+  </div>
+</section>
+
+{% if evenements %}
+<section>
+  <div class="ac-section-heading ac-reveal">
+    <div>
+      <h2>Prochains rendez-vous communautaires</h2>
+      <p>La premiere carte met en avant l'evenement le plus proche. Les autres restent accessibles rapidement.</p>
+    </div>
+  </div>
+
+  <div class="ac-event-board">
+    {% for evt in evenements %}
+      {% if forloop.first %}
+      <article class="ac-event-board__featured ac-reveal">
+        <span class="ac-date-pill">{{ evt.date_heure|date:"d M" }}<small>{{ evt.date_heure|date:"H:i" }}</small></span>
+        <h2>{{ evt.titre }}</h2>
+        <div class="ac-card-meta">
+          <span>{{ evt.lieu|default:"Lieu a confirmer" }}</span>
+          <span>{{ evt.organisateur.get_full_name }}</span>
+          {% if evt.pk in inscriptions_utilisateur %}<span>Inscrit</span>{% endif %}
+        </div>
+        {% if evt.description %}<p>{{ evt.description|truncatewords:34 }}</p>{% endif %}
+        {% if evt.places_max %}
+        <div class="ac-progress" aria-label="{{ evt.nb_inscrits }} inscrits sur {{ evt.places_max }}"><span style="width: {% widthratio evt.nb_inscrits evt.places_max 100 %}%"></span></div>
+        <p>{{ evt.nb_inscrits }}/{{ evt.places_max }} inscrits</p>
+        {% endif %}
+        <div class="ac-action-strip">
+          <a href="{% url 'parrainage:evenement_detail' evt.pk %}" class="button primary small">Voir la fiche</a>
+        </div>
+      </article>
+      <div class="ac-event-stack">
+      {% else %}
+      <article class="ac-event-card ac-event-card--compact ac-reveal">
+        <span class="ac-event-ribbon" aria-hidden="true"></span>
+        <span class="ac-date-pill">{{ evt.date_heure|date:"d M" }}<small>{{ evt.date_heure|date:"H:i" }}</small></span>
+        <div>
+          <h3>{{ evt.titre }}</h3>
+          <div class="ac-card-meta">
+            <span>{{ evt.lieu|default:"Lieu a confirmer" }}</span>
+            {% if evt.pk in inscriptions_utilisateur %}<span>Inscrit</span>{% endif %}
+          </div>
+          {% if evt.description %}<p>{{ evt.description|truncatewords:16 }}</p>{% endif %}
+          <a href="{% url 'parrainage:evenement_detail' evt.pk %}" class="button small">Voir</a>
+        </div>
+      </article>
+      {% endif %}
+      {% if forloop.last and not forloop.first %}</div>{% endif %}
+    {% endfor %}
+    {% if evenements|length == 1 %}<div class="ac-event-stack"><article class="ac-dashboard-card ac-reveal"><h3>Restez en veille</h3><p>Les prochains ateliers apparaitront ici des qu'ils seront publies.</p></article></div>{% endif %}
+  </div>
+</section>
+{% else %}
+<section class="ac-dashboard-card ac-reveal">
+  <h2>Aucun evenement planifie</h2>
+  <p>Revenez bientot: les ateliers et sessions collectives seront affiches ici.</p>
+  {% if peut_creer %}<a href="{% url 'parrainage:evenement_creer' %}" class="button primary small">Creer le premier evenement</a>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

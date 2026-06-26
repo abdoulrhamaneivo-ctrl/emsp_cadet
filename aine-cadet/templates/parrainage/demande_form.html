@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Demande de parrainage — {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section>
+  <header class="main">
+    <h1>Demander {{ parrain.get_full_name }} comme Ainé</h1>
+    <p>{{ parrain.filiere|default:"—" }} · {{ parrain.classe|default:"—" }}</p>
+  </header>
+
+  <div class="ac-form-section">
+    <form method="post" class="ac-form" novalidate>
+      {% csrf_token %}
+      {% include "partials/_form_fields.html" with form=form %}
+      <ul class="actions">
+        <li><button type="submit" class="button primary">Envoyer la demande</button></li>
+        <li><a href="{% url 'parrainage:detail_aine' parrain.pk %}" class="button">Annuler</a></li>
+      </ul>
+    </form>
+  </div>
+</section>
+{% endblock %}

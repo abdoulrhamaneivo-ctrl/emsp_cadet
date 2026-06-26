@@ -1,0 +1,8 @@
+{# Messages flash Django (succès, erreur, info) #}
+{% if messages %}
+<section class="ac-messages">
+  {% for message in messages %}
+  <div class="ac-alert ac-alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+</section>
+{% endif %}

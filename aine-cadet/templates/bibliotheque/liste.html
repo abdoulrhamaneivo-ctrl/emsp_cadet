@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Bibliotheque & Mediatheque - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-hero-panel">
+  <span class="ac-kicker">Ressources EMSP</span>
+  <h1>Bibliotheque & Mediatheque</h1>
+  <p>Documents pedagogiques, supports institutionnels, photos et videos officielles pour comprendre la vie de l'ecole.</p>
+  <div class="ac-action-strip">
+    {% if user.is_staff or user.role == 'admin' %}
+    <a href="/admin/bibliotheque/ressourcedocument/add/" class="button primary">Ajouter un document</a>
+    <a href="/admin/bibliotheque/mediabibliotheque/add/" class="button">Ajouter un media</a>
+    {% endif %}
+    <a href="{% url 'formations:liste' %}" class="button">Voir les formations</a>
+  </div>
+</section>
+
+{% if medias %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Mediatheque immersive</h2>
+      <p>Un carrousel horizontal pour parcourir rapidement photos, videos et temps forts EMSP.</p>
+    </div>
+  </div>
+  <div class="ac-carousel">
+    {% for m in medias %}
+    <article class="ac-media-card">
+      {% if m.type_media == 'photo' and m.fichier %}
+      <span class="image fit"><img src="{{ m.fichier.url }}" alt="{{ m.titre }}" /></span>
+      {% endif %}
+      <div class="ac-card-meta">
+        <span>{{ m.get_type_media_display }}</span>
+        <span>{{ m.date_creation|date:"d/m/Y" }}</span>
+      </div>
+      <h3>{{ m.titre }}</h3>
+      {% if m.legende %}<p>{{ m.legende|truncatewords:22 }}</p>{% endif %}
+      <div class="ac-action-strip">
+        {% if m.type_media == 'photo' and m.fichier %}
+        <a href="{{ m.fichier.url }}" target="_blank" class="button small">Afficher</a>
+        {% elif m.video_url %}
+        <a href="{{ m.video_url }}" target="_blank" class="button primary small">Regarder</a>
+        {% elif m.fichier %}
+        <a href="{{ m.fichier.url }}" target="_blank" class="button primary small">Lire</a>
+        {% endif %}
+        {% if user.is_staff or user.role == 'admin' %}
+        <a href="/admin/bibliotheque/mediabibliotheque/{{ m.pk }}/change/" target="_blank" class="button small">Modifier</a>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if reservees %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Ressources reservees aux etudiants</h2>
+      <p>Supports internes accessibles apres connexion.</p>
+    </div>
+  </div>
+  <div class="ac-media-grid">
+    {% for r in reservees %}
+    <article class="ac-media-card">
+      <div class="ac-card-meta"><span>{{ r.get_categorie_display }}</span></div>
+      <h3>{{ r.titre }}</h3>
+      <p>{{ r.resume|default:"Document disponible pour les etudiants connectes."|truncatewords:30 }}</p>
+      <a href="{{ r.get_absolute_url }}" class="button primary small">Consulter</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if publiques %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Documents publics</h2>
+      <p>Brochures et ressources consultables par tous.</p>
+    </div>
+  </div>
+  <div class="ac-media-grid">
+    {% for r in publiques %}
+    <article class="ac-media-card">
+      <div class="ac-card-meta"><span>{{ r.get_categorie_display }}</span></div>
+      <h3>{{ r.titre }}</h3>
+      <p>{{ r.resume|default:"Document public EMSP."|truncatewords:30 }}</p>
+      <a href="{{ r.get_absolute_url }}" class="button small">Consulter</a>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if not ressources and not medias %}
+<section class="ac-dashboard-card">
+  <h2>Aucune ressource disponible</h2>
+  <p>Les documents et medias seront publies ici par l'administration.</p>
+  {% if user.is_staff or user.role == 'admin' %}
+  <a href="/admin/bibliotheque/ressourcedocument/add/" class="button primary small">Ajouter la premiere ressource</a>
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

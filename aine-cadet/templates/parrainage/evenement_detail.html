@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}{{ evenement.titre }} - {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section class="ac-hero-panel">
+  <span class="ac-kicker">Evenement EMSP</span>
+  <h1>{{ evenement.titre }}</h1>
+  <p>{{ evenement.date_heure|date:"d/m/Y H:i" }} - {{ evenement.lieu|default:"Lieu a confirmer" }}. Organise par <strong>{{ evenement.organisateur.get_full_name }}</strong>.</p>
+  <div class="ac-action-strip">
+    {% if deja_inscrit %}
+    <span class="ac-badge">Vous etes inscrit</span>
+    {% elif peut_sinscrire %}
+    <form method="post" action="{% url 'parrainage:evenement_inscrire' evenement.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="button primary">S'inscrire</button>
+    </form>
+    {% endif %}
+    <a href="{% url 'parrainage:evenements_liste' %}" class="button">Retour aux evenements</a>
+  </div>
+</section>
+
+<section class="ac-feature-grid">
+  <article class="ac-feature-card ac-feature-card--highlight">
+    <h2>Programme</h2>
+    {% if evenement.description %}
+    <p>{{ evenement.description|linebreaks }}</p>
+    {% else %}
+    <p>Le detail du programme sera precise par l'organisateur.</p>
+    {% endif %}
+  </article>
+  <article class="ac-feature-card">
+    <h3>Informations pratiques</h3>
+    <ul>
+      <li>Date: {{ evenement.date_heure|date:"d/m/Y H:i" }}</li>
+      <li>Lieu: {{ evenement.lieu|default:"A confirmer" }}</li>
+      <li>Organisateur: {{ evenement.organisateur.get_full_name }}</li>
+    </ul>
+  </article>
+  <article class="ac-feature-card">
+    <h3>Places</h3>
+    {% if evenement.places_max %}
+    <p>{{ evenement.inscriptions.count }}/{{ evenement.places_max }} inscrits{% if places_restantes is not None %} - {{ places_restantes }} restante{{ places_restantes|pluralize }}{% endif %}</p>
+    <div class="ac-progress"><span style="width: {% widthratio evenement.inscriptions.count evenement.places_max 100 %}%"></span></div>
+    {% else %}
+    <p>Places non limitees.</p>
+    {% endif %}
+  </article>
+</section>
+
+{% if evenement.inscriptions.exists %}
+<section>
+  <div class="ac-section-heading">
+    <div>
+      <h2>Participants inscrits</h2>
+      <p>Les membres deja presents sur cette session.</p>
+    </div>
+  </div>
+  <div class="ac-dashboard-grid">
+    {% for ins in evenement.inscriptions.all %}
+    <article class="ac-dashboard-card">
+      <h3>{{ ins.participant.get_full_name }}</h3>
+      <p>{{ ins.participant.filiere|default:"Filiere non renseignee" }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

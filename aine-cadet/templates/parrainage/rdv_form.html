@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Rendez-vous — {{ APP_NAME }}{% endblock %}
+
+{% block content %}
+<section>
+  <header class="main">
+    <h1>{% if rdv_origine %}Contre-proposition{% else %}Proposer un rendez-vous{% endif %}</h1>
+    <p>Avec {{ partenaire.get_full_name }}</p>
+  </header>
+
+  {% if rdv_origine %}
+  <div class="box ac-form-section">
+    <p><strong>Proposition initiale :</strong> {{ rdv_origine.titre }} — {{ rdv_origine.date_heure|date:"d/m/Y H:i" }} — {{ rdv_origine.lieu }}</p>
+  </div>
+  {% endif %}
+
+  <div class="ac-form-section">
+    <form method="post" class="ac-form" novalidate>
+      {% csrf_token %}
+      {% include "partials/_form_fields.html" with form=form %}
+      <ul class="actions">
+        <li><button type="submit" class="button primary">{{ action_label }}</button></li>
+        <li><a href="{% url 'parrainage:messages' parrainage.pk %}" class="button">Annuler</a></li>
+      </ul>
+    </form>
+  </div>
+</section>
+{% endblock %}

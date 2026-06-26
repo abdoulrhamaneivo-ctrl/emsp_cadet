@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600">
+  <defs>
+    <!-- Dégradé de fond profond (Charte EMSP) -->
+    <linearGradient id="gradBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f3d38;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#081620;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Dégradé pour les éléments technologiques -->
+    <linearGradient id="techGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ef9c00;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffcc66;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Filtre de lueur (Glow) pour le style High-Tech -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <style>
+      @keyframes pulseGrid { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.35; } }
+      @keyframes floatIllustration { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+      @keyframes drawLine { from { stroke-dashoffset: 400; } to { stroke-dashoffset: 0; } }
+      @keyframes rotateClockwise { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @keyframes rotateCounter { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+      @keyframes pulseNode { 0%, 100% { r: 5; opacity: 1; } 50% { r: 9; opacity: 0.4; } }
+      @keyframes slideUpText { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+      
+      .bg-grid { animation: pulseGrid 6s infinite ease-in-out; }
+      .illustration-group { animation: floatIllustration 5s infinite ease-in-out; }
+      .data-line { stroke-dasharray: 400; stroke-dashoffset: 400; animation: drawLine 2s ease-out forwards; }
+      .spin-slow { transform-origin: 400px 200px; animation: rotateClockwise 25s linear infinite; }
+      .spin-reverse { transform-origin: 400px 200px; animation: rotateCounter 15s linear infinite; }
+      .pulse-node { animation: pulseNode 2s infinite ease-in-out; fill: #ef9c00; filter: url(#neonGlow); }
+      .text-reveal { opacity: 0; animation: slideUpText 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
+  </defs>
+
+  <!-- Fond avec dégradé -->
+  <rect width="800" height="600" fill="url(#gradBg)"/>
+  
+  <!-- Grille technologique de fond -->
+  <g class="bg-grid" stroke="#ffffff" stroke-width="0.2" opacity="0.2">
+    <path d="M0 50 H800 M0 150 H800 M0 250 H800 M0 350 H800 M0 450 H800 M0 550 H800" />
+    <path d="M50 0 V600 M150 0 V600 M250 0 V600 M350 0 V600 M450 0 V600 M550 0 V600 M650 0 V600 M750 0 V600" />
+  </g>
+
+  <!-- Groupe d'illustration flottant (Management & Technologie) -->
+  <g class="illustration-group">
+    
+    <!-- Anneau de données extérieur (Rotatif) -->
+    <circle cx="400" cy="200" r="105" fill="none" stroke="#147c71" stroke-dasharray="10 20" stroke-width="1.5" class="spin-reverse" />
+    <circle cx="400" cy="200" r="120" fill="none" stroke="#ef9c00" stroke-dasharray="40 160" stroke-width="2" class="spin-slow" style="filter: url(#neonGlow); opacity: 0.7;" />
+
+    <!-- L'ENGRENAGE CENTRAL BLUEPRINT (Management) -->
+    <g class="spin-slow">
+      <!-- Dents de l'engrenage -->
+      <rect x="392" y="140" width="16" height="120" rx="4" fill="#ffffff" opacity="0.2" />
+      <rect x="392" y="140" width="16" height="120" rx="4" fill="#ffffff" opacity="0.2" transform="rotate(45 400 200)" />
+      <rect x="392" y="140" width="16" height="120" rx="4" fill="#ffffff" opacity="0.2" transform="rotate(90 400 200)" />
+      <rect x="392" y="140" width="16" height="120" rx="4" fill="#ffffff" opacity="0.2" transform="rotate(135 400 200)" />
+      <!-- Corps de l'engrenage -->
+      <circle cx="400" cy="200" r="45" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.3" />
+      <circle cx="400" cy="200" r="35" fill="#0f3d38" stroke="#147c71" stroke-width="3" />
+      <circle cx="400" cy="200" r="12" fill="none" stroke="#ef9c00" stroke-width="2" />
+    </g>
+
+    <!-- COURBE DE CROISSANCE DE L'ÉCONOMIE (Se dessine au chargement) -->
+    <path d="M 280,260 L 340,210 L 400,235 L 460,165 L 520,130" fill="none" stroke="#ef9c00" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="data-line" style="filter: url(#neonGlow);" />
+    
+    <!-- Nœuds de connexion (Glow effect) -->
+    <circle cx="280" cy="260" r="4" fill="#ffffff" stroke="#ef9c00" stroke-width="2" />
+    <circle cx="340" cy="210" r="4" fill="#ffffff" stroke="#ef9c00" stroke-width="2" />
+    <circle cx="400" cy="235" r="4" fill="#ffffff" stroke="#ef9c00" stroke-width="2" />
+    <circle cx="460" cy="165" r="4" fill="#ffffff" stroke="#ef9c00" stroke-width="2" />
+    
+    <!-- Nœud final pulsant -->
+    <circle cx="520" cy="130" r="5" class="pulse-node" />
+  </g>
+
+  <!-- Bloc de Texte (Positionné et animé avec soin) -->
+  <g text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif">
+    
+    <!-- Acronyme principal -->
+    <text x="400" y="360" fill="#ef9c00" font-size="60" font-weight="900" letter-spacing="10" class="text-reveal" style="animation-delay: 0.2s;">
+      FS MENUM
+    </text>
+
+    <!-- Barre de séparation dégradée -->
+    <rect x="300" y="385" width="200" height="3" fill="url(#techGrad)" class="text-reveal" style="animation-delay: 0.4s;"/>
+
+    <!-- Titre Complet -->
+    <text x="400" y="430" fill="#ffffff" font-size="18" font-weight="300" letter-spacing="1" class="text-reveal" style="animation-delay: 0.6s;">
+      Formation Supérieure en <tspan font-weight="700" fill="#ffffff">Management</tspan>
+    </text>
+    
+    <text x="400" y="465" fill="#ffffff" font-size="22" font-weight="600" letter-spacing="2" class="text-reveal" style="animation-delay: 0.8s;">
+      DE L'ÉCONOMIE NUMÉRIQUE
+    </text>
+
+    <!-- Pied de page / Institution -->
+    <text x="400" y="520" fill="#ef9c00" font-size="14" font-weight="700" opacity="0.8" class="text-reveal" style="animation-delay: 1s; letter-spacing: 3px;">
+      EMSP • EXCELLENCE &amp; INNOVATION
+    </text>
+  </g>
+
+  <!-- Décoration de flux binaire en arrière-plan -->
+  <g fill="#ffffff" font-size="10" font-family="monospace" opacity="0.08">
+    <text x="60" y="80">01101</text>
+    <text x="700" y="140">10110</text>
+    <text x="80" y="480">00110</text>
+    <text x="710" y="520">11001</text>
+  </g>
+
+</svg>

@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | EMSP Admin{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/emsp-admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+<div id="site-name" class="emsp-admin-brand">
+  <a href="{% url 'admin:index' %}">
+    <span class="emsp-admin-brand__mark">E</span>
+    <span>
+      <strong>Administration EMSP</strong>
+      <small>Aine & Cadet</small>
+    </span>
+  </a>
+</div>
+{% endblock %}
+
+{% block nav-global %}
+<nav class="emsp-admin-shortcuts" aria-label="Raccourcis administration">
+  <a href="{% url 'admin:index' %}">Tableau de bord</a>
+  <a href="{% url 'parrainage:dashboard' %}">Espace app</a>
+  <a href="{{ EMSP_VITRINE_URL|default:'/index.html' }}">Site public</a>
+</nav>
+{% endblock %}

@@ -1,0 +1,9 @@
+Bonjour {{ prenom }},
+
+Votre compte {{ app_name }} a bien été créé.
+
+Connectez-vous ici : {{ site_url }}{{ login_url }}
+
+Complétez votre profil pour profiter pleinement du parrainage EMSP.
+
+— EMSP / Ainé & Cadet

@@ -1,0 +1,11 @@
+Nouvelle pré-inscription concours FS MENUM — vitrine EMSP
+
+Session : {{ session_annee }}
+Nom : {{ nom }} {{ prenom }}
+E-mail : {{ email_candidat }}
+Parcours : {{ parcours_libelle }}
+
+Motivation :
+{{ motivation }}
+
+— EMSP / Admissions
