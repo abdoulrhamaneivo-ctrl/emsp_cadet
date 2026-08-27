@@ -23,6 +23,7 @@
   --text-muted: #4a5d50;
   --border-soft: #e4dcc8;
   --border-structural: #356247;
+  --bg-input: #ffffff;
   --hover-bg: #eef0da;
   --accent-green: #0f5132;
   --accent-gold: #e9b517;
@@ -59,6 +60,7 @@ html.dark {
   --text-muted: #a8bdb0;
   --border-soft: #35543f;
   --border-structural: #48705a;
+  --bg-input: #24402f;
   --hover-bg: #24402f;
   --accent-green: #34c47c;
   --accent-gold: #f0c04a;
@@ -172,4 +174,12 @@ body::before {
     var(--emsp-gold) 8px 14px,
     var(--emsp-green-bright) 14px 22px
   );
+}
+
+/* Carrousels horizontaux : scrollbar native masquée, navigation au swipe/trackpad */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

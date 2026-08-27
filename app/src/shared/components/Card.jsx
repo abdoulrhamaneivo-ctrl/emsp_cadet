@@ -12,7 +12,7 @@ export default function Card({ interactive = false, className, children, ...prop
       whileHover={interactive ? { y: -4 } : undefined}
       transition={{ duration: 0.2 }}
       className={cx(
-        "rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] shadow-[var(--shadow-card)]",
+        "rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] shadow-[var(--shadow-card)] min-w-0",
         interactive && "cursor-pointer",
         className,
       )}

@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "sonner";
 import "@/styles/index.css";
 import App from "./App";
 
@@ -15,6 +16,7 @@ async function demarrer() {
     <StrictMode>
       <BrowserRouter>
         <App />
+        <Toaster position="top-center" richColors />
       </BrowserRouter>
     </StrictMode>,
   );
