@@ -116,3 +116,16 @@ Corrections apportées (revue vision + re-mesure overflow OK) :
 
 Rappel barre Ivo : statique = bug. Toute nouvelle page DOIT montrer : fond animé + panneaux opaques tranchants + stagger d'entrée + hover + contenu dense.
 
+### 9.2 Passe de-slop « ne doit pas paraître IA » (même jour)
+
+Audit contre les 10 signes du slop, corrections appliquées :
+- **Casse naturelle partout** : suppression du `uppercase tracking-wide` CSS sur Chip (les mocks sont en casse naturelle « Patiente »), titres d'encarts, eyebrow du hero (remplacé par `text-sm font-semibold` or), badge alumni.
+- **Déco retirée** : filet or à gauche de la citation (liseré = fausse hiérarchie), `animate-pulse` infini de la JaugeCapacite (dernière place signalée par la couleur seule), `font-black` → `font-bold` (pas de stats géantes), double `whileHover` carte (une seule animation, sur Card : ombre au hover, plus de lévitation).
+- **NavBar** : `backdrop-blur-sm` + fond 85% → fond plein `#143524` (translucide interdit, doc 19).
+- **Redondance** : « Mise en avant automatique » apparaissait 2× (span header + légende) → gardé en légende seule.
+
+**Bug trouvé et corrigé au passage** (mesuré playwright, chevauchement réel) : dans une cellule de grille, un `h-full` sur le lien de la carte consomme TOUTE la hauteur de la ligne et pousse le contenu sibling (chip IA) HORS de la cellule, par-dessus l'élément suivant. Fix : item = `flex flex-col min-w-0`, carte enveloppée dans `<div className="min-h-0 flex-1">`. Règle T2+ : jamais de `h-full` nu dans une cellule qui contient un sibling sous la carte.
+
+Leçons consignées aussi dans le skill emsp-connect-project.
+
+

@@ -10,7 +10,6 @@ import { cx } from "@shared/utils/cx";
 export default function Card({ interactive = false, accent = false, className, children, ...props }) {
   return (
     <motion.div
-      whileHover={interactive ? { y: -6 } : undefined}
       transition={{ duration: 0.2 }}
       className={cx(
         "relative overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] shadow-[var(--shadow-card)] min-w-0",
