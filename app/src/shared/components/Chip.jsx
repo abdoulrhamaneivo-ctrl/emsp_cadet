@@ -2,6 +2,7 @@ import { cx } from "@shared/utils/cx";
 
 const tons = {
   neutral: "bg-[var(--bg-panel-alt)] text-[var(--text-primary)] border border-[var(--border-soft)]",
+  goldSoft: "bg-[var(--acc-gold-soft)] text-[var(--text-primary)] border border-[var(--acc-gold-border)]",
   success: "bg-[var(--emsp-green-bright)]/12 text-[var(--accent-green)] border border-[var(--emsp-green-bright)]/40",
   gold: "bg-[var(--emsp-gold)] text-[#16281c]",
   danger: "bg-[#b42318]/10 text-[#b42318] border border-[#b42318]/30",

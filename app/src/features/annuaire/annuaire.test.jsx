@@ -36,8 +36,8 @@ describe("AnnuairePage (doc 04)", () => {
     expect(screen.queryByText(/Serge Kouadio/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Nadia Traoré/)).not.toBeInTheDocument();
 
-    // Compteur : 7 éligibles non complets
-    expect(await screen.findByText(/7 Aînés disponibles/i)).toBeInTheDocument();
+    // Compteur dans le header (stat or : nombre + libellé séparés)
+    expect(await screen.findByText(/aînés disponibles/i)).toBeInTheDocument();
   });
 
   it("le toggle « Inclure les Aînés complets » fait réapparaître l'Aîné à 5/5", async () => {

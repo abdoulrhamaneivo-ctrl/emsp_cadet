@@ -104,3 +104,15 @@ Leçons consignées (à réutiliser T2+) :
 - **Anti-overflow grille** : chaîne complète `li flex min-w-0` → `motion.div min-w-0` → carte → `line-clamp` + `break-words` (le `-webkit-box` de line-clamp impose un min-content large sinon).
 - **Dark mode** : interdiction de `bg-white` en dur dans les composants → token `--bg-input` (défini clair ET sombre dans globals.css). Chips `neutral` sur `--bg-panel-alt` (adaptatif), jamais un crème fixe.
 - **Env mocks** : `VITE_ENABLE_MOCKS=1` dans `.env.local` (jamais committé) — sans lui, MSW ne démarre pas et les appels API retombent silencieusement sur le fallback SPA (page vide sans erreur). Toute page « mystérieusement vide » en dev : vérifier MSW d'abord.
+
+### 9.1 Retouche UX « barre designer senior » (même jour — critique Ivo : « aucune ergonomie, aucun dynamisme »)
+
+Corrections apportées (revue vision + re-mesure overflow OK) :
+- **Header hero** : panneau vert profond OPAQUE + `kente-pattern` en fond + KPI compteur or (chiffre `text-4xl font-black` + libellé) — le header n'est plus une barre blanche fade.
+- **Cartes** : liseré or (`Card accent`), padding intérieur, citation en `flex-1` avec filet or (plus de creux entre tags et footer), hover-lift `whileHover={{ y: -6 }}`.
+- **Fiche** : encart CTA signature (header or + corps vert profond) + encart « Comment ça marche » (4 étapes numérotées) → la colonne droite n'est jamais vide.
+- **Suggestions** : carrousel horizontal remplacé par grille 3 colonnes (`sm:grid-cols-2 lg:grid-cols-3`) — plafond 3 suggestions (doc 04) = pleine largeur garantie, zéro bleed, zéro overflow (le bleed `-mx` du carrousel créait un débordement 1294/1280).
+- **Tests** : `whileInView` (framer-motion) exige `IntersectionObserver`, absent de jsdom → polyfill minimal dans `src/shared/test/setup.js`, sinon crash de toute la suite.
+
+Rappel barre Ivo : statique = bug. Toute nouvelle page DOIT montrer : fond animé + panneaux opaques tranchants + stagger d'entrée + hover + contenu dense.
+
