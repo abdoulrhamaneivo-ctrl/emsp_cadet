@@ -285,7 +285,7 @@ const profilsAine = {
     badges: [{ code: "RAMPE", libelle: "Premier accompagnement", dateObtention: "2025-05-14" }],
     ambitions: ["Data engineer", "Maîtriser les pipelines temps réel"],
     projets: ["Tableau de bord des flux postaux — Power BI alimenté par un ETL maison"],
-    pointsForts: ["Python & données", "Calm"],
+    pointsForts: ["Python & données", "Calme"],
     pointsFaibles: ["Réservé au premier abord"],
   },
 };

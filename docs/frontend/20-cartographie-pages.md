@@ -128,4 +128,27 @@ Audit contre les 10 signes du slop, corrections appliquées :
 
 Leçons consignées aussi dans le skill emsp-connect-project.
 
+### 9.3 Passe « qualité iPhone » (polish/artisanat — plan annoncé par l'agent, validé Ivo)
+
+Fondations créées puis déployées sur /annuaire + fiche Aîné. Palette et kente intacts.
+
+**Fondations (globals.css, index.html)**
+- Ombres two-layer complétées : `--shadow-card-hover` (la lumière s'éloigne au survol, jamais de lift) + `--shadow-pressed` (enfoncement : ombre interne venant DU HAUT — un objet descend sous le doigt, il ne s'illumine pas).
+- Typographie : Inter (UI précise) en `--font-sans` + `-0.011em` sur body ; Bricolage Grotesque réservé aux titres via `--font-display` + `font-display`. Inter ajouté à la requête Google Fonts.
+- Détails d'artisanat : sélection or (`::selection`), scrollbar fine, `prefers-reduced-motion` (fond statique, transitions coupées).
+
+**Ressorts physiques (variants.js, ScrollReveal, Button, Switch)**
+- `ressortStandard` (spring 260/30/0.9) pour toutes les apparitions ; `hoverLift`/`pulseGentle` supprimés (source unique assainie).
+- Bouton : `whileTap scale 0.97` + ombre interne au clic + spinner lucide ; support `to` (lien router stylé bouton, `motion.create`).
+- Nouveau composant `Switch.jsx` : interrupteur iOS (track 40×24, pouce à ressort 550/32) — remplace la checkbox RG3.
+
+**Désempilement de boîtes + revue vision (2 tours de correction)**
+- Barre filtres SANS panneau (les contrôles vivent sur la page), pagination sans boîte, bandeau suggestions éditorial (titre + trait, plus de 3e cartouche), panneau signature de la fiche SANS card-emboîtée (bandeau or + corps direct).
+- Jauge RG2 : segments resserrés (2×14), compteur tabular-nums, `title` explicatif, mode `surFonce` (segments verts vifs sur fond vert profond — l'ancienne version était invisible sur le panneau signature).
+- Contrastes corrigés (les textes sombres posés sur le fond vert étaient illisibles) : bandeau suggestions en crème, filtres (`Réinitialiser` en variant `ghost-fonce`, label RG3 crème), retour de fiche. Chips `rounded-full` (iOS), chip alumni unifié (text-xs, non tronqué). Noms JAMAIS tronqués (badges passés sur la ligne méta, marqués `Suggéré`).
+- Format de note toujours une décimale (4,0) ; mock « Calm »→« Calme » ; placeholder raccourci (plus de troncature) ; avatars cerclés d'un anneau rond (`rounded-full` sur le conteneur).
+- raisonIA rentrée DANS la carte (pieds de cartes alignés dans la grille).
+
+**Méthode** : captures déterministes (`scripts/shoot-iphone.mjs`, `document.fonts.ready`) revues par vision ; tout défaut constaté a été corrigé puis re-capturé. 23/23 tests (assertion « Suggérés pour toi »→« Suggestions pour toi » suivie), lint 0, build vert, overflow 0 (375/768/1280).
+
 

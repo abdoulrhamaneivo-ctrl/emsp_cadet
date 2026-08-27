@@ -3,6 +3,7 @@ import { Input } from "@shared/components/Input";
 import Select from "@shared/components/Select";
 import Chip from "@shared/components/Chip";
 import Button from "@shared/components/Button";
+import Switch from "@shared/components/Switch";
 
 const FILIERES = [
   { value: "", label: "Toutes les filières" },
@@ -23,8 +24,8 @@ const CLASSES = [
 
 /**
  * Barre filtres annuaire (doc 04 §4) — TOUJOURS visibles (desktop ET mobile),
- * liseré or, toggle RG3, chips actifs retirables. Pas d'accordéon : chaque
- * filtre est accessible en un seul geste (leçon UX T1, doc 20 §9).
+ * interrupteur iOS pour RG3, chips actifs retirables. Pas de boîte : les
+ * filtres vivent sur la page (leçon iPhone — moins d'emboîtés).
  * @param {object} filtres — { q, filiere, classe, inclureComplets }
  * @param {function} onChanger — patch des filtres
  * @param {function} onReinitialiser
@@ -45,14 +46,12 @@ export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
     <form
       role="search"
       onSubmit={(e) => e.preventDefault()}
-      className="relative overflow-hidden rounded-[var(--radius-panel)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-4 shadow-[var(--shadow-card)] md:p-5"
+      className="flex flex-col gap-3.5"
     >
-      <span className="absolute inset-x-0 top-0 h-[3px] bg-[var(--emsp-gold)]" aria-hidden="true" />
-
       <div className="grid gap-3 md:grid-cols-[1fr_220px_220px_auto] md:items-center">
         <Input
           leadingIcon={Search}
-          placeholder="Rechercher par nom, filière, classe, point fort…"
+          placeholder="Nom, filière, classe, point fort"
           value={filtres.q}
           onChange={(e) => onChanger({ q: e.target.value })}
           aria-label="Rechercher un Aîné"
@@ -70,7 +69,7 @@ export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
           onChange={(e) => onChanger({ classe: e.target.value })}
         />
         <Button
-          variant="ghost"
+          variant="ghost-fonce"
           size="sm"
           icon={RotateCcw}
           onClick={onReinitialiser}
@@ -80,34 +79,35 @@ export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
         </Button>
       </div>
 
-      <label className="mt-3 flex items-center gap-2 text-sm text-[var(--text-primary)]">
-        <input
-          type="checkbox"
-          checked={filtres.inclureComplets}
-          onChange={(e) => onChanger({ inclureComplets: e.target.checked })}
-          className="h-4 w-4 accent-[var(--accent-green)]"
-        />
-        Inclure les Aînés complets (RG3)
-      </label>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
+        <label className="flex cursor-pointer select-none items-center gap-2.5 text-sm text-[var(--emsp-cream)]">
+          <Switch
+            checked={filtres.inclureComplets}
+            onChange={(suivant) => onChanger({ inclureComplets: suivant })}
+            label="Inclure les Aînés complets (RG3)"
+          />
+          Inclure les Aînés complets (RG3)
+        </label>
 
-      {chipsActifs.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[var(--border-soft)] pt-3">
-          {chipsActifs.map((c) => (
-            <button
-              key={c.cle}
-              type="button"
-              onClick={() => retirer(c.cle)}
-              aria-label={`Retirer le filtre ${c.libelle}`}
-              className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-green-luminous)] rounded-[var(--radius-chip)]"
-            >
-              <Chip tone="neutral" className="pr-1.5">
-                {c.libelle}
-                <X size={12} aria-hidden="true" className="ml-1" />
-              </Chip>
-            </button>
-          ))}
-        </div>
-      )}
+        {chipsActifs.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            {chipsActifs.map((c) => (
+              <button
+                key={c.cle}
+                type="button"
+                onClick={() => retirer(c.cle)}
+                aria-label={`Retirer le filtre ${c.libelle}`}
+                className="group rounded-[var(--radius-chip)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-green-luminous)]"
+              >
+                <Chip tone="neutral" className="transition-colors group-hover:border-[var(--border-structural)] pr-1.5">
+                  {c.libelle}
+                  <X size={12} aria-hidden="true" className="ml-1" />
+                </Chip>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </form>
   );
 }

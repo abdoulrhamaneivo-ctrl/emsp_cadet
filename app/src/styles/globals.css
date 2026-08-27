@@ -35,6 +35,12 @@
   --shadow-card:
     0 2px 12px -2px rgba(13, 42, 24, 0.1),
     0 1px 2px -1px rgba(13, 42, 24, 0.06);
+  /* Survol : la lumière s'éloigne (ambiance grandit, lisible = plus clair) */
+  --shadow-card-hover:
+    0 8px 28px -6px rgba(13, 42, 24, 0.18),
+    0 2px 8px -2px rgba(13, 42, 24, 0.1);
+  /* Enfoncement : l'ombre vient DU HAUT, l'élément descend sous le doigt */
+  --shadow-pressed: inset 0 2px 4px rgba(13, 42, 24, 0.28);
 
   /* Rayons hiérarchisés : panel > card > chip/input */
   --radius-panel: 1rem;
@@ -46,9 +52,10 @@
   --kente-opacity: 0.22;
   --kente-color: #e9b517;
 
-  /* Polices */
-  --font-sans: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont,
+  /* Polices — Inter = précision UI, Bricolage = identité titres */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
@@ -71,6 +78,10 @@ html.dark {
   --shadow-card:
     0 2px 12px -2px rgba(0, 0, 0, 0.3),
     0 1px 2px -1px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover:
+    0 8px 28px -6px rgba(0, 0, 0, 0.45),
+    0 2px 8px -2px rgba(0, 0, 0, 0.25);
+  --shadow-pressed: inset 0 2px 4px rgba(0, 0, 0, 0.5);
 
   --kente-opacity: 0.13;
   --kente-color: #34c47c;
@@ -91,6 +102,21 @@ body {
   background-attachment: fixed;
   animation: bg-gradient 22s ease infinite;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.011em;
+}
+
+/* Sélection or — détail d'artisanat (iOS surligne, il ne bleuit pas) */
+::selection {
+  background: rgba(233, 181, 23, 0.35);
+  color: inherit;
+}
+
+/* Scrollbar fine et discrète (desktop) — le contenu respire */
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-soft) transparent;
+  }
 }
 
 /* Voile discret pour la profondeur (jamais translucide sur les panneaux) */
@@ -192,4 +218,17 @@ body::before {
 .dark {
   --acc-gold-soft: rgba(233, 181, 23, 0.16);
   --acc-gold-border: rgba(233, 181, 23, 0.5);
+}
+
+/* Mouvement réduit : fond statique, transitions coupées */
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }

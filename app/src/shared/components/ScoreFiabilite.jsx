@@ -27,7 +27,7 @@ export default function ScoreFiabilite({ score, nbAvis = 0, detail = false, fond
   const noteDemiPoint = Math.round(score * 2) / 2;
   const pleines = Math.floor(noteDemiPoint);
   const demi = noteDemiPoint - pleines === 0.5;
-  const noteAffichee = String(score).replace(".", ",");
+  const noteAffichee = score.toFixed(1).replace(".", ",");
 
   return (
     <span
