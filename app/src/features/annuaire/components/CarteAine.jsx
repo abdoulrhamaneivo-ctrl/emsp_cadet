@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Card from "@shared/components/Card";
 import Chip from "@shared/components/Chip";
@@ -56,9 +55,9 @@ export default function CarteAine({ aine }) {
         </p>
       )}
 
-      {/* Citation — bloc flex-1 stylé (filet or) : comble le creux, l'espace devient intentionnel */}
+      {/* Citation — bloc flex-1 : comble le creux, l'espace devient intentionnel */}
       <div className="mt-3 min-h-0 flex-1">
-        <p className="line-clamp-2 break-words border-l-2 border-[var(--emsp-gold)] pl-3 text-sm italic leading-relaxed text-[var(--text-primary)]/90">
+        <p className="line-clamp-2 break-words text-sm italic leading-relaxed text-[var(--text-primary)]/90">
           «&nbsp;{(aine.ambitions?.[0] ?? "Vitrine en cours de complétion.").replace(/\.$/, "")}&nbsp;…&nbsp;»
         </p>
       </div>
@@ -93,15 +92,13 @@ export default function CarteAine({ aine }) {
   }
 
   return (
-    <motion.div className="h-full min-w-0" whileHover={{ y: -6 }} transition={{ duration: 0.2 }}>
-      <Link
-        to={`/annuaire/${aine.id}`}
-        className="block h-full rounded-[var(--radius-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-green-luminous)] focus-visible:ring-offset-2"
-      >
-        <Card interactive accent className="h-full">
-          {corps}
-        </Card>
-      </Link>
-    </motion.div>
+    <Link
+      to={`/annuaire/${aine.id}`}
+      className="block h-full min-w-0 rounded-[var(--radius-card)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-green-luminous)] focus-visible:ring-offset-2"
+    >
+      <Card interactive accent className="h-full">
+        {corps}
+      </Card>
+    </Link>
   );
 }

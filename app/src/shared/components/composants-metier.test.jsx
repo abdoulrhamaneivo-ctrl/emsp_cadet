@@ -9,19 +9,19 @@ describe("JaugeCapacite (doc 03 §6.14, RG2)", () => {
     expect(screen.getByRole("img", { name: "Capacité 3 sur 5" })).toBeInTheDocument();
   });
 
-  it("à 4/5, le dernier segment pulse or (avertissement dernière place)", () => {
+  it("à 4/5, le dernier segment est signalé or (avertissement dernière place)", () => {
     const { container } = render(<JaugeCapacite actifs={4} />);
     const segments = container.firstElementChild.querySelectorAll("span[aria-hidden]");
     expect(segments).toHaveLength(5);
     expect(segments[3].className).toContain("bg-[var(--accent-green)]");
-    expect(segments[4].className).toContain("animate-pulse");
+    expect(segments[4].className).toContain("bg-[var(--accent-gold)]/25");
     expect(segments[4].className).toContain("border-[var(--accent-gold)]");
   });
 
-  it("à 2/5, aucun segment ne pulse", () => {
+  it("à 2/5, aucun segment n'est signalé or", () => {
     const { container } = render(<JaugeCapacite actifs={2} />);
     const segments = container.firstElementChild.querySelectorAll("span[aria-hidden]");
-    expect(segments[4].className).not.toContain("animate-pulse");
+    expect(segments[4].className).not.toContain("bg-[var(--accent-gold)]/25");
   });
 });
 

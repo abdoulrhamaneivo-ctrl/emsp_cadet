@@ -27,7 +27,7 @@ export default function Chip({ variant = "solid", tone = "neutral", className, c
   return (
     <span
       className={cx(
-        "inline-flex items-center gap-1 rounded-[var(--radius-chip)] px-2.5 py-1 text-xs font-medium uppercase tracking-wide",
+        "inline-flex items-center gap-1 rounded-[var(--radius-chip)] px-2.5 py-1 text-xs font-medium",
         variant === "outline" ? cx("bg-transparent border", tonsOutline[tone]) : tons[tone],
         className,
       )}

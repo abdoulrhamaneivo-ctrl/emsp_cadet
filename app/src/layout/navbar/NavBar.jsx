@@ -55,7 +55,7 @@ export default function NavBar() {
       </a>
 
       <header
-        className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#143524]/85 backdrop-blur-sm"
+        className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#143524]"
         aria-label="En-tête du site"
       >
         <div className="mx-auto w-full max-w-7xl px-5 lg:px-10">

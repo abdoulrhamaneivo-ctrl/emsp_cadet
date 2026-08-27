@@ -26,13 +26,10 @@ export default function BandeauSuggestions({ suggestions = [] }) {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Chip tone="gold">Suggérés pour toi</Chip>
-            <span className="text-xs uppercase tracking-wide text-[var(--text-muted)]">
+            <span className="text-xs text-[var(--text-muted)]">
               même filière · intérêts proches
             </span>
           </div>
-          <span className="hidden text-xs font-medium text-[var(--text-muted)] md:inline">
-            Mise en avant automatique
-          </span>
         </div>
 
         {/* Grille pleine largeur — suggestions plafonnées à 3 (doc 04), chaque
@@ -42,9 +39,13 @@ export default function BandeauSuggestions({ suggestions = [] }) {
             <motion.div
               key={s.id}
               variants={staggerItem}
-              className="min-w-0"
+              className="flex min-w-0 flex-col"
             >
-              <CarteAine aine={s} />
+              {/* Wrapper flex-1 : la carte remplit l'espace restant SANS pousser
+                  le chip hors de la cellule (sinon chevauchement avec la légende) */}
+              <div className="min-h-0 flex-1">
+                <CarteAine aine={s} />
+              </div>
               {s.raisonIA && (
                 <p className="mt-2 flex items-start gap-1.5 rounded-[var(--radius-chip)] bg-[#175cd3]/10 px-2.5 py-1.5 text-xs text-[#175cd3]">
                   <Sparkles size={13} aria-hidden="true" className="mt-0.5 shrink-0" />

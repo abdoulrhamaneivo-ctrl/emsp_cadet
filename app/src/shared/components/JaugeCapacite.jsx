@@ -28,7 +28,7 @@ export default function JaugeCapacite({ actifs = 0, total = 5, className }) {
               rempli
                 ? "bg-[var(--accent-green)] border-[var(--accent-green)]"
                 : "bg-transparent border-[var(--border-structural)]/50",
-              pulseOr && "animate-pulse bg-[var(--accent-gold)]/25 border-[var(--accent-gold)]",
+              pulseOr && "bg-[var(--accent-gold)]/25 border-[var(--accent-gold)]",
             )}
           />
         );

@@ -199,7 +199,7 @@ export default function FicheAinePage() {
           <aside>
           <Card accent className="overflow-hidden p-0">
             <div className="border-b border-[var(--emsp-gold)]/30 bg-[var(--acc-gold-soft)] px-6 py-4">
-              <h2 className="text-base font-bold uppercase tracking-wide text-[var(--text-primary)]">Parrainage</h2>
+              <h2 className="text-base font-bold text-[var(--text-primary)]">Parrainage</h2>
             </div>
             <div className="bg-[var(--emsp-green-deep)] p-6">
               <div className="flex flex-col gap-3">
@@ -283,7 +283,7 @@ export default function FicheAinePage() {
 
           {/* Encart « Comment ça marche » — la colonne droite n'est jamais vide (barre designer) */}
           <Card accent className="p-5">
-            <h3 className="text-sm font-bold uppercase tracking-wide text-[var(--text-primary)]">
+            <h3 className="text-sm font-bold text-[var(--text-primary)]">
               Comment ça marche
             </h3>
             <ol className="mt-3 flex flex-col gap-2.5">
@@ -371,7 +371,7 @@ export default function FicheAinePage() {
 function estAlumniChip(aine) {
   if (aine.niveauEtude !== "alumni") return null;
   return (
-    <span className="inline-flex items-center rounded-[var(--radius-chip)] bg-[var(--emsp-gold)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#16281c]">
+    <span className="inline-flex items-center rounded-[var(--radius-chip)] bg-[var(--emsp-gold)] px-2 py-0.5 text-[10px] font-bold text-[#16281c]">
       Alumni · Promo {aine.anneePromotion}
     </span>
   );
