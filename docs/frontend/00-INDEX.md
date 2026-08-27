@@ -21,6 +21,8 @@
 | 15 | `15-spec-parcours-academique-transitions.md` | Parcours L1→L2→L3→M1→M2, déclaration d'intention fin de cycle (Master OU Alumni), modale transition annuelle admin 3 étapes | ✅ |
 | 16 | `16-spec-exclusions-sanctions.md` | Échelle graduée avertissement→suspension→exclusion, motifs obligatoires, écran /compte-suspendu, levée et appel, effets espaces collectifs | ✅ |
 | 17 | `17-spec-ia-plateforme.md` | Règles RG12 IA responsable (l'IA propose, l'humain dispose) + 6 fonctionnalités IA priorisées avec composants/états front requis | ✅ |
+| 18 | `18-analyse-senior-plan.md` | **AUDIT SENIOR** : forces, risques R1-R5, gaps traités, décisions structurantes (tranches verticales T0→T6), points à trancher par Ivo | ✅ |
+| 19 | `19-qualite-tests-devops.md` | **GARDE-FOUS CODE** : workflow git/PR, stack tests (Vitest+RTL+MSW+Playwright), erreurs globales, sécurité front, perf budget, CI, Definition of Done | ✅ |
 
 ## Décisions produit consignées (août 2026)
 1. **Échanges étudiants** : messagerie privée RÉSERVÉE au binôme accepté (cahier §3.4 inchangé) ; l'échange passe par 3 espaces COLLECTIFS — commentaires du Fil (doc 09), discussion des événements (doc 10), groupes Famille/Cercle (doc 13).
@@ -32,6 +34,10 @@
 7. **Alumni & parcours (demande Ivo)** : fin de L3, l'étudiant CHOISIT — continuer en M1/M2 (droits L2/L3 intacts) ou passer alumni ; fin de M2 → alumni. Transition admin annuelle atomique (doc 15). Les diplômés restent membres pleins, chip « ALUMNI · Promo », auteurs des Offres (doc 14).
 8. **Exclusions graduées (RG11)** : avertissement → suspension (gel réversible) → exclusion (irréversible après appel) ; jamais automatique ; motif + contestation obligatoires (doc 16).
 9. **IA responsable (RG12)** : l'IA propose, l'humain dispose ; chats privés jamais analysés ; tout étiqueté « Généré par IA » ; opt-in strict (doc 17).
+
+## Roadmap d'exécution (doc 18 §4 — fait foi)
+**T0 Socle** (structure+tokens+shared+shells+MSW+CI) → **T1 Annuaire** → **T2 Parrainage+avis** → **T3 Communication** (WS+RDV, backend requis) → **T4 Communauté** (fil+events+groupes) → **T5 Back-office** (admin+transitions+sanctions) → **T6 IA** (IA-1 puis IA-2, extensions déjà intégrées aux specs 04/09/11/12/14).
+Chaque tranche : démo Ivo (375px+1280px) + checklist doc 03 §11 + tests doc 19 verts + merge + tag.
 
 ## Ce qui reste HORS docs (à écrire si besoin plus tard)
 - Landing page `/` marketing (spec légère seulement)

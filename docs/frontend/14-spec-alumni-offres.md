@@ -159,7 +159,12 @@ Champs zod live : Type segmented obligatoire | Titre | Entreprise | Lieu (input 
 7. Filtre/search sync URL (?type=&q=) — partage de résultat possible.
 8. Checklist design-system doc 03 §11 complète.
 
-## 10. Frontières
+## 11. EXTENSION IA — Aide à la rédaction d'offres (IA-6, doc 17 ; T6)
+
+- ComposeurOffreModal : bouton « Structurer mon offre » (Sparkles, si consentement copilot) → PanneauSuggestionsIA proposant un squelette selon le type (stage : missions/profil/modalités ; emploi : idem + avantages) — insertion par clic, étiquette IA obligatoire.
+- IA-1 s'applique aussi aux offres (modération préventive au POST).
+
+## 12. Frontières
 
 - Matching automatique offres ↔ filières/attentes : V2 (données déjà là)
 - Candidatures plateforme (CV, suivi dossier) : hors scope V1 assumé

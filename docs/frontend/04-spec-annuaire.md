@@ -198,7 +198,15 @@ interactive: motion hoverLift, click → /annuaire/:id
 
 ---
 
-## 9. Frontières de cette spec (ne PAS faire ici)
+## 9. EXTENSION IA — Matching enrichi (IA-2, doc 17 ; s'active en T6)
+
+Prévu dès maintenant dans la structure, pour ne pas retoucher la page plus tard :
+- `GET /api/parrains/suggestions/` gagne un champ optionnel `raisonIA: string|null` par résultat (ex. « Proche de tes attentes : bases de données et réseaux »).
+- BandeauSuggestions : si `raisonIA` présent → ChipIA (Sparkles, tone info) sous la carte + la raison en une ligne muted. Absent → rendu actuel inchangé.
+- Toggle consentement : si `me.preferencesIA.matchingEnrichi===false` → requête envoyée sans le flag IA (l'endpoint retombe sur le matching filière/centres d'intérêt §3.2 du cahier).
+- Le frontend ne CALCULE jamais la similarité : il affiche la raison reçue. Skeleton pendant recalcul.
+
+## 10. Frontières de cette spec (ne PAS faire ici)
 
 - Messagerie (Doc séparée, phase 2)
 - Contenu admin des fiches

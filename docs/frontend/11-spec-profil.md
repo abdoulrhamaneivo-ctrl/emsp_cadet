@@ -146,7 +146,14 @@ MODALE de bascule candidature (à l'activation OU désactivation) :
 6. Email hors domaine impossible à soumettre (live error zod).
 7. Checklist design-system doc 03 §11.
 
-## 9. Frontières
+## 9. EXTENSION IA — Copilot de rédaction (IA-3, doc 17 ; s'active en T6)
+
+- Sur les textareas attentes (cadet) et ambitions/projets (aîné) : bouton ghost-xs « M'aider à rédiger » (icône Sparkles) SI `me.preferencesIA.copilot===true` (sinon absent, jamais grisé).
+- Clic → PanneauSuggestionsIA (3 propositions courtes) → insertion = clic utilisateur explicite ; les propositions s'ajoutent, ne remplacent pas.
+- Consentement : le bouton absent est l'occasion, au premier usage du profil, d'un hint discret « L'assistant IA peut t'aider — activer dans Mes préférences » (lien ancre section préférences).
+- Échec service → dégradation silencieuse (pas de blocage du formulaire, doc 17 §4.3).
+
+## 10. Frontières
 
 - Changement de niveau FORCÉ par admin (erreur de saisie initiale) : doc 12 flux admin, hors cette page
 - Réglages notifications granulaires : phase 2+

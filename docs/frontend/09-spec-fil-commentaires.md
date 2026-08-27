@@ -149,7 +149,16 @@ Actions rate-limitées visuellement : bouton désactivé 15s après post success
 6. Règle 1 question/jour : compteur affiché quand approche limite.
 7. Checklist design-system doc 03 §11.
 
-## 9. Frontières
+## 9. EXTENSION IA — Modération préventive (IA-1, doc 17 ; s'active en T6)
+
+Prévu dans le flux de publication dès maintenant :
+- POST d'une publication/commentaire → la réponse peut contenir `moderationIA: {verdict:"ok"|"en_verification", raison?:string}`.
+- `en_verification` : la carte s'affiche avec bandeau discret or « Publication en vérification — visible pour toi seul » + toast info une fois. Elle reste modifiable/supprimable par son auteur.
+- Elle n'apparaît PAS dans le feed des autres tant que l'admin n'a pas tranché (serveur garantit).
+- La file admin (doc 12) gagne la source « Détection IA » — voir extension doc 12.
+- Aucune suppression automatique : RG12.1, l'auteur ne reçoit jamais un refus sans humain derrière.
+
+## 10. Frontières
 
 - Pas de photos/images en V1 (stockage externe phase prod) → texte pur assumé
 - Notifications push des réponses : badge nav + toast in-app V1

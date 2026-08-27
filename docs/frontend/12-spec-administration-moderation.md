@@ -142,7 +142,14 @@ src/features/admin/
 6. Les annonces officielles postées ont le chip distinctif `OFFICIEL` côté Fil (doc 09 consomme).
 7. Checklist design-system doc 03 §11.
 
-## 9. Frontières
+## 9. EXTENSION IA — Source « Détection IA » dans la file (IA-1, doc 17 ; T6)
+
+- Chaque CarteSignalement gagne une origine : `utilisateur` (existant) ou `ia` avec `{score, raison}` affichés (ChipIA + score discret).
+- Priorisation de la file : signalements IA à haute confidence en tête, mais TOUJOURS sous la décision humaine (aucun acte auto).
+- Stats admin : compteur « contenus pré-filtrés par l'IA cette semaine » (transparence).
+- Kill-switch RG12.5 : si désactivé, la source disparaît et la file redevient 100% signalements utilisateurs.
+
+## 10. Frontières
 
 - Lecture du contenu des conversations privées : NON livré V1 (intimité binôme — décision produit assumée, les signalements contiennent déjà l'extrait signalé)
 - Statistiques exportables CSV/graphes temporels : phase prod
