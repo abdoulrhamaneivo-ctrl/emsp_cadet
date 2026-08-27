@@ -17,9 +17,10 @@
 | P05 | `/reinitialiser-mot-de-passe/:uid/:token` | ResetPasswordPage | `features/auth/pages/ResetPasswordPage.jsx` | déjà codée | T0 | 🔁 à migrer |
 | P06 | `/verifier-email/:uid/:token` | VerifyEmailPage | `features/auth/pages/VerifyEmailPage.jsx` | déjà codée | T0 | 🔁 à migrer |
 | P07 | `/compte-suspendu` | CompteSuspenduPage | `features/auth/pages/CompteSuspenduPage.jsx` | **doc 16 §4** | T5 | ⬜ à construire |
-| P08 | `/health` | HealthCheck | `shared/pages/HealthCheck.jsx` | trivial | T0 | ⬜ à construire |
+| P08 | `/health` | HealthCheck | `shared/pages/HealthCheck.jsx` | trivial | T0 | ✅ fait (T0) |
 
 > ⚠️ Note d'état réel (27 août 2026) : les pages marquées 🔁 « déjà codée » existaient dans les sessions précédentes mais **ne sont PAS sur disque aujourd'hui** — le template est vierge. Elles sont donc à RECONSTRUIRE selon les docs. Traitées comme ⬜.
+> ✅ État T0 (commit 4fcd12b, tag t0-socle) : toutes les routes de la doc 02 sont posées dans `app/src/app/App.jsx` en PlaceholderPage (chip or « Page à venir » + référence spec). Un statut ne passe ✅ que pour les pages réellement construites.
 
 ## 2. Shell protégé — cœur parcours (tous les étudiants)
 
@@ -58,8 +59,8 @@
 
 | # | Route | Page | Fichier | Spec | Tranche | Statut |
 |---|---|---|---|---|---|---|
-| P25 | `*` | NotFoundPage | `shared/pages/NotFoundPage.jsx` | doc 03 EmptyState style | T0 | ⬜ à construire |
-| P26 | ErrorBoundary | ShellBoundary + FeatureBoundary | `shared/components/ErrorBoundary.jsx` | **doc 19 §4.2** | T0 | ⬜ à construire |
+| P25 | `*` | NotFoundPage | `shared/pages/NotFoundPage.jsx` | doc 03 EmptyState style | T0 | ✅ fait (T0) |
+| P26 | ErrorBoundary | ShellBoundary + FeatureBoundary | `shared/components/ErrorBoundary.jsx` | **doc 19 §4.2** | T0 | ✅ fait (T0) |
 
 ---
 
@@ -67,7 +68,7 @@
 
 | Composant | Tranche | Statut |
 |---|---|---|
-| Button, Card, Input/FormField, Avatar, Chip, Skeleton, EmptyState, Divider | **T0** (socle minimal) | ⬜ |
+| Button, Card, Input/FormField, Avatar, Chip, Skeleton, EmptyState, Divider | **T0** (socle minimal) | ✅ (commit 4fcd12b) |
 | Modal/ConfirmDialog (MUI habillé), Tabs, Pagination, Tooltip | T0/T1 | ⬜ |
 | Table, Toast (sonner), Progress | T1/T2 | ⬜ |
 | ScoreFiabilite, JaugeCapacite, BadgeVitrine, BandeauBadges | T1/T2 (docs 04/07) | ⬜ |
@@ -80,3 +81,12 @@
 - Une page passe ✅ SEULEMENT après : checklist doc 03 §11 + tests doc 19 + capture 375px/1280px + commit sur la branche de tranche.
 - Les fichiers vivent dans `src/features/<domaine>/pages/` — la carte des routes est la doc 02 §4 (source unique, ne jamais dupliquer ici).
 - La colonne Tranche renvoie à la roadmap doc 18 §4 : on construit PAR TRANCHE, pas par page isolée.
+
+---
+
+## 8. Dette issue de la revue indépendante T0 (27 août 2026 — verdict : passed, 0 souci sécurité/logique)
+
+- [ ] Tests unitaires de l'intercepteur 401 (refresh dédupliqué + replay unique) — obligatoire avant la vraie auth (T2, doc 19).
+- [ ] Garde de rôle `isAdmin` sur `/administration` et `/moderation` dans ProtectedShell — à ajouter quand les vraies pages admin arrivent (T5).
+- [ ] `authApi.session` : distinguer erreur réseau de « invité » (aujourd'hui toute erreur → null).
+- [ ] Décider du sort de `app/src/_template_pages/` avant mise en production (référence de dev uniquement, exclue du lint).
