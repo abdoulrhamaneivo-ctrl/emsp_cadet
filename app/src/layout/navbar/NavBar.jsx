@@ -75,7 +75,7 @@ export default function NavBar() {
             </div>
 
             {/* Menu desktop */}
-            <ul className="hidden lg:flex lg:flex-row gap-1 text-sm font-medium text-[var(--emsp-cream)]/80" role="list">
+            <ul className="hidden lg:flex lg:flex-row gap-1 text-sm font-medium text-[var(--emsp-cream)]/90" role="list">
               {menuData.map((item) => (
                 <li key={item.id} className="list-none">
                   <Link

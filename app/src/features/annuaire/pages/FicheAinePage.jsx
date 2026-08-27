@@ -106,7 +106,7 @@ export default function FicheAinePage() {
     <div className="flex flex-col gap-5">
       <Link
         to="/annuaire"
-        className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-[var(--emsp-cream)]/80 hover:text-[var(--emsp-cream)]"
+        className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-[var(--emsp-cream)]/90 hover:text-[var(--emsp-cream)]"
       >
         <ArrowLeft size={16} aria-hidden="true" /> Retour annuaire
       </Link>
@@ -130,7 +130,7 @@ export default function FicheAinePage() {
                 <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--emsp-cream)] lg:text-[1.75rem]">
                   {aine.prenom} {aine.nom}
                 </h1>
-                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--emsp-cream)]/80">
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--emsp-cream)]/90">
                   <span>{aine.filiere}</span>
                   <span aria-hidden="true">·</span>
                   <span>{aine.classe}</span>
@@ -204,17 +204,17 @@ export default function FicheAinePage() {
         <div className="flex flex-col gap-4 lg:sticky lg:top-24">
           <aside>
           <div className="overflow-hidden rounded-[var(--radius-panel)] shadow-[var(--shadow-panel)]">
-            <div className="bg-[var(--acc-gold-soft)] px-6 py-3.5">
-              <h2 className="text-sm font-bold text-[var(--text-primary)]">Parrainage</h2>
+            <div className="bg-[var(--emsp-gold)] px-6 py-3.5">
+              <h2 className="text-sm font-bold text-[#16281c]">Parrainage</h2>
             </div>
             <div className="bg-[var(--emsp-green-deep)] p-6">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-[var(--emsp-cream)]/80">Capacité d'accueil</span>
+                  <span className="text-sm text-[var(--emsp-cream)]/90">Capacité d'accueil</span>
                   <JaugeCapacite actifs={aine.nbCadetsActifs} surFonce />
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-[var(--emsp-cream)]/80">Fiabilité</span>
+                  <span className="text-sm text-[var(--emsp-cream)]/90">Fiabilité</span>
                   <ScoreFiabilite score={aine.scoreFiabilite} nbAvis={aine.nbAvis} fond="fonce" />
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default function FicheAinePage() {
                     >
                       Demander ce parrain
                     </Button>
-                    <p className="mt-3 text-xs text-[var(--emsp-cream)]/60">
+                    <p className="mt-3 text-xs text-[var(--emsp-cream)]/90">
                       Réponse généralement sous quelques jours.
                     </p>
                   </>
@@ -240,7 +240,7 @@ export default function FicheAinePage() {
                 {consultationAdmin && (
                   <>
                     <Chip tone="info">Consultation administrateur</Chip>
-                    <p className="mt-3 text-xs text-[var(--emsp-cream)]/60">
+                    <p className="mt-3 text-xs text-[var(--emsp-cream)]/90">
                       Les demandes de parrainage se font depuis un compte étudiant.
                     </p>
                   </>
@@ -249,7 +249,7 @@ export default function FicheAinePage() {
                 {verdict.code === "deja_engage" && (
                   <>
                     <Chip tone="success">Déjà accompagné(e)</Chip>
-                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/75">{verdict.raison}</p>
+                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/90">{verdict.raison}</p>
                     <Link
                       to="/mon-parrainage"
                       className="mt-3 inline-block text-sm font-semibold text-[var(--emsp-gold)] underline-offset-2 hover:underline"
@@ -262,7 +262,7 @@ export default function FicheAinePage() {
                 {verdict.code === "attente" && demandeEnAttente && (
                   <>
                     <Chip tone="info">Demande envoyée</Chip>
-                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/75">
+                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/90">
                       Ta demande est en attente de réponse de {demandeEnAttente.aine?.prenom ?? "l'Aîné"}.
                     </p>
                     <Button
@@ -279,7 +279,7 @@ export default function FicheAinePage() {
                 {verdict.code === "plein" && (
                   <>
                     <Chip tone="gold">Complet 5/5</Chip>
-                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/75">{verdict.raison}</p>
+                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/90">{verdict.raison}</p>
                   </>
                 )}
               </div>

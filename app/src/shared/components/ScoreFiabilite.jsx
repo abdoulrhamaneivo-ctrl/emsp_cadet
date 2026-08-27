@@ -17,7 +17,7 @@ export default function ScoreFiabilite({ score, nbAvis = 0, detail = false, fond
   if (score == null || nbAvis === 0) {
     return (
       <span
-        className={cx("inline-flex items-center text-xs", surFonce ? "text-[var(--emsp-cream)]/70" : "text-[var(--text-muted)]", className)}
+        className={cx("inline-flex items-center text-xs", surFonce ? "text-[var(--emsp-cream)]/85" : "text-[var(--text-muted)]", className)}
       >
         Pas encore noté
       </span>
@@ -47,7 +47,7 @@ export default function ScoreFiabilite({ score, nbAvis = 0, detail = false, fond
       <span className={cx("font-semibold", detail ? "text-sm" : "text-xs", surFonce ? "text-[var(--emsp-cream)]" : "text-[var(--text-primary)]")}>
         {noteAffichee}
       </span>
-      <span className={cx(detail ? "text-sm" : "text-xs", surFonce ? "text-[var(--emsp-cream)]/75" : "text-[var(--text-muted)]")}>
+      <span className={cx(detail ? "text-sm" : "text-xs", surFonce ? "text-[var(--emsp-cream)]/90" : "text-[var(--text-muted)]")}>
         ({nbAvis})
       </span>
     </span>
