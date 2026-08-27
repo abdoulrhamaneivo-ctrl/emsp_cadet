@@ -1,0 +1,29 @@
+# Dépendances & builds
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# Caches
+.vite/
+.eslintcache
+*.log
+npm-debug.log*
+
+# Environnement
+.env
+.env.local
+.env.*.local
+
+# OS / éditeur
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Sessions Hermes locales
+.hermes_sessions/
+
+# Photos brutes (210 Mo d'événements — à trier avant de versionner)
+Photos/
+
