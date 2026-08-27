@@ -25,7 +25,7 @@ Intégrer les **Alumni** comme catégorie de membres pleine plutôt qu'après-co
 | # | Hypothèse | Conséquence si fausse |
 |---|---|---|
 | H1 | L'adresse `@emsp.int` est CONSERVÉE après le diplôme → connexion inchangée (RG4 intact) | Flux d'invitation admin par email externe à créer (V2, hors périmètre front immédiat) |
-| H2 | Le passage étudiant → alumni est une action ADMIN (transition annuelle collective, doc 12) — pas d'auto-déclaration | Ajouter un mode « Je suis diplômé » demandant vérification (V2) |
+| H2 | Le passage étudiant → alumni n'intervient qu'en FIN DE CYCLE (fin L3 ou M2), via la transition admin annuelle (doc 15) où l'intention déclarée de l'étudiant (Master/Alumni) oriente la proposition — pas de sortie en cours de cursus | Si l'école veut des sorties anticipées (abandon) : flux admin séparé à cadrer |
 | H3 | Aucune route séparée « alumni » : mêmes espaces, statut rendu par chips/badges | Replier un espace alumni isolé casserait la chaîne verticale (anti-objectif) |
 
 ---
@@ -78,7 +78,7 @@ Règles dures :
 
 | Module | Effet |
 |---|---|
-| Annuaire (doc 04) | Un alumnus avec candidature OUVERTE apparaît normalement ; chip « ALUMNI · Promo {année} » sur cartes+fiche+suggestions (tag « expérience pro » dans pourquoi cette suggestion) |
+| Annuaire (doc 04) | Un alumnus avec candidature OUVERTE apparaît normalement ; chip « ALUMNI · Promo {année} » sur cartes+fiche+suggestions (tag « expérience pro » dans pourquoi cette suggestion). Les M1/M2 apparaissent avec leur chip de niveau — même traitement que L2/L3 |
 | Parrainage (docs 05/07) | Aucune différence de règles — RG8/RG9 identiques ; badges/score fiabilité fonctionnent pour lui aussi |
 | Familles/Cercles (doc 13) | Il vit selon les règles G existantes (relations actives). Inviter un alumnus HORS grand-aîné direct dans un cercle : V2 (pas de création forcée de liens morts) |
 | Profil (doc 11) | Niveau L2/L3 éligible candidature SE PROLONGE à alumni ; chip statut RO sur profil ; éditeur d'offres ajouté à ses outils |

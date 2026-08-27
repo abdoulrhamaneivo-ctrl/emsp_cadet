@@ -42,7 +42,7 @@ POST   /api/publications/                       // type="annonce_officielle" (cf
 Règles hard :
 1. Garde de route DOUBLE : côté shell (ProtectedRoute roles:["admin"]) ET redirection `/accueil` si accès direct.
 2. Toute action destructive exige ConfirmDialog avec motif texte ≥10 chars, sauf restaurer/rejeter (one-click).
-3. Changement de rôle : modale dédiée listant les conséquences automatiques (binômes en cours → que deviennent-ils ? quota ?) — l'API tranche, le front affiche le plan retourné. Transition annuelle RG10 : bouton collectif « Clôturer l'année — passer les L3 en Alumni » (récapitulatif, confirmation forte, loggé).
+3. Changement de rôle : modale dédiée listant les conséquences automatiques (binômes en cours → que deviennent-ils ? quota ?) — l'API tranche, le front affiche le plan retourné. Transition annuelle RG10+doc 15 : bouton « Clôturer l'année » ouvrant la modale 3 étapes de la doc 15 (récapitulatif promotions L1→L2→L3→M1→M2, fins de cycle L3 selon intention déclarée Master/Alumni/Indécis, M2→alumni, anomalies à corriger avant exécution, confirmation forte, log complet).
 4. Les stats se rafraîchissent au mount + bouton refresh manuel ; PAS de polling agressif (60s max).
 5. Chaque action admin est loggée serveur ; front affiche l'historique dans le panneau détaillé du signalement.
 

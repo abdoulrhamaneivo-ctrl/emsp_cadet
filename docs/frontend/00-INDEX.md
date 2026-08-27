@@ -18,6 +18,9 @@
 | 12 | `12-spec-administration-moderation.md` | Spec admin : stats KPI, binômes à risque, file signalements, comptes, changement rôle RG5 | ✅ |
 | 13 | `13-spec-groupes-famille-cercles.md` | Spec Familles (groupe auto Aîné+ses cadets, extension grand-aîné) & Cercles (groupes libres entre relations) — échange de groupe vertical, règles G1–G8 | ✅ |
 | 14 | `14-spec-alumni-offres.md` | Spec Alumni (statut, transition admin annuelle, capacités prolongées) + module Offres stage/alternance/emploi publié par alumni/admin | ✅ |
+| 15 | `15-spec-parcours-academique-transitions.md` | Parcours L1→L2→L3→M1→M2, déclaration d'intention fin de cycle (Master OU Alumni), modale transition annuelle admin 3 étapes | ✅ |
+| 16 | `16-spec-exclusions-sanctions.md` | Échelle graduée avertissement→suspension→exclusion, motifs obligatoires, écran /compte-suspendu, levée et appel, effets espaces collectifs | ✅ |
+| 17 | `17-spec-ia-plateforme.md` | Règles RG12 IA responsable (l'IA propose, l'humain dispose) + 6 fonctionnalités IA priorisées avec composants/états front requis | ✅ |
 
 ## Décisions produit consignées (août 2026)
 1. **Échanges étudiants** : messagerie privée RÉSERVÉE au binôme accepté (cahier §3.4 inchangé) ; l'échange passe par 3 espaces COLLECTIFS — commentaires du Fil (doc 09), discussion des événements (doc 10), groupes Famille/Cercle (doc 13).
@@ -26,7 +29,9 @@
 4. Lexique UI : Cadet/Aîné (jamais filleul/parrain à l'écran) ; `role` remplacé par `isAdmin` + `niveauEtude` + `candidatureAineOuverte`.
 5. Rendez-vous, avis et badges intégrés au périmètre officiel (docs 06/07).
 6. Pas d'images dans le Fil V1 (stockage externe phase prod).
-7. **Alumni (demande Ivo)** : les diplômés restent MEMBRES pleins (hypothèses H1–H3 doc 14 §2). Statut basculé par l'admin en fin de L3 ; candidature Aîné toujours disponible (chip « ALUMNI · Promo ») ; auteurs naturels des Offres /offres (5 ouvertes max).
+7. **Alumni & parcours (demande Ivo)** : fin de L3, l'étudiant CHOISIT — continuer en M1/M2 (droits L2/L3 intacts) ou passer alumni ; fin de M2 → alumni. Transition admin annuelle atomique (doc 15). Les diplômés restent membres pleins, chip « ALUMNI · Promo », auteurs des Offres (doc 14).
+8. **Exclusions graduées (RG11)** : avertissement → suspension (gel réversible) → exclusion (irréversible après appel) ; jamais automatique ; motif + contestation obligatoires (doc 16).
+9. **IA responsable (RG12)** : l'IA propose, l'humain dispose ; chats privés jamais analysés ; tout étiqueté « Généré par IA » ; opt-in strict (doc 17).
 
 ## Ce qui reste HORS docs (à écrire si besoin plus tard)
 - Landing page `/` marketing (spec légère seulement)

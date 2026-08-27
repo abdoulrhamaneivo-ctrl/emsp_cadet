@@ -119,6 +119,18 @@ Le code utilise `niveauEtude:"L1|L2|L3"`, `candidatureAineOuverte:boolean`, `isA
 - Privilège exclusif : publication des Offres stage/alternance/emploi sur `/offres` (max 5 ouvertes simultanées), lisible par tous (doc 14).
 - Hypothèses H1–H3 consignées dans doc 14 §2 — à invalider officiellement auprès de l'école si besoin.
 
+**RG11 — Sanctions graduées, humaines et contestables (doc 16).**
+- Échelle : avertissement → suspension 7/15/30 j → exclusion définitive. Motif obligatoire ≥20 chars ; notification à l'intéressé ; historique immuable.
+- Jamais automatique (l'IA flagge, doc 17 ; l'humain sanctionne). Suspension = compte gelé (binômes gelés, contenus conservés) ; exclusion = clôture binômes motif « exclusion » + contenus masqués.
+- Route publique `/compte-suspendu` (écran d'état) ; interception 423 par le shell avant tout rendu.
+
+**RG12 — IA responsable (doc 17).**
+- L'IA propose, l'humain dispose : aucune suppression/sanction automatique.
+- Conversations privées et groupes JAMAIS analysés (méta-données seules pour l'inactivité).
+- Toute sortie IA visible = étiquette « Généré par IA » ; features personnelles = opt-in strict révocable (`preferencesIA`) ; kill-switch admin global.
+
+**Parcours académique (doc 15)** : niveaux L1→L2→L3→M1→M2 ; fin de L3, l'étudiant déclare son intention (Master/Alumni/Indécis — défaut alumni ajustable) ; fin de M2 → alumni ; transition annuelle admin atomique et loggée. Les M1/M2 ont exactement les droits L2/L3 (éligibles Aîné).
+
 ---
 
 ## 4. Carte des routes définitive (source unique)
@@ -131,6 +143,7 @@ Le code utilise `niveauEtude:"L1|L2|L3"`, `candidatureAineOuverte:boolean`, `isA
 "/mot-de-passe-oublie",                       // ForgotPasswordPage ✅
 "/reinitialiser-mot-de-passe/:uid/:token",    // ResetPasswordPage ✅
 "/verifier-email/:uid/:token",                // VerifyEmailPage ✅
+"/compte-suspendu",                           // Écran d'état suspension (RG11, public)
 "/health",                                    // HealthCheck ✅
 
 // PROTÉGÉ tous rôles (ProtectedShell — sidebar/navigateur applicatif)
@@ -172,7 +185,9 @@ Badges et avis n'ONT PAS de route dédiée (cf. cahier §3.8 « affichés sur le
  * @property {string} nom
  * @property {string} email            // doit finir par @emsp.int (RG4)
  * @property {boolean} isAdmin                  // RG5 : accès administration (RO)
- * @property {"L1"|"L2"|"L3"|"alumni"} niveauEtude  // RG7/RG10 : conditionne le droit d'être Aîné
+ * @property {"L1"|"L2"|"L3"|"M1"|"M2"|"alumni"} niveauEtude  // RG7/RG10/RG-doc15 : parcours complet
+ * @property {"master"|"alumni"|"inconnu"} intentionAnneeSuivante  // déclaratif fin de cycle (doc 15)
+ * @property {{matchingEnrichi: boolean, copilot: boolean}} preferencesIA  // RG12 : opt-in strict (doc 17)
  * @property {string|null} anneePromotion           // ex "2026" — rempli à la bascule alumni
  * @property {boolean} candidatureAineOuverte   // RG8 : pilote la casquette Aîné
  * @property {string} classe           // ex: "L1", "L2 SI"

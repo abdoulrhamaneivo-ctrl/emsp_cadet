@@ -26,7 +26,7 @@ Endpoints consommés (à mocker tant que backend absent) :
 GET /api/parrains/?filiere=&classe=&q=&page=&inclureComplets=false
   → { count, results: ProfilAine[] }
     // éligibilité annuaire v2 (toutes cumulatives) :
-    //   candidatureAineOuverte===true (RG8) ET niveauEtude "L2|L3|alumni" (RG7+RG10 — un L1 n'apparaît JAMAIS)
+    //   candidatureAineOuverte===true (RG8) ET niveauEtude ∈ {L2,L3,M1,M2,alumni} (RG7+RG10+RG15 — un L1 n'apparaît JAMAIS)
     //   ET nbCadetsActifs < 5 (RG3)
 GET /api/parrains/suggestions/
   → { results: ProfilAine[] }             // max 3, même filière / intérêts proches
