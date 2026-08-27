@@ -183,3 +183,13 @@ body::before {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/* ---- Accents or (identité kente) — bandeaux et chips prioritaires ---- */
+:root {
+  --acc-gold-soft: rgba(233, 181, 23, 0.14);
+  --acc-gold-border: rgba(233, 181, 23, 0.45);
+}
+.dark {
+  --acc-gold-soft: rgba(233, 181, 23, 0.16);
+  --acc-gold-border: rgba(233, 181, 23, 0.5);
+}

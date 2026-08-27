@@ -1,11 +1,8 @@
-import { useState } from "react";
-import { Search, SlidersHorizontal, X, RotateCcw } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, RotateCcw, X } from "lucide-react";
 import { Input } from "@shared/components/Input";
 import Select from "@shared/components/Select";
 import Chip from "@shared/components/Chip";
 import Button from "@shared/components/Button";
-import { cx } from "@shared/utils/cx";
 
 const FILIERES = [
   { value: "", label: "Toutes les filières" },
@@ -25,15 +22,14 @@ const CLASSES = [
 ];
 
 /**
- * Barre filtres annuaire (doc 04 §4) — recherche + selects + toggle RG3.
- * Mobile : repliée en accordéon (doc 04 §8 critère 8). Chips actifs cliquables.
+ * Barre filtres annuaire (doc 04 §4) — TOUJOURS visibles (desktop ET mobile),
+ * liseré or, toggle RG3, chips actifs retirables. Pas d'accordéon : chaque
+ * filtre est accessible en un seul geste (leçon UX T1, doc 20 §9).
  * @param {object} filtres — { q, filiere, classe, inclureComplets }
  * @param {function} onChanger — patch des filtres
  * @param {function} onReinitialiser
  */
 export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
-  const [ouvertMobile, setOuvertMobile] = useState(false);
-
   const chipsActifs = [];
   if (filtres.q) chipsActifs.push({ cle: "q", libelle: `« ${filtres.q} »` });
   if (filtres.filiere) chipsActifs.push({ cle: "filiere", libelle: filtres.filiere });
@@ -49,31 +45,11 @@ export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
     <form
       role="search"
       onSubmit={(e) => e.preventDefault()}
-      className="rounded-[var(--radius-panel)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-4 shadow-[var(--shadow-card)] md:p-5"
+      className="relative overflow-hidden rounded-[var(--radius-panel)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-4 shadow-[var(--shadow-card)] md:p-5"
     >
-      <div className="flex items-center gap-2">
-        <div className="flex-1 md:hidden">
-          <Input
-            leadingIcon={Search}
-            placeholder="Rechercher un Aîné…"
-            value={filtres.q}
-            onChange={(e) => onChanger({ q: e.target.value })}
-            aria-label="Rechercher un Aîné"
-          />
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          icon={SlidersHorizontal}
-          className="md:hidden"
-          aria-expanded={ouvertMobile}
-          onClick={() => setOuvertMobile((v) => !v)}
-        >
-          Filtres
-        </Button>
-      </div>
+      <span className="absolute inset-x-0 top-0 h-[3px] bg-[var(--emsp-gold)]" aria-hidden="true" />
 
-      <div className={cx("mt-0 hidden gap-3 md:grid md:grid-cols-[1fr_220px_220px] md:items-center", !ouvertMobile && "md:grid")}>
+      <div className="grid gap-3 md:grid-cols-[1fr_220px_220px_auto] md:items-center">
         <Input
           leadingIcon={Search}
           placeholder="Rechercher par nom, filière, classe, point fort…"
@@ -93,53 +69,25 @@ export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
           value={filtres.classe}
           onChange={(e) => onChanger({ classe: e.target.value })}
         />
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={RotateCcw}
+          onClick={onReinitialiser}
+          className="justify-self-start md:justify-self-end"
+        >
+          Réinitialiser
+        </Button>
       </div>
 
-      <AnimatePresence initial={false}>
-        {ouvertMobile && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="overflow-hidden md:hidden"
-          >
-            <div className="mt-3 flex flex-col gap-3 border-t border-[var(--border-soft)] pt-3">
-              <Select
-                label="Filtrer par filière"
-                options={FILIERES}
-                value={filtres.filiere}
-                onChange={(e) => onChanger({ filiere: e.target.value })}
-              />
-              <Select
-                label="Filtrer par classe"
-                options={CLASSES}
-                value={filtres.classe}
-                onChange={(e) => onChanger({ classe: e.target.value })}
-              />
-              <label className="flex items-center gap-2 text-sm text-[var(--text-primary)]">
-                <input
-                  type="checkbox"
-                  checked={filtres.inclureComplets}
-                  onChange={(e) => onChanger({ inclureComplets: e.target.checked })}
-                  className="h-4 w-4 accent-[var(--accent-green)]"
-                />
-                Inclure les Aînés complets (RG3)
-              </label>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Toggle RG3 desktop */}
-      <label className="mt-3 hidden items-center gap-2 text-sm text-[var(--text-primary)] md:flex">
+      <label className="mt-3 flex items-center gap-2 text-sm text-[var(--text-primary)]">
         <input
           type="checkbox"
           checked={filtres.inclureComplets}
           onChange={(e) => onChanger({ inclureComplets: e.target.checked })}
           className="h-4 w-4 accent-[var(--accent-green)]"
         />
-        Inclure les Aînés complets
+        Inclure les Aînés complets (RG3)
       </label>
 
       {chipsActifs.length > 0 && (
@@ -158,9 +106,6 @@ export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
               </Chip>
             </button>
           ))}
-          <Button variant="ghost" size="sm" icon={RotateCcw} onClick={onReinitialiser}>
-            Réinitialiser
-          </Button>
         </div>
       )}
     </form>

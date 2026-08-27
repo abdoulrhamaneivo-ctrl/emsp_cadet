@@ -194,87 +194,118 @@ export default function FicheAinePage() {
           </Bloc>
         </div>
 
-        {/* Encart CTA sticky (doc 04 §5) */}
-        <aside className="lg:sticky lg:top-24">
-          <Card className="p-6">
-            <h2 className="text-base font-semibold text-[var(--text-primary)]">Parrainage</h2>
-            <div className="mt-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm text-[var(--text-muted)]">Capacité d'accueil</span>
-                <JaugeCapacite actifs={aine.nbCadetsActifs} />
-              </div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-sm text-[var(--text-muted)]">Fiabilité</span>
-                <ScoreFiabilite score={aine.scoreFiabilite} nbAvis={aine.nbAvis} />
-              </div>
+        {/* Encart CTA — panneau signature : header or + corps vert profond (barre designer) */}
+        <div className="flex flex-col gap-4 lg:sticky lg:top-24">
+          <aside>
+          <Card accent className="overflow-hidden p-0">
+            <div className="border-b border-[var(--emsp-gold)]/30 bg-[var(--acc-gold-soft)] px-6 py-4">
+              <h2 className="text-base font-bold uppercase tracking-wide text-[var(--text-primary)]">Parrainage</h2>
             </div>
+            <div className="bg-[var(--emsp-green-deep)] p-6">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm text-[var(--emsp-cream)]/80">Capacité d'accueil</span>
+                  <JaugeCapacite actifs={aine.nbCadetsActifs} className="[&>span:last-child]:text-[var(--emsp-cream)]/70" />
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-sm text-[var(--emsp-cream)]/80">Fiabilité</span>
+                  <ScoreFiabilite score={aine.scoreFiabilite} nbAvis={aine.nbAvis} fond="fonce" />
+                </div>
+              </div>
 
-            <div className="mt-5 border-t border-[var(--border-soft)] pt-5">
-              {verdict.code === "ok" && !consultationAdmin && (
-                <>
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    icon={Send}
-                    className="w-full"
-                    onClick={() => setModaleOuverte(true)}
-                  >
-                    Demander ce parrain
-                  </Button>
-                  <p className="mt-3 text-xs text-[var(--text-muted)]">
-                    Réponse généralement sous quelques jours.
-                  </p>
-                </>
-              )}
+              <div className="mt-5 border-t border-[var(--emsp-cream)]/15 pt-5">
+                {verdict.code === "ok" && !consultationAdmin && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      icon={Send}
+                      className="w-full"
+                      onClick={() => setModaleOuverte(true)}
+                    >
+                      Demander ce parrain
+                    </Button>
+                    <p className="mt-3 text-xs text-[var(--emsp-cream)]/60">
+                      Réponse généralement sous quelques jours.
+                    </p>
+                  </>
+                )}
 
-              {consultationAdmin && (
-                <>
-                  <Chip tone="info">Consultation administrateur</Chip>
-                  <p className="mt-3 text-xs text-[var(--text-muted)]">
-                    Les demandes de parrainage se font depuis un compte étudiant.
-                  </p>
-                </>
-              )}
+                {consultationAdmin && (
+                  <>
+                    <Chip tone="info">Consultation administrateur</Chip>
+                    <p className="mt-3 text-xs text-[var(--emsp-cream)]/60">
+                      Les demandes de parrainage se font depuis un compte étudiant.
+                    </p>
+                  </>
+                )}
 
-              {verdict.code === "deja_engage" && (
-                <>
-                  <Chip tone="success">Déjà accompagné(e)</Chip>
-                  <p className="mt-3 text-sm text-[var(--text-muted)]">{verdict.raison}</p>
-                  <Link
-                    to="/mon-parrainage"
-                    className="mt-3 inline-block text-sm font-semibold text-[var(--accent-green)] underline-offset-2 hover:underline"
-                  >
-                    Voir mon parrainage
-                  </Link>
-                </>
-              )}
+                {verdict.code === "deja_engage" && (
+                  <>
+                    <Chip tone="success">Déjà accompagné(e)</Chip>
+                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/75">{verdict.raison}</p>
+                    <Link
+                      to="/mon-parrainage"
+                      className="mt-3 inline-block text-sm font-semibold text-[var(--emsp-gold)] underline-offset-2 hover:underline"
+                    >
+                      Voir mon parrainage
+                    </Link>
+                  </>
+                )}
 
-              {verdict.code === "attente" && demandeEnAttente && (
-                <>
-                  <Chip tone="info">Demande envoyée</Chip>
-                  <p className="mt-3 text-sm text-[var(--text-muted)]">
-                    Ta demande est en attente de réponse de {demandeEnAttente.aine?.prenom ?? "l'Aîné"}.
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="mt-3 w-full"
-                    loading={annuler.isPending}
-                    onClick={() => setConfirmationAnnulation(true)}
-                  >
-                    Annuler ma demande
-                  </Button>
-                </>
-              )}
+                {verdict.code === "attente" && demandeEnAttente && (
+                  <>
+                    <Chip tone="info">Demande envoyée</Chip>
+                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/75">
+                      Ta demande est en attente de réponse de {demandeEnAttente.aine?.prenom ?? "l'Aîné"}.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="mt-3 w-full"
+                      loading={annuler.isPending}
+                      onClick={() => setConfirmationAnnulation(true)}
+                    >
+                      Annuler ma demande
+                    </Button>
+                  </>
+                )}
 
-              {verdict.code === "plein" && (
-                <>
-                  <Chip tone="gold">Complet 5/5</Chip>
-                  <p className="mt-3 text-sm text-[var(--text-muted)]">{verdict.raison}</p>
-                </>
-              )}
+                {verdict.code === "plein" && (
+                  <>
+                    <Chip tone="gold">Complet 5/5</Chip>
+                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/75">{verdict.raison}</p>
+                  </>
+                )}
+              </div>
             </div>
           </Card>
-        </aside>
+          </aside>
+
+          {/* Encart « Comment ça marche » — la colonne droite n'est jamais vide (barre designer) */}
+          <Card accent className="p-5">
+            <h3 className="text-sm font-bold uppercase tracking-wide text-[var(--text-primary)]">
+              Comment ça marche
+            </h3>
+            <ol className="mt-3 flex flex-col gap-2.5">
+              {[
+                "Choisis ton Aîné dans l'annuaire.",
+                "Envoie ta demande avec un petit message.",
+                "Il accepte, refuse ou demande plus d'infos.",
+                "Accepté : vous formez un binôme pendant 6 mois.",
+              ].map((etape, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--text-muted)]">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--acc-gold-soft)] font-mono text-[11px] font-bold text-[var(--accent-gold)]">
+                    {i + 1}
+                  </span>
+                  {etape}
+                </li>
+              ))}
+            </ol>
+            <p className="mt-3 border-t border-[var(--border-soft)] pt-3 text-xs text-[var(--text-muted)]">
+              Tu ne peux avoir qu'un seul Aîné actif à la fois (RG1).
+            </p>
+          </Card>
+        </div>
       </div>
 
       {/* Modale de demande (doc 04 §5 flux) */}

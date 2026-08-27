@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SearchX, UserCheck, AlertTriangle, ArrowRight } from "lucide-react";
-import Chip from "@shared/components/Chip";
 import Button from "@shared/components/Button";
 import EmptyState from "@shared/components/EmptyState";
 import Pagination from "@shared/components/Pagination";
@@ -80,29 +79,38 @@ export default function AnnuairePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header page — panel opaque sticky (doc 04 §4) */}
-      <header className="sticky top-0 z-10 -mx-5 -mt-6 border-b border-[var(--border-soft)] bg-[var(--bg-panel)] px-5 py-5 shadow-[var(--shadow-card)] lg:-mx-10 lg:-mt-8 lg:px-10">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] lg:text-3xl">
-              Annuaire des Aînés
-            </h1>
-            <p className="mt-1 text-sm text-[var(--text-muted)]">
-              Trouve l'Aîné qui te correspond — filière, classe, points forts.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            {data && (
-              <Chip tone="success">
-                {data.count} Aîné{data.count > 1 ? "s" : ""} disponible{data.count > 1 ? "s" : ""}
-              </Chip>
-            )}
-            <Link
-              to="/mes-demandes"
-              className="text-sm font-semibold text-[var(--accent-green)] underline-offset-2 hover:underline"
-            >
-              Mes demandes
-            </Link>
+      {/* Header page — hero vert profond opaque avec kente (doc 04 §4, barre designer) */}
+      <header className="sticky top-0 z-10 -mx-5 -mt-6 lg:-mx-10 lg:-mt-8">
+        <div className="relative overflow-hidden border-b border-[var(--emsp-gold)]/30 bg-[var(--emsp-green-deep)] px-5 py-6 shadow-[var(--shadow-panel)] lg:px-10 lg:py-7">
+          <div className="kente-pattern absolute inset-0" aria-hidden="true" />
+          <div className="relative flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--emsp-gold)]">
+                Trouve ton guide
+              </p>
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-[var(--emsp-cream)] lg:text-3xl">
+                Annuaire des Aînés
+              </h1>
+              <p className="mt-1 text-sm text-[var(--emsp-cream)]/75">
+                Filière, classe, points forts — choisis celui qui te correspond.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              {data && (
+                <span className="inline-flex items-baseline gap-2 rounded-[var(--radius-chip)] bg-[var(--acc-gold-soft)] px-4 py-2 border border-[var(--acc-gold-border)]">
+                  <span className="text-4xl font-black leading-none tabular-nums text-[var(--emsp-gold)]">{data.count}</span>
+                  <span className="text-xs font-bold uppercase tracking-wide text-[var(--emsp-cream)]">
+                    Aîné{data.count > 1 ? "s" : ""} disponible{data.count > 1 ? "s" : ""}
+                  </span>
+                </span>
+              )}
+              <Link
+                to="/mes-demandes"
+                className="text-sm font-semibold text-[var(--emsp-cream)] underline-offset-2 hover:text-[var(--emsp-gold)] hover:underline"
+              >
+                Mes demandes
+              </Link>
+            </div>
           </div>
         </div>
       </header>
@@ -158,7 +166,7 @@ export default function AnnuairePage() {
       )}
 
       {!isPending && !isError && resultats.length === 0 && (
-        <section className="rounded-[var(--radius-panel)] border border-[var(--border-soft)] bg-[var(--bg-panel)] shadow-[var(--shadow-panel)]">
+        <Card accent>
           <EmptyState
             icon={SearchX}
             title="Aucun Aîné ne correspond"
@@ -166,7 +174,7 @@ export default function AnnuairePage() {
             actionLabel="Réinitialiser les filtres"
             onAction={reinitialiser}
           />
-        </section>
+        </Card>
       )}
 
       {/* Grille résultats — stagger au premier rendu ET à chaque page/filtre */}
