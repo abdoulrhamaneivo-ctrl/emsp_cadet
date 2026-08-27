@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Card from "@shared/components/Card";
 import Chip from "@shared/components/Chip";
 import Avatar from "@shared/components/Avatar";
@@ -10,39 +10,38 @@ import { cx } from "@shared/utils/cx";
 
 /**
  * Carte Aîné de l'annuaire (doc 04 §4 anatomy, ~210px) :
- * identité + score · ambition tronquée · points forts (3 max) · jauge RG2 + lien.
- * Liseré or + hover-lift renforcé (barre designer-senior). Complète (RG3) :
- * grisée bordure dashed, chip or COMPLET, non cliquable.
+ * identité (photo cerclée de blanc) + score · ambition tronquée · points
+ * forts (3 max) · pied aligné jauge RG2 + lien. Complète (RG3) : grisée
+ * bordure dashed, chip or COMPLET, non cliquable.
  */
-export default function CarteAine({ aine }) {
+export default function CarteAine({ aine, enVedette = false, raison = null }) {
   const complet = estComplet(aine);
   const alumni = estAlumni(aine);
 
   const corps = (
     <div className="flex h-full flex-col p-5">
-      <div className="flex items-start gap-3">
+      {/* Identité — photo cerclée de blanc : détache l'avatar du fond crème.
+          Le nom n'est JAMAIS tronqué (donnée cardinale) ; les badges vivent
+          sur la ligne méta, à suite du texte tronquable (filière = secondaire). */}
+      <div className="flex items-start gap-3.5">
         <Avatar
           prenom={aine.prenom}
           nom={aine.nom}
           photoUrl={aine.photoUrl}
           id={aine.id}
           size="lg"
-          className="ring-2 ring-[var(--bg-panel-alt)]"
+          className="shadow-[0_1px_4px_rgba(13,42,24,0.18)] ring-3 ring-white"
         />
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="truncate text-lg font-semibold leading-snug text-[var(--text-primary)]">
-              {aine.prenom} {aine.nom}
-            </h3>
-            {complet ? (
-              <Chip tone="gold">Complet</Chip>
-            ) : (
-              estDernierePlace(aine) && <Chip tone="goldSoft">Dernière place</Chip>
-            )}
+          <h3 className="text-base font-semibold leading-snug text-[var(--text-primary)]">
+            {aine.prenom} {aine.nom}
+          </h3>
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-[var(--text-muted)]">
+            <span className="truncate">{aine.filiere} · {aine.classe}</span>
+            {complet && <Chip tone="gold">Complet</Chip>}
+            {!complet && estDernierePlace(aine) && <Chip tone="goldSoft">Dernière place</Chip>}
+            {enVedette && <Chip tone="info">Suggéré</Chip>}
           </div>
-          <p className="mt-0.5 truncate text-sm text-[var(--text-muted)]">
-            {aine.filiere} · {aine.classe}
-          </p>
           <div className="mt-1.5">
             <ScoreFiabilite score={aine.scoreFiabilite} nbAvis={aine.nbAvis} />
           </div>
@@ -55,12 +54,11 @@ export default function CarteAine({ aine }) {
         </p>
       )}
 
-      {/* Citation — bloc flex-1 : comble le creux, l'espace devient intentionnel */}
-      <div className="mt-3 min-h-0 flex-1">
-        <p className="line-clamp-2 break-words text-sm italic leading-relaxed text-[var(--text-primary)]/90">
-          «&nbsp;{(aine.ambitions?.[0] ?? "Vitrine en cours de complétion.").replace(/\.$/, "")}&nbsp;…&nbsp;»
-        </p>
-      </div>
+      {/* Citation — sans guillemets ni italique (signes IA) ; bloc flex-1 :
+          l'espace restant devient intentionnel, le pied reste collé en bas */}
+      <p className="mt-3 min-h-0 flex-1 line-clamp-2 break-words text-sm leading-relaxed text-[var(--text-primary)]/90">
+        {(aine.ambitions?.[0] ?? "Vitrine en cours de complétion.").replace(/[.\s]+$/, "")}…
+      </p>
 
       {(aine.pointsForts?.length ?? 0) > 0 && (
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
@@ -73,7 +71,17 @@ export default function CarteAine({ aine }) {
         </div>
       )}
 
-      <div className="mt-4 flex items-center justify-between border-t border-[var(--border-soft)] pt-3">
+      {/* Raison de la suggestion (IA-2) — DANS la carte : les pieds des cartes
+          d'une même grille restent alignés, la note ne flotte pas dessous */}
+      {raison && (
+        <p className="mt-3 flex items-start gap-1.5 rounded-[var(--radius-chip)] bg-[#175cd3]/8 px-2.5 py-1.5 text-xs leading-snug text-[#175cd3]">
+          <Sparkles size={13} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <span>{raison}</span>
+        </p>
+      )}
+
+      {/* Pied — jauge à gauche, action à droite : la carte se termine net */}
+      <div className="mt-4 flex items-center justify-between gap-2 border-t border-[var(--border-soft)] pt-3.5">
         <JaugeCapacite actifs={aine.nbCadetsActifs} />
         <span
           className={cx(

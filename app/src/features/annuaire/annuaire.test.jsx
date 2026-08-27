@@ -30,7 +30,7 @@ describe("AnnuairePage (doc 04)", () => {
 
     // Cadet libre → bandeau suggestions présent (critère 4 : suggestions seulement si libre)
     expect(await screen.findByText(/Awa Kouassi/)).toBeInTheDocument();
-    expect(await screen.findByText(/Suggérés pour toi/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Suggestions pour toi/i)).toBeInTheDocument();
 
     // RG3 : Serge 5/5 absent par défaut ; RG7 : Nadia L1 absente
     expect(screen.queryByText(/Serge Kouadio/)).not.toBeInTheDocument();

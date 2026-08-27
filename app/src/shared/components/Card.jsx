@@ -4,16 +4,19 @@ import { cx } from "@shared/utils/cx";
 /**
  * Carte contenu (doc 03 §6.2). Le contenu EST la responsabilité du caller —
  * jamais vide (principe n°4 : densité de contenu).
- * @param {boolean} interactive=false — hover-lift framer-motion + curseur pointer + ombre portée
+ * Barre qualité : au survol la lumière s'éloigne (ombre ambiante, lisible
+ * = clair), la carte ne lève jamais. Reduced motion : transition coupée.
+ * @param {boolean} interactive=false — ombre ambiante au survol + curseur pointer
  * @param {boolean} accent=false — liseré or 3px en haut (identité kente, panneaux prioritaires)
  */
 export default function Card({ interactive = false, accent = false, className, children, ...props }) {
   return (
     <motion.div
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.18 }}
       className={cx(
         "relative overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] shadow-[var(--shadow-card)] min-w-0",
-        interactive && "cursor-pointer transition-shadow duration-200 hover:shadow-lg",
+        interactive &&
+          "cursor-pointer transition-shadow duration-200 hover:shadow-[var(--shadow-card-hover)] motion-reduce:transition-none",
         accent &&
           "before:absolute before:inset-x-0 before:top-0 before:z-[1] before:h-[3px] before:bg-[var(--emsp-gold)]",
         className,

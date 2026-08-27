@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Sparkle, Rocket, Send, Info } from "lucide-react";
 import { toast } from "sonner";
-import Card from "@shared/components/Card";
 import Chip from "@shared/components/Chip";
 import Button from "@shared/components/Button";
 import Avatar from "@shared/components/Avatar";
@@ -23,9 +22,9 @@ const MAX_MESSAGE = 300;
 function Bloc({ titre, children }) {
   return (
     <ScrollReveal>
-      <section className="rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-5 shadow-[var(--shadow-card)] md:p-6">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">{titre}</h2>
-        <div className="mt-3">{children}</div>
+      <section className="rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] px-5 py-4 shadow-[var(--shadow-card)] md:px-6 md:py-5">
+        <h2 className="text-base font-semibold text-[var(--text-primary)]">{titre}</h2>
+        <div className="mt-3.5">{children}</div>
       </section>
     </ScrollReveal>
   );
@@ -107,7 +106,7 @@ export default function FicheAinePage() {
     <div className="flex flex-col gap-5">
       <Link
         to="/annuaire"
-        className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+        className="inline-flex items-center gap-1.5 self-start text-sm font-semibold text-[var(--emsp-cream)]/80 hover:text-[var(--emsp-cream)]"
       >
         <ArrowLeft size={16} aria-hidden="true" /> Retour annuaire
       </Link>
@@ -116,12 +115,19 @@ export default function FicheAinePage() {
         {/* Colonne principale */}
         <div className="flex min-w-0 flex-col gap-4">
           {/* FicheHeader — panel vert profond (doc 04 §5) */}
-          <header className="relative overflow-hidden rounded-[var(--radius-panel)] bg-[var(--emsp-green-deep)] p-6 shadow-[var(--shadow-panel)] md:p-8">
+          <header className="relative overflow-hidden rounded-[var(--radius-panel)] bg-[var(--emsp-green-deep)] px-5 py-6 shadow-[var(--shadow-panel)] md:px-8 md:py-7">
             <div className="kente-band" aria-hidden="true" />
             <div className="flex flex-wrap items-center gap-5">
-              <Avatar prenom={aine.prenom} nom={aine.nom} photoUrl={aine.photoUrl} id={aine.id} size="xl" />
+              <Avatar
+                prenom={aine.prenom}
+                nom={aine.nom}
+                photoUrl={aine.photoUrl}
+                id={aine.id}
+                size="xl"
+                className="ring-3 ring-white/90"
+              />
               <div className="min-w-0 flex-1">
-                <h1 className="text-2xl font-bold tracking-tight text-[var(--emsp-cream)] lg:text-3xl">
+                <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--emsp-cream)] lg:text-[1.75rem]">
                   {aine.prenom} {aine.nom}
                 </h1>
                 <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[var(--emsp-cream)]/80">
@@ -194,18 +200,18 @@ export default function FicheAinePage() {
           </Bloc>
         </div>
 
-        {/* Encart CTA — panneau signature : header or + corps vert profond (barre designer) */}
+        {/* Encart CTA — panneau signature : bandeau or + corps vert profond (barre designer) */}
         <div className="flex flex-col gap-4 lg:sticky lg:top-24">
           <aside>
-          <Card accent className="overflow-hidden p-0">
-            <div className="border-b border-[var(--emsp-gold)]/30 bg-[var(--acc-gold-soft)] px-6 py-4">
-              <h2 className="text-base font-bold text-[var(--text-primary)]">Parrainage</h2>
+          <div className="overflow-hidden rounded-[var(--radius-panel)] shadow-[var(--shadow-panel)]">
+            <div className="bg-[var(--acc-gold-soft)] px-6 py-3.5">
+              <h2 className="text-sm font-bold text-[var(--text-primary)]">Parrainage</h2>
             </div>
             <div className="bg-[var(--emsp-green-deep)] p-6">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-[var(--emsp-cream)]/80">Capacité d'accueil</span>
-                  <JaugeCapacite actifs={aine.nbCadetsActifs} className="[&>span:last-child]:text-[var(--emsp-cream)]/70" />
+                  <JaugeCapacite actifs={aine.nbCadetsActifs} surFonce />
                 </div>
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-sm text-[var(--emsp-cream)]/80">Fiabilité</span>
@@ -278,15 +284,15 @@ export default function FicheAinePage() {
                 )}
               </div>
             </div>
-          </Card>
+          </div>
           </aside>
 
           {/* Encart « Comment ça marche » — la colonne droite n'est jamais vide (barre designer) */}
-          <Card accent className="p-5">
+          <section className="rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-5 shadow-[var(--shadow-card)]">
             <h3 className="text-sm font-bold text-[var(--text-primary)]">
               Comment ça marche
             </h3>
-            <ol className="mt-3 flex flex-col gap-2.5">
+            <ol className="mt-3.5 flex flex-col gap-3">
               {[
                 "Choisis ton Aîné dans l'annuaire.",
                 "Envoie ta demande avec un petit message.",
@@ -294,17 +300,17 @@ export default function FicheAinePage() {
                 "Accepté : vous formez un binôme pendant 6 mois.",
               ].map((etape, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--text-muted)]">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--acc-gold-soft)] font-mono text-[11px] font-bold text-[var(--accent-gold)]">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[var(--acc-gold-soft)] font-display text-[11px] font-bold text-[var(--accent-gold)]">
                     {i + 1}
                   </span>
                   {etape}
                 </li>
               ))}
             </ol>
-            <p className="mt-3 border-t border-[var(--border-soft)] pt-3 text-xs text-[var(--text-muted)]">
+            <p className="mt-3.5 border-t border-[var(--border-soft)] pt-3.5 text-xs text-[var(--text-muted)]">
               Tu ne peux avoir qu'un seul Aîné actif à la fois (RG1).
             </p>
-          </Card>
+          </section>
         </div>
       </div>
 
@@ -371,7 +377,7 @@ export default function FicheAinePage() {
 function estAlumniChip(aine) {
   if (aine.niveauEtude !== "alumni") return null;
   return (
-    <span className="inline-flex items-center rounded-[var(--radius-chip)] bg-[var(--emsp-gold)] px-2 py-0.5 text-[10px] font-bold text-[#16281c]">
+    <span className="inline-flex items-center rounded-full bg-[var(--emsp-gold)] px-2 py-0.5 text-xs font-semibold text-[#16281c]">
       Alumni · Promo {aine.anneePromotion}
     </span>
   );

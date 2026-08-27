@@ -1,35 +1,35 @@
 /**
  * Variantes framer-motion partagées — SOURCE UNIQUE (doc 03 §7).
  * Importer ici, ne jamais redéfinir une variante locale.
+ *
+ * Barre qualité « iPhone » : des ressorts physiques, jamais des durées
+ * linéaires — l'interface répond comme un objet massif, pas comme un slide.
+ * Reduced motion est géré globalement (globals.css + motion-reduce).
  */
 
+/** Ressort standard : apparitions de contenu, entrées de listes. */
+export const ressortStandard = { type: "spring", stiffness: 260, damping: 30, mass: 0.9 };
+
 export const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
+  initial: { opacity: 0, y: 14 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 },
-  transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+  exit: { opacity: 0, y: -10 },
+  transition: ressortStandard,
 };
 
 export const staggerContainer = {
-  animate: { transition: { staggerChildren: 0.08 } },
+  animate: { transition: { staggerChildren: 0.06 } },
 };
 
 export const staggerItem = {
-  initial: { opacity: 0, y: 16 },
+  initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+  transition: ressortStandard,
 };
-
-export const hoverLift = { whileHover: { y: -4 }, transition: { duration: 0.2 } };
 
 export const pageTransition = {
-  initial: { opacity: 0, x: 24 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -24 },
-  transition: { type: "tween", duration: 0.3, ease: "anticipate" },
-};
-
-export const pulseGentle = {
-  animate: { scale: [1, 1.03, 1] },
-  transition: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+  initial: { opacity: 0, y: 10 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+  transition: { duration: 0.22, ease: [0.25, 0.8, 0.3, 1] },
 };

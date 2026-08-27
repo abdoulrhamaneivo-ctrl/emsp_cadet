@@ -49,7 +49,7 @@ export default function ScrollReveal({
       initial={depart}
       whileInView={arrivee}
       viewport={{ once, margin: "-80px" }}
-      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94], delay }}
+      transition={{ type: "spring", stiffness: 260, damping: 30, mass: 0.9, delay }}
       className={className}
       {...rest}
     >

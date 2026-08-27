@@ -14,7 +14,7 @@ export default function Avatar({ prenom = "", nom = "", photoUrl, id, size = "md
   const initiales = `${prenom.charAt(0)}${nom.charAt(0)}`.toUpperCase() || "?";
 
   return (
-    <span className={cx("relative inline-block shrink-0", className)} style={{ width: px, height: px }}>
+    <span className={cx("relative inline-block shrink-0 rounded-full", className)} style={{ width: px, height: px }}>
       {photoUrl ? (
         <img
           src={photoUrl}

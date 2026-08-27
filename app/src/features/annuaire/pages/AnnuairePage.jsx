@@ -6,7 +6,7 @@ import Button from "@shared/components/Button";
 import EmptyState from "@shared/components/EmptyState";
 import Pagination from "@shared/components/Pagination";
 import { SkeletonCard } from "@shared/components/Skeleton";
-import { staggerContainer } from "@shared/motion/variants";
+import { staggerContainer, ressortStandard } from "@shared/motion/variants";
 import { useDebounce } from "@shared/hooks/useDebounce";
 import CarteAine from "../components/CarteAine";
 import BandeauSuggestions from "../components/BandeauSuggestions";
@@ -81,14 +81,14 @@ export default function AnnuairePage() {
     <div className="flex flex-col gap-6">
       {/* Header page — hero vert profond opaque avec kente (doc 04 §4, barre designer) */}
       <header className="sticky top-0 z-10 -mx-5 -mt-6 lg:-mx-10 lg:-mt-8">
-        <div className="relative overflow-hidden border-b border-[var(--emsp-gold)]/30 bg-[var(--emsp-green-deep)] px-5 py-6 shadow-[var(--shadow-panel)] lg:px-10 lg:py-7">
+        <div className="relative overflow-hidden border-b border-white/8 bg-[var(--emsp-green-deep)] px-5 py-7 lg:px-10 lg:py-8">
           <div className="kente-pattern absolute inset-0" aria-hidden="true" />
           <div className="relative flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-[var(--emsp-gold)]">
+              <p className="font-display text-sm font-semibold text-[var(--emsp-gold)]">
                 Trouve ton guide
               </p>
-              <h1 className="mt-1 text-2xl font-bold tracking-tight text-[var(--emsp-cream)] lg:text-3xl">
+              <h1 className="font-display mt-1 text-2xl font-bold tracking-tight text-[var(--emsp-cream)] lg:text-[1.75rem]">
                 Annuaire des Aînés
               </h1>
               <p className="mt-1 text-sm text-[var(--emsp-cream)]/75">
@@ -97,34 +97,43 @@ export default function AnnuairePage() {
             </div>
             <div className="flex items-center gap-3">
               {data && (
-                <span className="inline-flex items-baseline gap-2 rounded-[var(--radius-chip)] bg-[var(--acc-gold-soft)] px-4 py-2 border border-[var(--acc-gold-border)]">
-                  <span className="text-3xl font-bold leading-none tabular-nums text-[var(--emsp-gold)]">{data.count}</span>
-                  <span className="text-xs font-semibold text-[var(--emsp-cream)]">
+                <span
+                  className="inline-flex items-center rounded-[var(--radius-chip)] bg-[var(--emsp-cream)] py-1.5 pl-3.5 pr-4"
+                  title="Aînés avec au moins une place disponible"
+                >
+                  <span className="text-2xl font-semibold leading-none tabular-nums text-[var(--accent-green)]">
+                    {data.count}
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    className="mx-2.5 self-stretch w-px bg-[var(--border-soft)]"
+                  />
+                  <span className="max-w-[7rem] text-[11px] font-medium leading-tight text-[var(--text-muted)]">
                     Aîné{data.count > 1 ? "s" : ""} disponible{data.count > 1 ? "s" : ""}
                   </span>
                 </span>
               )}
-              <Link
-                to="/mes-demandes"
-                className="text-sm font-semibold text-[var(--emsp-cream)] underline-offset-2 hover:text-[var(--emsp-gold)] hover:underline"
-              >
+              <Button variant="ghost-fonce" size="sm" to="/mes-demandes">
                 Mes demandes
-              </Link>
+              </Button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* RG1 : cadet déjà engagé → encart vert à la place des suggestions */}
+      {/* RG1 : cadet déjà engagé → encart calme (identité de contenu, pas d'alerte) */}
       {engageRG1 && (
         <motion.section
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-panel)] border border-[var(--emsp-green-bright)]/40 bg-[var(--emsp-green-bright)]/12 p-5"
+          transition={ressortStandard}
+          className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-4 shadow-[var(--shadow-card)] sm:p-5"
           aria-label="Parrainage en cours"
         >
           <div className="flex items-center gap-3">
-            <UserCheck size={22} aria-hidden="true" className="text-[var(--accent-green)]" />
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--acc-gold-soft)]">
+              <UserCheck size={20} aria-hidden="true" className="text-[var(--accent-gold)]" />
+            </span>
             <div>
               <p className="font-semibold text-[var(--text-primary)]">Tu es accompagné(e)</p>
               <p className="text-sm text-[var(--text-muted)]">
@@ -148,8 +157,10 @@ export default function AnnuairePage() {
 
       {/* États serveur (doc 03 §9) */}
       {isError && (
-        <section className="rounded-[var(--radius-panel)] border border-[#b42318]/30 bg-[#b42318]/10 p-6 text-center">
-          <AlertTriangle size={24} aria-hidden="true" className="mx-auto mb-2 text-[#b42318]" />
+        <section className="flex flex-col items-center rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-6 text-center shadow-[var(--shadow-card)]">
+          <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#b42318]/10">
+            <AlertTriangle size={22} aria-hidden="true" className="text-[#b42318]" />
+          </span>
           <p className="font-semibold text-[var(--text-primary)]">Impossible de charger l'annuaire.</p>
           <Button variant="outline" className="mt-3" onClick={() => refetch()}>
             Réessayer
@@ -158,7 +169,7 @@ export default function AnnuairePage() {
       )}
 
       {isPending && (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
           {Array.from({ length: 9 }, (_, i) => (
             <SkeletonCard key={i} />
           ))}
@@ -187,7 +198,7 @@ export default function AnnuairePage() {
               initial="initial"
               animate="animate"
               exit={{ opacity: 0, transition: { duration: 0.12 } }}
-              className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+              className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
             >
               {resultats.map((aine) => (
                 <li key={aine.id} className="flex min-w-0">
@@ -197,7 +208,8 @@ export default function AnnuairePage() {
             </motion.ul>
           </AnimatePresence>
 
-          <nav className="rounded-[var(--radius-panel)] border border-[var(--border-soft)] bg-[var(--bg-panel)] px-4 py-4 shadow-[var(--shadow-card)]">
+          {/* Pagination — en volume, sans boîte : le geste porte le contenu */}
+          <nav className="pt-1">
             <Pagination
               page={filtres.page}
               pageCount={data?.totalPages ?? 1}
