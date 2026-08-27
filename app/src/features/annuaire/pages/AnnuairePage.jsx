@@ -91,7 +91,7 @@ export default function AnnuairePage() {
               <h1 className="font-display mt-1 text-2xl font-bold tracking-tight text-[var(--emsp-cream)] lg:text-[1.75rem]">
                 Annuaire des Aînés
               </h1>
-              <p className="mt-1 text-sm text-[var(--emsp-cream)]/75">
+              <p className="mt-1 text-sm text-[var(--emsp-cream)]/90">
                 Filière, classe, points forts — choisis celui qui te correspond.
               </p>
             </div>

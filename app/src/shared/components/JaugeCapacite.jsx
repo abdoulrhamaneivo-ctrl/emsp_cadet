@@ -42,8 +42,8 @@ export default function JaugeCapacite({ actifs = 0, total = 5, surFonce = false,
       })}
       <span
         className={cx(
-          "ml-1.5 font-mono text-[11px] font-medium tabular-nums",
-          surFonce ? "text-[var(--emsp-cream)]/70" : "text-[var(--text-muted)]",
+          "ml-1.5 font-mono text-xs font-medium tabular-nums",
+          surFonce ? "text-[var(--emsp-cream)]/85" : "text-[var(--text-muted)]",
         )}
       >
         {actifs}/{total}

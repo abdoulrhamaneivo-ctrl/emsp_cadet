@@ -77,7 +77,7 @@ export default function Sidebar() {
         <Avatar prenom={user?.prenom ?? ""} nom={user?.nom ?? ""} id={user?.id} size="sm" />
         <span className="min-w-0">
           <span className="block truncate text-sm font-semibold text-[var(--emsp-cream)]">{deco}</span>
-          <span className="block truncate text-xs text-[var(--emsp-cream)]/60">{user?.classe ?? "—"}</span>
+          <span className="block truncate text-xs text-[var(--emsp-cream)]/90">{user?.classe ?? "—"}</span>
         </span>
       </button>
       <div className="mt-2 flex gap-2">
@@ -195,7 +195,7 @@ export default function Sidebar() {
                   className={({ isActive }) =>
                     cx(
                       "flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium",
-                      isActive ? "text-[var(--emsp-gold)]" : "text-[var(--emsp-cream)]/75",
+                      isActive ? "text-[var(--emsp-gold)]" : "text-[var(--emsp-cream)]/85",
                     )
                   }
                 >
@@ -209,7 +209,7 @@ export default function Sidebar() {
             <button
               type="button"
               onClick={() => setMobileOuvert(true)}
-              className="flex w-full flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium text-[var(--emsp-cream)]/75"
+              className="flex w-full flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium text-[var(--emsp-cream)]/85"
             >
               <Menu size={19} aria-hidden="true" />
               Plus

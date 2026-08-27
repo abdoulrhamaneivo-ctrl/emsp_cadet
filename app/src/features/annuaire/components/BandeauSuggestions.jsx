@@ -25,7 +25,7 @@ export default function BandeauSuggestions({ suggestions = [] }) {
           <Sparkles size={16} aria-hidden="true" className="text-[var(--emsp-gold)]" />
           Suggestions pour toi
         </h2>
-        <p className="text-xs text-[var(--emsp-cream)]/80">
+        <p className="text-xs font-medium text-[var(--emsp-cream)]/95">
           même filière · intérêts proches
         </p>
       </div>
@@ -48,7 +48,7 @@ export default function BandeauSuggestions({ suggestions = [] }) {
         ))}
       </div>
 
-      <p className="mt-4 text-xs text-[var(--emsp-cream)]/65">
+      <p className="mt-4 text-xs font-medium text-[var(--emsp-cream)]/95">
         Basé sur ta filière et tes attentes — mise en avant automatique.
       </p>
     </motion.section>
