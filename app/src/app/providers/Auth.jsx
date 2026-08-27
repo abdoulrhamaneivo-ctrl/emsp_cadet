@@ -18,7 +18,7 @@ export function AuthProvider({ children }) {
     if (import.meta.env.VITE_DEMO_SESSION === "1") {
       // Session de démo : l'utilisateur mocké par MSW
       setUser(window.__sessionDemo ?? {
-        id: 1, prenom: "Ivo", nom: "Abdoul", isAdmin: true,
+        id: 1, prenom: "Ivo", nom: "Abdoul", isAdmin: false,
         niveauEtude: "L2", classe: "L2 Digitalisation",
       });
       setStatut("authentifie");

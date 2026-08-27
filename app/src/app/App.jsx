@@ -5,6 +5,8 @@ import ProtectedShell from "@layout/shells/ProtectedShell";
 import NotFoundPage from "@shared/pages/NotFoundPage";
 import HealthCheck from "@shared/pages/HealthCheck";
 import PlaceholderPage from "@shared/pages/PlaceholderPage";
+import AnnuairePage from "@features/annuaire/pages/AnnuairePage";
+import FicheAinePage from "@features/annuaire/pages/FicheAinePage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -26,8 +28,8 @@ function AppRoutes() {
       <Route element={<ProtectedShell />}>
         <Route path="/accueil" element={<PlaceholderPage titre="Accueil" spec="T0* — P09" />} />
         <Route path="/profil" element={<PlaceholderPage titre="Profil" spec="doc 11 — P10" />} />
-        <Route path="/annuaire" element={<PlaceholderPage titre="Annuaire" spec="doc 04 — P11 (première page métier, T1)" />} />
-        <Route path="/annuaire/:parrainId" element={<PlaceholderPage titre="Fiche Aîné" spec="doc 04 §5 — P12" />} />
+        <Route path="/annuaire" element={<AnnuairePage />} />
+        <Route path="/annuaire/:parrainId" element={<FicheAinePage />} />
         <Route path="/mes-demandes" element={<PlaceholderPage titre="Mes demandes" spec="doc 05 §4 — P13" />} />
         <Route path="/mon-parrainage" element={<PlaceholderPage titre="Mon parrainage" spec="doc 05 §5 — P14" />} />
         <Route path="/rendez-vous" element={<PlaceholderPage titre="Rendez-vous" spec="doc 06 — P15" />} />

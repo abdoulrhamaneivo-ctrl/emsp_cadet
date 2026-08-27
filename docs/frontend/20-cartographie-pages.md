@@ -28,8 +28,8 @@
 |---|---|---|---|---|---|---|
 | P09 | `/accueil` | HomePage | `features/accueil/pages/HomePage.jsx` | doc 09 §5 onboarding + widget RDV (06 §6) | T0* | ⬜ à construire |
 | P10 | `/profil` | ProfilePage | `features/profil/pages/ProfilePage.jsx` | **doc 11** (+15 intention) | T2* | ⬜ à construire |
-| P11 | `/annuaire` | AnnuairePage | `features/annuaire/pages/AnnuairePage.jsx` | **doc 04** | T1 | ⬜ PREMIÈRE PAGE MÉTIER |
-| P12 | `/annuaire/:parrainId` | FicheAinePage | `features/annuaire/pages/FicheAinePage.jsx` | **doc 04 §5** | T1 | ⬜ à construire |
+| P11 | `/annuaire` | AnnuairePage | `features/annuaire/pages/AnnuairePage.jsx` | **doc 04** | T1 | ✅ fait (T1) |
+| P12 | `/annuaire/:parrainId` | FicheAinePage | `features/annuaire/pages/FicheAinePage.jsx` | **doc 04 §5** | T1 | ✅ fait (T1) |
 | P13 | `/mes-demandes` | MesDemandesPage | `features/parrainage/pages/MesDemandesPage.jsx` | **doc 05 §4** | T2 | ⬜ à construire |
 | P14 | `/mon-parrainage` | MonParrainagePage | `features/parrainage/pages/MonParrainagePage.jsx` | **doc 05 §5** (double facette) | T2 | ⬜ à construire |
 | P15 | `/rendez-vous` | RendezVousPage | `features/rendez-vous/pages/RendezVousPage.jsx` | **doc 06 §4** | T3 | ⬜ à construire |
@@ -69,9 +69,11 @@
 | Composant | Tranche | Statut |
 |---|---|---|
 | Button, Card, Input/FormField, Avatar, Chip, Skeleton, EmptyState, Divider | **T0** (socle minimal) | ✅ (commit 4fcd12b) |
-| Modal/ConfirmDialog (MUI habillé), Tabs, Pagination, Tooltip | T0/T1 | ⬜ |
-| Table, Toast (sonner), Progress | T1/T2 | ⬜ |
-| ScoreFiabilite, JaugeCapacite, BadgeVitrine, BandeauBadges | T1/T2 (docs 04/07) | ⬜ |
+| Modal/ConfirmDialog (MUI habillé), Pagination, Select (natif habillé), Toast (sonner) | T0/T1 | ✅ (T1) |
+| Tabs, Tooltip | T1/T2 | ⬜ |
+| Table, Progress | T1/T2 | ⬜ |
+| ScoreFiabilite (mode `fond="fonce"` pour headers verts), JaugeCapacite (pulse RG3) | T1/T2 (docs 04/07) | ✅ (T1) |
+| BadgeVitrine, BandeauBadges (docs 04/07) | T1/T2 | ⬜ |
 | AvatarStack, StatutChip, ChipIA, PanneauSuggestionsIA, ToggleConsentementIA | T2/T4/T6 | ⬜ |
 | BanniereRappelProchainRDV (widget global) | T3 | ⬜ |
 
@@ -90,3 +92,15 @@
 - [ ] Garde de rôle `isAdmin` sur `/administration` et `/moderation` dans ProtectedShell — à ajouter quand les vraies pages admin arrivent (T5).
 - [ ] `authApi.session` : distinguer erreur réseau de « invité » (aujourd'hui toute erreur → null).
 - [ ] Décider du sort de `app/src/_template_pages/` avant mise en production (référence de dev uniquement, exclue du lint).
+
+---
+
+## 9. Bilan T1 annuaire (27 août 2026 — branche feat/t1-annuaire)
+
+Livrables : AnnuairePage (bandeau suggestions même filière, filtres URL-sync q/filiere/classe/complets avec debounce 400 ms, grille cartes, pagination serveur) + FicheAinePage (header vert profond, 4 blocs vitrine, encart CTA avec règles RG1/RG3 + modale demande) + api/hooks/rules + mocks MSW complets (10 profils, cas limites : L1 exclu, alumni promo 2023, vitrine incomplète, complet 5/5). 23 tests Vitest, lint 0, build vert, overflow horizontal éliminé (mesuré playwright-core : 375/768/1280 → OK), captures validées.
+
+Leçons consignées (à réutiliser T2+) :
+- **Tailwind v4 JIT** : toute classe `grid-cols-N` DOIT apparaître en dur dans le source (compléter par `grid-cols-1` statique) — les groupes dynamiques ne sont pas scannés.
+- **Anti-overflow grille** : chaîne complète `li flex min-w-0` → `motion.div min-w-0` → carte → `line-clamp` + `break-words` (le `-webkit-box` de line-clamp impose un min-content large sinon).
+- **Dark mode** : interdiction de `bg-white` en dur dans les composants → token `--bg-input` (défini clair ET sombre dans globals.css). Chips `neutral` sur `--bg-panel-alt` (adaptatif), jamais un crème fixe.
+- **Env mocks** : `VITE_ENABLE_MOCKS=1` dans `.env.local` (jamais committé) — sans lui, MSW ne démarre pas et les appels API retombent silencieusement sur le fallback SPA (page vide sans erreur). Toute page « mystérieusement vide » en dev : vérifier MSW d'abord.

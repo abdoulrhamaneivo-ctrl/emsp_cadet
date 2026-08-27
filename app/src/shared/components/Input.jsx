@@ -24,8 +24,8 @@ export const Input = forwardRef(function Input(
         ref={ref}
         aria-invalid={invalid || undefined}
         className={cx(
-          "w-full h-11 px-3.5 text-sm rounded-[var(--radius-input)] bg-white text-[var(--text-primary)] placeholder:text-[var(--text-muted)]",
-          "border bg-white",
+          "w-full h-11 px-3.5 text-sm rounded-[var(--radius-input)] bg-[var(--bg-input)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]",
+          "border",
           invalid
             ? "border-[#b42318]"
             : "border-[var(--border-soft)] focus:border-[var(--accent-green)]",
