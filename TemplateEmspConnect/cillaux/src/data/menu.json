@@ -1,0 +1,40 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "title": "Home",
+      "link": "/",
+      "image": "/assets/house.svg"
+    },
+    {
+      "id": 2,
+      "title": "About",
+      "link": "/about",
+      "image": "/assets/user.svg"
+    },
+    {
+      "id": 3,
+      "title": "Services",
+      "link": "/services",
+      "image": "/assets/layers.svg"
+    },
+    {
+      "id": 4,
+      "title": "Portfolio",
+      "link": "/portfolio",
+      "image": "/assets/briefcase.svg"
+    },
+    {
+      "id": 5,
+      "title": "Blog",
+      "link": "/blog",
+      "image": "/assets/pencil.svg"
+    },
+    {
+      "id": 6,
+      "title": "Contact",
+      "link": "/contact",
+      "image": "/assets/message.svg"
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1,
+    "category": "Web Design",
+    "title": "Minimal Furniture Shop",
+    "body": "A clean e-commerce concept focusing on crisp typography and generous whitespace. Built with React and a headless cart pattern to keep interactions snappy.",
+    "images": [
+      "https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1493666438207-1c01b1c1b6b6?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1200&auto=format&fit=crop",
+    "url": "https://example.com/projects/minimal-furniture"
+  },
+  {
+    "id": 2,
+    "category": "Branding",
+    "title": "Cold Brew Identity",
+    "body": "Logo, color system, and can label layout for a small-batch cold brew startup. The palette leans into deep blues and copper accents.",
+    "images": [
+      "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1453614512568-c4024d13c247?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
+    "url": "https://example.com/projects/cold-brew-identity"
+  },
+  {
+    "id": 3,
+    "category": "UI/UX",
+    "title": "Wellness Mobile App",
+    "body": "Meditation and habit-tracking flows with gentle micro-interactions. Focused on clarity and accessibility with large tap targets and calm motion.",
+    "images": [
+      "https://images.unsplash.com/photo-1550565118-3a14e8d038d9?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1200&auto=format&fit=crop",
+    "url": "https://example.com/projects/wellness-app"
+  },
+  {
+    "id": 4,
+    "category": "Development",
+    "title": "SaaS Dashboard",
+    "body": "Admin dashboard with role-based access, dark mode, and lightweight charts. Emphasis on performance and a cohesive component system.",
+    "images": [
+      "https://images.unsplash.com/photo-1551281044-8d8e8aa0f0a8?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1200&auto=format&fit=crop",
+    "url": "https://example.com/projects/saas-dashboard"
+  },
+  {
+    "id": 5,
+    "category": "Illustration",
+    "title": "City Nights Poster Series",
+    "body": "A trio of vector posters exploring neon-lit cityscapes. Strong geometry, halftone textures, and a vibrant, high-contrast palette.",
+    "images": [
+      "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1491884662610-dfcd28f30cf5?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1508057198894-247b23fe5ade?q=80&w=1200&auto=format&fit=crop",
+    "url": "https://example.com/projects/city-nights"
+  },
+  {
+    "id": 6,
+    "category": "Photography",
+    "title": "Analog Portraits",
+    "body": "A study in natural light and grain shot on 35mm film. Subtle color grading to preserve the character of the stock.",
+    "images": [
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "coverImage": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=1200&auto=format&fit=crop",
+    "url": "https://example.com/projects/analog-portraits"
+  }
+]

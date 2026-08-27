@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "year": "2020 - Present",
+    "position": "Frontend Developer",
+    "company": "Jive",
+    "image": "/assets/facebook.svg"
+  },
+  {
+    "id": 2,
+    "year": "2018 - 2020",
+    "position": "UI/UX Designer",
+    "company": "Figma",
+    "image": "/assets/figma.svg"
+  },
+  {
+    "id": 3,
+    "year": "2016 - 2018",
+    "position": "Intern Developer",
+    "company": "Web Startup",
+    "image": "/assets/instagram.svg"
+  },
+  {
+    "id": 4,
+    "year": "2015 - 2016",
+    "position": "Junior Developer",
+    "company": "Code Factory",
+    "image": "/assets/linkedin.svg"
+  },
+  {
+    "id": 5,
+    "year": "2014 - 2015",
+    "position": "Trainee",
+    "company": "DevWorks",
+    "image": "/assets/facebook.svg"
+  }
+]

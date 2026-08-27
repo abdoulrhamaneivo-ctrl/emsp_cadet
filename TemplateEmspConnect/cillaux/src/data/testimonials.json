@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Amara O.",
+    "role": "Head of Product, Nebula Pay",
+    "rating": 5,
+    "quote": "Priscy delivered beyond expectations. The UX flow cut our onboarding time by 37% and customers noticed immediately.",
+    "avatar": "https://i.pravatar.cc/120?img=1"
+  },
+  {
+    "id": 2,
+    "name": "David K.",
+    "role": "Founder, CraftCart",
+    "rating": 5,
+    "quote": "Clean code, crisp design, and excellent communication. Launch went smoothly and the site is blazing fast.",
+    "avatar": "https://i.pravatar.cc/120?img=2"
+  },
+  {
+    "id": 3,
+    "name": "Lina P.",
+    "role": "Marketing Lead, Oceanic",
+    "rating": 4,
+    "quote": "Our rebrand looks modern and consistent across channels. The design system has been a game changer for our team.",
+    "avatar": "https://i.pravatar.cc/120?img=3"
+  },
+  {
+    "id": 4,
+    "name": "Zach M.",
+    "role": "CTO, ByteForge",
+    "rating": 5,
+    "quote": "Delivered a robust dashboard with thoughtful accessibility. Dark mode is immaculate.",
+    "avatar": "https://i.pravatar.cc/120?img=4"
+  },
+  {
+    "id": 5,
+    "name": "Chidera N.",
+    "role": "Ops Manager, FreshHub",
+    "rating": 5,
+    "quote": "From kickoff to handoff, everything was clear and on schedule. Mobile conversion improved noticeably.",
+    "avatar": "https://i.pravatar.cc/120?img=5"
+  },
+  {
+    "id": 6,
+    "name": "Marco S.",
+    "role": "CEO, AtlasLabs",
+    "rating": 4,
+    "quote": "Reliable partner. The team understood our constraints and shipped a polished MVP on time.",
+    "avatar": "https://i.pravatar.cc/120?img=6"
+  }
+]

@@ -1,0 +1,137 @@
+[
+  {
+    "id": 1,
+    "slug": "designing-for-speed",
+    "category": "Performance",
+    "title": "Designing for Speed: Faster UI, Happier Users",
+    "excerpt": "Practical ways to make interfaces feel instant—perceived performance, skeletons, and optimistic updates.",
+    "body": "We explore perceived performance techniques, including skeleton screens, optimistic actions, and prefetching routes. We also cover image strategy, font loading, and micro-interactions that mask latency.",
+    "coverImage": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop",
+    "images": [
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "author": "Priscy",
+    "date": "2025-03-06",
+    "url": "https://example.com/blog/designing-for-speed"
+  },
+  {
+    "id": 2,
+    "slug": "color-systems-in-2025",
+    "category": "Design",
+    "title": "Color Systems in 2025: Tokens, Modes, and Contrast",
+    "excerpt": "Dark mode, high contrast themes, and how to structure tokens so brand changes are painless.",
+    "body": "We map semantic tokens to modes, discuss WCAG contrast, and show how to keep brand palettes flexible without breaking components.",
+    "coverImage": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1600&auto=format&fit=crop",
+    "images": [
+      "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=1600&auto=format&fit=crop"
+    ],
+    "author": "Priscy",
+    "date": "2025-02-14",
+    "url": "https://example.com/blog/color-systems-in-2025"
+  },
+  {
+    "id": 3,
+    "slug": "portfolio-case-study-template",
+    "category": "Process",
+    "title": "A Reusable Portfolio Case Study Template",
+    "excerpt": "Tell a tight story: problem → approach → impact. A simple outline you can reuse across projects.",
+    "body": "This template keeps you focused on outcomes. We include example sections, asset checklists, and metrics to highlight.",
+    "coverImage": "https://images.unsplash.com/photo-1493666438817-866a91353ca9?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2025-01-22",
+    "url": "https://example.com/blog/portfolio-case-study-template"
+  },
+  {
+    "id": 4,
+    "slug": "microinteractions-that-delight",
+    "category": "UI/UX",
+    "title": "Micro-interactions That Delight (Without Being Noisy)",
+    "excerpt": "Small, purposeful animations that guide attention and communicate state.",
+    "body": "We cover duration, easing, and how to use motion as feedback rather than decoration. Includes examples and do/don'ts.",
+    "coverImage": "https://images.unsplash.com/photo-1550565118-3a14e8d038d9?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2024-12-11",
+    "url": "https://example.com/blog/microinteractions-that-delight"
+  },
+  {
+    "id": 5,
+    "slug": "building-accessible-modals",
+    "category": "Accessibility",
+    "title": "Building Accessible Modals in React",
+    "excerpt": "Focus traps, aria labels, scroll locking, and escape hatches.",
+    "body": "A checklist and code snippets for modals that work for everyone—including keyboard and screen reader users.",
+    "coverImage": "https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2024-11-05",
+    "url": "https://example.com/blog/building-accessible-modals"
+  },
+  {
+    "id": 6,
+    "slug": "image-loading-strategies",
+    "category": "Performance",
+    "title": "Smart Image Loading for Portfolio Sites",
+    "excerpt": "When to use `object-fit`, responsive sources, and lazy loading to keep pages snappy.",
+    "body": "We compare techniques for art direction and bandwidth savings: `srcset`, `sizes`, `loading=lazy`, and preloading hero assets.",
+    "coverImage": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2024-10-10",
+    "url": "https://example.com/blog/image-loading-strategies"
+  },
+  {
+    "id": 7,
+    "slug": "design-handoff-checklist",
+    "category": "Process",
+    "title": "Design → Dev Handoff Checklist",
+    "excerpt": "Everything devs need: tokens, states, empty/error screens, and motion specs.",
+    "body": "Use this checklist before handoff to reduce rework and mismatches in production.",
+    "coverImage": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2024-08-28",
+    "url": "https://example.com/blog/design-handoff-checklist"
+  },
+  {
+    "id": 8,
+    "slug": "grid-layouts-that-scale",
+    "category": "CSS",
+    "title": "Grid Layouts That Scale Across Breakpoints",
+    "excerpt": "Fluid columns, minmax, clamp, and intrinsic sizing patterns.",
+    "body": "We show common responsive patterns that keep content readable at any width.",
+    "coverImage": "https://images.unsplash.com/photo-1491884662610-dfcd28f30cf5?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2024-07-17",
+    "url": "https://example.com/blog/grid-layouts-that-scale"
+  },
+  {
+    "id": 9,
+    "slug": "navbars-that-dont-annoy",
+    "category": "UI/UX",
+    "title": "Sticky Navbars That Don’t Annoy Users",
+    "excerpt": "When to use sticky vs fixed, and how to keep them out of the way.",
+    "body": "Tradeoffs, safe areas, and scroll-aware patterns that balance access with focus.",
+    "coverImage": "https://images.unsplash.com/photo-1520975916090-3105956dac38?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2024-06-02",
+    "url": "https://example.com/blog/navbars-that-dont-annoy"
+  },
+  {
+    "id": 10,
+    "slug": "writing-case-studies-people-read",
+    "category": "Content",
+    "title": "Writing Case Studies People Actually Read",
+    "excerpt": "Short intros, visuals first, and clear outcomes—skip the fluff.",
+    "body": "How to structure, what to cut, and quick heuristics to keep readers engaged.",
+    "coverImage": "https://images.unsplash.com/photo-1493666438207-1c01b1c1b6b6?q=80&w=1600&auto=format&fit=crop",
+    "images": [],
+    "author": "Priscy",
+    "date": "2024-05-01",
+    "url": "https://example.com/blog/writing-case-studies-people-read"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "title": "Cousera UI/UX Design",
+    "year": "2022 - 2023",
+    "status": "Completed",
+    "link": "#",
+    "image": "/assets/facebook.svg"
+  },
+  {
+    "id": 2,
+    "title": "Adobe UI/UX Master Class",
+    "year": "2022 - 2023",
+    "status": "Completed",
+    "link": "#",
+    "image": "/assets/instagram.svg"
+  },
+  {
+    "id": 3,
+    "title": "Figma UI/UX Design",
+    "year": "2022 - 2023",
+    "status": "Completed",
+    "link": "#",
+    "image": "/assets/facebook.svg"
+  },
+  {
+    "id": 4,
+    "title": "DevOps UI/UX Master Class",
+    "year": "2022 - 2023",
+    "status": "Completed",
+    "link": "#",
+    "image": "/assets/instagram.svg"
+  }
+]
