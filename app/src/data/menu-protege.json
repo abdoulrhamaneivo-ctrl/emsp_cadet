@@ -1,0 +1,13 @@
+{
+  "data": [
+    { "id": 1, "title": "Accueil", "link": "/accueil", "icon": "home" },
+    { "id": 2, "title": "Annuaire", "link": "/annuaire", "icon": "users" },
+    { "id": 3, "title": "Parrainage", "link": "/mon-parrainage", "icon": "link" },
+    { "id": 4, "title": "Messagerie", "link": "/messagerie", "icon": "message" },
+    { "id": 5, "title": "Fil", "link": "/fil", "icon": "newspaper" },
+    { "id": 6, "title": "Événements", "link": "/evenements", "icon": "calendar" },
+    { "id": 7, "title": "RDV", "link": "/rendez-vous", "icon": "clock" },
+    { "id": 8, "title": "Offres", "link": "/offres", "icon": "briefcase" },
+    { "id": 9, "title": "Profil", "link": "/profil", "icon": "user" }
+  ]
+}

@@ -1,0 +1,53 @@
+/* Keyframes réutilisables — doc 01 (styles/animations.css) */
+
+@keyframes bg-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+/* Skeleton shimmer (doc 03 §6.10) */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--hover-bg) 25%,
+    var(--bg-panel-alt) 50%,
+    var(--hover-bg) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
+  .skeleton-shimmer {
+    animation: none;
+  }
+}

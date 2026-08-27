@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://priscy-orcin.vercel.app/sitemap.xml

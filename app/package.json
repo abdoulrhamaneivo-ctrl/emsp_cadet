@@ -1,0 +1,63 @@
+{
+  "name": "emsp-connect",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "description": "EMSP Connect — plateforme de parrainage Cadets/Aînés de l'École Multinationale des Postes (Abidjan).",
+  "scripts": {
+    "dev": "vite --port 5200 --strictPort",
+    "dev-host": "vite --port 5200 --strictPort --host",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview --port 5200",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.0",
+    "@mui/material": "^6.4.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "@tanstack/react-query": "^5.66.0",
+    "axios": "^1.8.0",
+    "framer-motion": "^12.4.0",
+    "lucide-react": "^0.546.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-hook-form": "^7.54.0",
+    "react-router-dom": "^7.9.4",
+    "sonner": "^2.0.0",
+    "tailwindcss": "^4.1.14",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.36.0",
+    "@mswjs/data": "^0.16.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.2.0",
+    "@types/react": "^19.1.16",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.4",
+    "eslint": "^9.36.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.22",
+    "globals": "^16.4.0",
+    "jsdom": "^26.0.0",
+    "msw": "^2.7.0",
+    "vite": "^7.1.7",
+    "vitest": "^3.0.0"
+  },
+  "allowScripts": {
+    "@tailwindcss/oxide@4.1.14": true,
+    "esbuild@0.25.11": true,
+    "msw@2.15.0": true
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
+  }
+}

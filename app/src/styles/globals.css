@@ -1,0 +1,175 @@
+/* =========================================================
+   EMSP Connect — styles globaux
+   Tokens : doc 01 §1.5 (palette validée — NE PAS retoucher)
+   Panneaux opaques, fond animé vert profond, kente sobre.
+   ========================================================= */
+
+:root {
+  /* Palette Light (validée utilisateur) */
+  --emsp-green-deep: #1d4430;
+  --emsp-green-mid: #2d5a3f;
+  --emsp-green-bright: #1a8a52;
+  --emsp-green-luminous: #34c47c;
+  --emsp-cream: #fdfaf2;
+  --emsp-cream-alt: #f3eddd;
+  --emsp-gold: #e9b517;
+  --emsp-gold-bright: #f0c04a;
+
+  /* Sémantiques Light */
+  --bg-page: linear-gradient(155deg, #1d4430 0%, #143524 55%, #0f2b1d 100%);
+  --bg-panel: #fdfaf2;
+  --bg-panel-alt: #f3eddd;
+  --text-primary: #16281c;
+  --text-muted: #4a5d50;
+  --border-soft: #e4dcc8;
+  --border-structural: #356247;
+  --hover-bg: #eef0da;
+  --accent-green: #0f5132;
+  --accent-gold: #e9b517;
+
+  /* Ombres two-layer */
+  --shadow-panel:
+    0 4px 24px -4px rgba(13, 42, 24, 0.15),
+    0 1px 3px -1px rgba(13, 42, 24, 0.1);
+  --shadow-card:
+    0 2px 12px -2px rgba(13, 42, 24, 0.1),
+    0 1px 2px -1px rgba(13, 42, 24, 0.06);
+
+  /* Rayons hiérarchisés : panel > card > chip/input */
+  --radius-panel: 1rem;
+  --radius-card: 0.75rem;
+  --radius-chip: 0.5rem;
+  --radius-input: 0.5rem;
+
+  /* Kente */
+  --kente-opacity: 0.22;
+  --kente-color: #e9b517;
+
+  /* Polices */
+  --font-sans: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}
+
+html.dark {
+  --bg-page: linear-gradient(155deg, #0e1f16, #122a1d, #0b1c13);
+  --bg-panel: #1c3226;
+  --bg-panel-alt: #24402f;
+  --text-primary: #ecf4ee;
+  --text-muted: #a8bdb0;
+  --border-soft: #35543f;
+  --border-structural: #48705a;
+  --hover-bg: #24402f;
+  --accent-green: #34c47c;
+  --accent-gold: #f0c04a;
+
+  --shadow-panel:
+    0 4px 24px -4px rgba(0, 0, 0, 0.4),
+    0 1px 3px -1px rgba(0, 0, 0, 0.3);
+  --shadow-card:
+    0 2px 12px -2px rgba(0, 0, 0, 0.3),
+    0 1px 2px -1px rgba(0, 0, 0, 0.2);
+
+  --kente-opacity: 0.13;
+  --kente-color: #34c47c;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  margin: 0;
+  color: var(--text-primary);
+  background: var(--bg-page);
+  background-size: 400% 400%;
+  background-attachment: fixed;
+  animation: bg-gradient 22s ease infinite;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Voile discret pour la profondeur (jamais translucide sur les panneaux) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(253, 250, 242, 0.04);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Focus visible partout — règle doc 03 §10 */
+:focus-visible {
+  outline: 2px solid var(--emsp-green-luminous);
+  outline-offset: 2px;
+}
+
+/* Skip-link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-chip);
+  font-weight: 600;
+  box-shadow: var(--shadow-card);
+}
+.skip-link:focus {
+  position: fixed;
+  left: 0.5rem;
+  top: 0.5rem;
+}
+
+/* ---- Panneaux opaques (signature visuelle du produit) ---- */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.panel-alt {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-card);
+}
+
+/* ---- Motifs kente — texture discrète, jamais au-dessus du contenu ---- */
+.kente-pattern {
+  background-image:
+    repeating-linear-gradient(45deg, var(--kente-color) 0 2px, transparent 2px 14px),
+    repeating-linear-gradient(-45deg, var(--kente-color) 0 2px, transparent 2px 14px);
+  opacity: var(--kente-opacity);
+  mask-image: linear-gradient(to bottom, black, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+  pointer-events: none;
+}
+
+/* Bande kente horizontale 8px — panneaux prioritaires (doc 03 §8) */
+.kente-band {
+  height: 8px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--emsp-green-deep) 0 10px,
+    var(--emsp-gold) 10px 18px,
+    var(--emsp-green-bright) 18px 28px,
+    var(--emsp-gold) 28px 36px
+  );
+}
+
+/* Ruban tissé bas de page */
+.woven-ribbon {
+  height: 6px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--emsp-green-deep) 0 8px,
+    var(--emsp-gold) 8px 14px,
+    var(--emsp-green-bright) 14px 22px
+  );
+}

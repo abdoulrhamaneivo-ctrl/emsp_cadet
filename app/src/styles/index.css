@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "./globals.css";
+@import "./animations.css";
+
+/*
+ * Pont Tailwind v4 : expose la palette EMSP aux utilitaires
+ * (bg-emsp-green, text-emsp-gold, etc.)
+ */
+@theme {
+  --color-emsp-green: #1d4430;
+  --color-emsp-green-mid: #2d5a3f;
+  --color-emsp-bright: #1a8a52;
+  --color-emsp-luminous: #34c47c;
+  --color-emsp-cream: #fdfaf2;
+  --color-emsp-cream-alt: #f3eddd;
+  --color-emsp-gold: #e9b517;
+  --color-emsp-gold-bright: #f0c04a;
+  --color-ink: #16281c;
+  --color-ink-muted: #4a5d50;
+
+  --font-sans: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", monospace;
+}

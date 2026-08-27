@@ -23,8 +23,10 @@
 | 17 | `17-spec-ia-plateforme.md` | Règles RG12 IA responsable (l'IA propose, l'humain dispose) + 6 fonctionnalités IA priorisées avec composants/états front requis | ✅ |
 | 18 | `18-analyse-senior-plan.md` | **AUDIT SENIOR** : forces, risques R1-R5, gaps traités, décisions structurantes (tranches verticales T0→T6), points à trancher par Ivo | ✅ |
 | 19 | `19-qualite-tests-devops.md` | **GARDE-FOUS CODE** : workflow git/PR, stack tests (Vitest+RTL+MSW+Playwright), erreurs globales, sécurité front, perf budget, CI, Definition of Done | ✅ |
+| 20 | `20-cartographie-pages.md` | **TABLEAU DE BORD CONSTRUCTION** : les 26 pages (P01-P26) avec route/fichier/spec/tranche/statut + planning composants shared | ✅ |
 
 ## Décisions produit consignées (août 2026)
+0. **NOM FINAL (décision Ivo, 27 août 2026) : « EMSP Connect »** — partout dans l'UI, le code, les déploiements. « Parr'Innov » désigne uniquement le cahier des charges d'origine, jamais le produit.
 1. **Échanges étudiants** : messagerie privée RÉSERVÉE au binôme accepté (cahier §3.4 inchangé) ; l'échange passe par 3 espaces COLLECTIFS — commentaires du Fil (doc 09), discussion des événements (doc 10), groupes Famille/Cercle (doc 13).
 2. **Modèle casquettes (besoin réel exprimé par Ivo)** : en L2 on a déjà des filleuls pendant que notre aîné nous accompagne ENCORE. Cadet/Aîné se CUMULENT. Aîné exige L2+ (RG7) et une candidature personnelle ouverte/fermée (RG8). Quotas séparés (RG9). Un L1 ne peut ni être aîné ni l'être plus tard avant promotion.
 3. **Familles automatiques** : dès son premier binôme accepté, un Aîné reçoit son groupe Famille (lui + ses cadets ≤7) ; option « famille étendue » invitant SON propre aîné — la chaîne verticale complète s'échange (doc 13).
