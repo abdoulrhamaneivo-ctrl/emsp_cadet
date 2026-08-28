@@ -21,6 +21,11 @@ export function definirJeton(jeton) {
   jetonMemoire = jeton;
 }
 
+/** Le WS réel lit le token ici (mémoire seule — jamais sessionStorage, doc 19). */
+export function obtenirJeton() {
+  return jetonMemoire;
+}
+
 apiClient.interceptors.request.use((config) => {
   if (jetonMemoire) {
     config.headers.Authorization = `Bearer ${jetonMemoire}`;

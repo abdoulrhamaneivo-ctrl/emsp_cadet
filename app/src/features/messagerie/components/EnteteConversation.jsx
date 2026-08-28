@@ -4,10 +4,11 @@ import Chip from "@shared/components/Chip";
 
 /**
  * Entête de conversation (doc 08 §5) : panneau vert opaque sticky. Privé =
- * identité interlocuteur + présence ; famille/groupe = icône + titre + nombre
- * de membres (casse naturelle, pas de chip présence en groupe).
+ * identité interlocuteur + présence TEMPS RÉEL (point vert « En ligne » /
+ * « Vu récemment » neutre — événements presence doc 08 §2 ; null = état
+ * démo statique) ; famille/groupe = icône + titre + nombre de membres.
  */
-export default function EnteteConversation({ conversation, surRetour }) {
+export default function EnteteConversation({ conversation, surRetour, presence = null }) {
   const prive = conversation?.type === "prive";
   const interlocuteur = prive ? conversation.interlocuteur : null;
   const groupe = conversation?.groupe ?? null;
@@ -44,7 +45,12 @@ export default function EnteteConversation({ conversation, surRetour }) {
             : `${groupe.membres?.length ?? 0} membres`}
         </p>
       </div>
-      {interlocuteur && <Chip tone="gold">En ligne</Chip>}
+      {interlocuteur &&
+        (presence === false ? (
+          <Chip tone="neutral">Vu récemment</Chip>
+        ) : (
+          <Chip tone="gold">En ligne</Chip>
+        ))}
     </div>
   );
 }

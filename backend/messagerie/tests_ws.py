@@ -93,3 +93,64 @@ def test_message_new_diffuse_au_binome(api, users, conv_privee):
     assert evenement["conversationId"] == conv_privee.pk
     assert evenement["message"]["contenu"] == "Coucou temps réel"
     assert evenement["message"]["envoyeParMoi"] is False  # reçu par Ivo, envoyé par Awa
+
+
+@pytest.mark.django_db(transaction=True)
+def test_ws_contrat_typing_presence_et_lu(api, users, conv_privee):
+    """Contrat doc 08 §2 : presence au join, typing {utilisateurId, etat},
+    message.lu {parUserId, jusquaMessageId} — et JAMAIS mon propre écho."""
+    from messagerie.models import Message
+
+    message = Message.objects.create(
+        conversation=conv_privee,
+        auteur=users.awa,
+        contenu="salut",
+        idempotency_key="ws-lu-1",
+    )
+    jeton_ivo = _access(users.ivo)
+    jeton_awa = _access(users.awa)
+
+    async def scenario():
+        ivo = _connecter(jeton_ivo)
+        awa = _connecter(jeton_awa)
+        await ivo.connect()
+        await awa.connect()
+        await ivo.send_json_to({"type": "join", "conversationId": conv_privee.pk})
+        await asyncio.sleep(0.2)  # group_add asynchrone : laisser la boucle respirer
+        await awa.send_json_to({"type": "join", "conversationId": conv_privee.pk})
+        # Awa rejoint APRÈS Ivo → Ivo reçoit presence{Awa, true}, Awa reçoit rien
+        # de son propre join (anti-écho) : le presence d'Ivo est parti avant que
+        # Awa soit membre… donc Ivo reçoit exactement UN événement ici.
+        presence = await ivo.receive_json_from(timeout=3)
+        # Awa tape → Ivo reçoit {utilisateurId: Awa, etat: true}.
+        await awa.send_json_to(
+            {"type": "typing", "conversationId": conv_privee.pk, "etat": True}
+        )
+        typing = await ivo.receive_json_from(timeout=3)
+        # Ivo marque lu → message.lu {parUserId: Ivo} part à Awa, pas à Ivo.
+        await asyncio.to_thread(
+            _client(users.ivo).patch,
+            f"/api/conversations/{conv_privee.pk}/lu/",
+            {"dernierMessageId": message.pk},
+            format="json",
+        )
+        lu = await awa.receive_json_from(timeout=3)
+        await ivo.disconnect()
+        await awa.disconnect()
+        return presence, typing, lu
+
+    presence, typing, lu = asyncio.run(scenario())
+    assert presence == {
+        "type": "presence",
+        "conversationId": conv_privee.pk,
+        "utilisateurId": users.awa.pk,
+        "enLigne": True,
+    }
+    assert typing == {
+        "type": "typing",
+        "conversationId": conv_privee.pk,
+        "utilisateurId": users.awa.pk,
+        "etat": True,
+    }
+    assert lu["type"] == "message.lu" and lu["parUserId"] == users.ivo.pk
+    assert lu["jusquaMessageId"] == message.pk

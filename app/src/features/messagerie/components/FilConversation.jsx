@@ -1,23 +1,38 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { CalendarOff } from "lucide-react";
-import Button from "@shared/components/Button";
 import Card from "@shared/components/Card";
 import BulleMessage from "./BulleMessage";
 import EnteteConversation from "./EnteteConversation";
 import ZoneSaisie from "./ZoneSaisie";
+import IndicateurTyping from "./IndicateurTyping";
+import BanniereConnexion from "./BanniereConnexion";
 import { useMessages } from "../hooks/useMessages";
+import { useTyping } from "../hooks/useTyping";
 import { useAuth } from "@app/providers/Auth";
 
 /**
  * Fil de messages (doc 08 §5) : panel crème, scroll interne, séparateurs de
  * date, « Charger les anciens » prepend, scroll bas auto à l'ouverture.
+ * Temps réel complet : bannière perte de lien, « Prénom écrit… », « ✓ lu ».
  */
 export default function FilConversation({ conversation, surRetour }) {
   const { user } = useAuth();
-  const { messages, hasMore, chargement, brouillon, setBrouillon, envoyer, chargerAnciens } =
-    useMessages(conversation.id);
+  const {
+    messages,
+    hasMore,
+    chargement,
+    brouillon,
+    setBrouillon,
+    envoyer,
+    chargerAnciens,
+    envoyerBrut,
+    etatConnexion,
+    etatTyping,
+    presence,
+    luJusqua,
+  } = useMessages(conversation.id);
+  const surSaisie = useTyping(envoyerBrut, conversation.id);
   const refFin = useRef(null);
 
   // Scroll bas auto à l'ouverture et à chaque nouveau message
@@ -55,7 +70,8 @@ export default function FilConversation({ conversation, surRetour }) {
 
   return (
     <Card className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <EnteteConversation conversation={conversation} surRetour={surRetour} />
+      <BanniereConnexion visible={etatConnexion === "reconnexion"} />
+      <EnteteConversation conversation={conversation} surRetour={surRetour} presence={presence} />
       <div
         role="log"
         aria-live="polite"
@@ -97,13 +113,24 @@ export default function FilConversation({ conversation, surRetour }) {
                     ? user
                     : (interlocuteur ?? auteurParId.get(entree.message.auteurId))
                 }
+                luJusqua={luJusqua?.jusquaMessageId ?? null}
               />
             ),
           )
         )}
         <div ref={refFin} />
       </div>
-      <ZoneSaisie valeur={brouillon} onChange={setBrouillon} onEnvoyer={envoyer} />
+      {etatTyping?.actif && (
+        <IndicateurTyping prenom={interlocuteur?.prenom ?? ""} />
+      )}
+      <ZoneSaisie
+        valeur={brouillon}
+        onChange={(valeur) => {
+          setBrouillon(valeur);
+          surSaisie(valeur);
+        }}
+        onEnvoyer={envoyer}
+      />
       <span className="sr-only">
         <Link to="/messagerie">Retour à la messagerie</Link>
       </span>
