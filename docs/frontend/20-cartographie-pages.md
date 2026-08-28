@@ -212,4 +212,16 @@ Page réelle sur la route placeholder : feature `src/features/authentification/`
 
 **Chaîne qualité** — 46/46 tests (6 nouveaux : RG4 domaine, champs requis, 401 serveur affiché, succès → redirect, `state.from`, remplissage démo), lint 0, build vert, overflow 0 (375/768/1280), 6 captures (`shoot-connexion.mjs`) revues vision en 2 passes (retouches : kente en couche dédiée, contraste de la ligne interne, affordance des comptes démo).
 
+### 9.8 Tranche T3d « Temps réel » (doc 08 §2/§5 sur backend réel) — consumer WS, typing, presence, ✓✓ lu
 
+Boucle temps réel complète côté front (`useWebSocketChat` reconnexion expo 1s→30s + `etatConnexion`, `useTyping` throttle 2 s / fin 2,5 s, `IndicateurTyping`, presence entête, `BulleMessage` CheckCheck or piloté par `message.lu {parUserId, jusquaMessageId}` non régressif, `BanniereConnexion`, file d'envois rejouée à la reconnexion avec les MÊMES idempotencyKeys, toast cliquable cross-conv) + scènes E2E sur le **backend Django réel, zéro MSW** : `app/scripts/t3d-temps-reel.mjs` (deux acteurs — Awa par REST direct `Bearer`, Ivo par vrai navigateur chromium `--no-sandbox`) et `app/scripts/t3d-lu-accuse.mjs` (Ivo ENVOIE par la vraie UI → Awa PATCH `/lu/` → `[aria-label="Lu"]` attendu en direct).
+
+**Pièges T3d (leçons)** —
+- **Le « ✓ lu » exige une bulle PROPRE** : première capture de validation lancée sur un fil où Ivo n'avait aucun message sortant → rien à marquer, verdict vision « pas de ✓✓ » faussement alarmant. Toujours faire ENVOYER un message par l'UI avant d'assertion un accusé de lecture.
+- **`--danger` utilisé avant d'exister** (bannière + bulle échec invisibles) : le grep `var(--emsp-*)` contre globals.css doit couvrir TOUT token sémantique soupçonné, pas seulement la famille emsp. Désormais deux tokens : `--danger` (encre mode-aware : texte/bordure) + `--danger-solid` (fond fixe plein rouge `#b3261e` texte blanc, lisible light ET dark — un `--danger` clair en dark mode sous du texte blanc = illisible).
+- **Le WS réel lisait `sessionStorage("jwt")`** — clé jamais écrite (jeton mort, `token=` vide) ET interdite par doc 19. Correctif : `obtenirJeton()` exposé par `shared/api/client.js`, mémoire seule ; les seuls `localStorage` tolérés restent le thème et rien d'autre.
+- **Composants déstructurés en props** (`{ icone: Icone }`) : ESLint core ne voit pas l'usage JSX sans plugin react → `argsIgnorePattern: '^[A-Z]'` (même famille que le cas `^motion$` déjà documenté). Diagnostiquer « defined but never used » sur un composant AVANT de croire à un bug de rendu.
+- Artefacts E2E en base de dev : les scripts créent de vrais messages → **DELETE ciblé par pk** (et `Lecture` pointant dessus) après la passe, jamais de `flush` ni de recréation de seed. Un « message vide 19:58 » du rapport vision ne laissait AUCUNE trace en base : chercher du côté du scroll/du rendu avant d'incriminer les données.
+- Emoji « 📍 » signalé en vision devant « Salle B12 » : **faux positif** — c'est l'icône lucide `MapPin` (SVG) OCR-isée par le modèle vision ; zéro emoji dans le code (vérifié grep).
+
+**Chaîne qualité** — vitest 46/46, lint 0, build vert, pytest 22/22 + ruff 0, overflow 0 (375/768/1280), E2E temps réel et accusé de lecture verts sur backend réel, capture `/tmp/t3d-lu-accuse.png` revue vision avec zoom ×2 (double coche or confirmée sur bulles couvertes par `jusquaMessageId`).

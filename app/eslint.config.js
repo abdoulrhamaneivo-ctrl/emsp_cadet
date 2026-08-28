@@ -41,7 +41,8 @@ export default defineConfig([
     },
     rules: {
       // ^motion$ : ESLint core ne trace pas les usages JSX (<motion.div>) sans le plugin react
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]|^motion$', argsIgnorePattern: '^_', caughtErrors: 'none' }],
+      // ^[A-Z] en args : composants déstructurés en props ({ icone: Icone }) — même cécité
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]|^motion$', argsIgnorePattern: '^_|^[A-Z]', caughtErrors: 'none' }],
     },
   },
   {

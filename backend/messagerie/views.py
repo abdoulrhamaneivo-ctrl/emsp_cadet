@@ -108,6 +108,10 @@ class LuView(APIView):
     def patch(self, request, conversation_id):
         conversation = _conversation_autorisee(request, conversation_id)
         dernier_id = request.data.get("dernierMessageId")
+        # pk entière uniquement (une chaîne type "optimiste-…" lèverait un
+        # ValueError non maîtrisé → 500 au lieu d'un 422 propre).
+        if not isinstance(dernier_id, int):
+            raise ErreurValidation("Message inconnu dans cette conversation.")
         dernier = conversation.messages.filter(pk=dernier_id).first()
         if dernier is None:
             raise ErreurValidation("Message inconnu dans cette conversation.")
@@ -124,12 +128,15 @@ class LuView(APIView):
                 utilisateur=request.user,
                 defaults={"dernier_message_lu": dernier},
             )
+            # Contrat WS doc 08 §2 : {parUserId, jusquaMessageId} → le « ✓ lu »
+            # temps réel de l'interlocuteur.
             publier(
                 conversation.pk,
                 {
                     "type": "message.lu",
                     "conversationId": conversation.pk,
-                    "dernierMessageId": dernier.pk,
+                    "parUserId": request.user.pk,
+                    "jusquaMessageId": dernier.pk,
                 },
             )
         return Response({"ok": True})

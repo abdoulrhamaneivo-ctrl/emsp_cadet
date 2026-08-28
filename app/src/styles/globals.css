@@ -27,6 +27,10 @@
   --hover-bg: #eef0da;
   --accent-green: #0f5132;
   --accent-gold: #e9b517;
+  /* Danger : encre mode-aware (texte/bordure) + fond fixe (bannières plein
+     rouge texte blanc — lisible dans les DEUX modes). */
+  --danger: #b3261e;
+  --danger-solid: #b3261e;
 
   /* Ombres two-layer */
   --shadow-panel:
@@ -71,6 +75,7 @@ html.dark {
   --hover-bg: #24402f;
   --accent-green: #34c47c;
   --accent-gold: #f0c04a;
+  --danger: #f2b8b5;
 
   --shadow-panel:
     0 4px 24px -4px rgba(0, 0, 0, 0.4),

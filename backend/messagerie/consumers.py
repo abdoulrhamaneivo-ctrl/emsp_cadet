@@ -56,8 +56,16 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if type_evenement == "join" and conversation_id:
             await self.rejoindre(conversation_id)
         elif type_evenement == "typing" and conversation_id:
+            # Contrat doc 08 §2 : {type, conversationId, utilisateurId, etat} —
+            # le front filtre ses PROPREs événements et affiche « Prénom écrit… ».
             await self.diffuser(
-                conversation_id, {"type": "typing", "conversationId": conversation_id}
+                conversation_id,
+                {
+                    "type": "typing",
+                    "conversationId": conversation_id,
+                    "utilisateurId": self.utilisateur.pk,
+                    "etat": bool(contenu.get("etat", True)),
+                },
             )
 
     async def rejoindre(self, conversation_id):
@@ -68,6 +76,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         if groupe not in self.groupes_joints:
             await self.channel_layer.group_add(groupe, self.channel_name)
             self.groupes_joints.add(groupe)
+            # Presence « en ligne » au join (doc 08 §2 — point vert de l'entête) ;
+            # conversationId est porté par chaque événement (contrat doc 08).
+            await self.diffuser(
+                conversation_id,
+                {
+                    "type": "presence",
+                    "conversationId": conversation_id,
+                    "utilisateurId": self.utilisateur.pk,
+                    "enLigne": True,
+                },
+            )
 
     async def disconnect(self, code):
         for groupe in list(self.groupes_joints):
@@ -79,6 +98,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                     "texte": json.dumps(
                         {
                             "type": "presence",
+                            "conversationId": int(groupe.removeprefix("conv.")),
                             "utilisateurId": self.utilisateur.pk,
                             "enLigne": False,
                         }
@@ -95,6 +115,12 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             evenement["message"]["envoyeParMoi"] = (
                 evenement["message"].get("auteurId") == self.utilisateur.pk
             )
+        elif (
+            evenement.get("utilisateurId") == self.utilisateur.pk
+            or evenement.get("parUserId") == self.utilisateur.pk
+        ):
+            # presence / typing / message.lu : jamais mon propre écho.
+            return
         await self.send(text_data=json.dumps(evenement))
 
     # ── Helpers async (ORM via database_sync_to_async) ────────────────────────

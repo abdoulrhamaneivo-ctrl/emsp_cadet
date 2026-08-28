@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { AlertCircle, Check, Loader2 } from "lucide-react";
+import { AlertCircle, Check, CheckCheck, Loader2 } from "lucide-react";
 import Avatar from "@shared/components/Avatar";
 import { cx } from "@shared/utils/cx";
 
@@ -8,10 +8,15 @@ import { cx } from "@shared/utils/cx";
  * l'autre panneau clair à gauche. Coin asymétrique 16/16/16/4 = signature chat.
  * États d'envoi : en_cours (horloge), envoyé (✓), echec (alerte, cliquable).
  */
-export default function BulleMessage({ message, auteur }) {
+export default function BulleMessage({ message, auteur, luJusqua = null }) {
   const mienne = message.envoyeParMoi;
   const echec = message.etat === "echec";
   const enCours = message.etat === "en_cours";
+  // « ✓ lu » temps réel (doc 08 §2) : l'interlocuteur a lu jusqu'à
+  // jusquaMessageId → mes bulles d'id ≤ ce seuil passent en CheckCheck or.
+  const numerique = typeof message.id === "number";
+  const lu =
+    mienne && numerique && luJusqua !== null && message.id <= luJusqua;
 
   const heure = new Date(message.dateEnvoi).toLocaleTimeString("fr-FR", {
     hour: "2-digit",
@@ -59,6 +64,8 @@ export default function BulleMessage({ message, auteur }) {
               <Loader2 size={11} className="animate-spin" aria-label="Envoi en cours" />
             ) : echec ? (
               <AlertCircle size={11} className="text-[var(--danger)]" aria-label="Échec — cliquer pour renvoyer" />
+            ) : lu ? (
+              <CheckCheck size={11} className="text-[var(--accent-gold)]" aria-label="Lu" />
             ) : (
               <Check size={11} aria-label="Envoyé" />
             ))}

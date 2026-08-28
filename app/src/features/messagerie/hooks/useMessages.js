@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { messagerieApi } from "../api";
 import { useWebSocketChat } from "./useWebSocketChat";
+import { useAuth } from "@app/providers/Auth";
 
 const creeCle = () =>
   (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`);
@@ -11,42 +14,26 @@ const creeCle = () =>
  * OPTIMISTE idempotente — la bulle apparaît instantanément (état « en cours »),
  * le remplacement par la réponse serveur se fait par idempotencyKey : zéro
  * doublon même en retry réseau (critère d'acceptation n°2 doc 08 §8).
+ *
+ * Temps réel doc 08 §2 complet : message.new, typing, presence, message.lu —
+ * plus file d'envois rejouée à la reconnexion (mêmes idempotencyKeys) et
+ * toast cliquable pour un message.new d'une AUTRE conversation.
  */
 export function useMessages(conversationId) {
   const client = useQueryClient();
+  const naviguer = useNavigate();
+  const { user } = useAuth();
+  const monId = user?.id;
   const [brouillon, setBrouillon] = useState("");
+  const [etatTyping, setEtatTyping] = useState(null); // {utilisateurId, actif}
+  const [presence, setPresence] = useState(null); // bool|null (interlocuteur privé)
+  const [luJusqua, setLuJusqua] = useState(null); // {parUserId, jusquaMessageId}
   const clesLocales = useRef(new Map()); // idempotencyKey → contenu optimiste
+  const fileAttente = useRef([]); // envois en échec → rejoués à la reconnexion
 
   const requete = useQuery({
     queryKey: ["messages", conversationId],
     queryFn: () => messagerieApi.messages(conversationId),
-  });
-
-  // Temps réel : un message.new pour CETTE conversation s'ajoute au cache
-  useWebSocketChat({
-    conversationId,
-    surEvenement: (evenement) => {
-      if (evenement.type !== "message.new") return;
-      if (evenement.conversationId !== conversationId) {
-        client.invalidateQueries({ queryKey: ["conversations"] });
-        return;
-      }
-      const message = evenement.message;
-      // Si c'était un optimiste local, la vraie réponse le remplacera via
-      // setQueryData du mutation onSuccess — on évite juste le doublon par clé.
-      client.setQueryData(["messages", conversationId], (ancien) => {
-        if (!ancien) return ancien;
-        if (ancien.results.some((m) => m.id === message.id)) return ancien;
-        if (
-          message.idempotencyKey &&
-          ancien.results.some((m) => m.idempotencyKey === message.idempotencyKey)
-        ) {
-          return ancien;
-        }
-        // Cache « plus récent d'abord » → prepend
-        return { ...ancien, results: [message, ...ancien.results] };
-      });
-    },
   });
 
   const mutation = useMutation({
@@ -58,7 +45,7 @@ export function useMessages(conversationId) {
         idempotencyKey: cle,
         contenu,
         dateEnvoi: new Date().toISOString(),
-        auteurId: 1,
+        auteurId: monId,
         envoyeParMoi: true,
         etat: "en_cours",
       };
@@ -80,8 +67,10 @@ export function useMessages(conversationId) {
       });
       client.invalidateQueries({ queryKey: ["conversations"] });
     },
-    onError: () => {
-      // Échec : l'optimiste passe en état « echec » (icône alerte, clic = renvoyer)
+    onError: (erreur, variables) => {
+      // Échec (réseau) : bulle « echec » + mise en file — rejouée à la
+      // reconnexion avec la MÊME idempotencyKey (zéro doublon, doc 08 §5).
+      fileAttente.current.push(variables);
       client.setQueryData(["messages", conversationId], (ancien) => {
         if (!ancien) return ancien;
         return {
@@ -94,6 +83,81 @@ export function useMessages(conversationId) {
     },
   });
 
+  const { envoyerBrut, etatConnexion } = useWebSocketChat({
+    conversationId,
+    surEvenement: (evenement) => {
+      switch (evenement.type) {
+        case "message.new": {
+          if (evenement.conversationId !== conversationId) {
+            client.invalidateQueries({ queryKey: ["conversations"] });
+            toast("Nouveau message reçu", {
+              description: evenement.message?.contenu?.slice(0, 80),
+              action: {
+                label: "Ouvrir",
+                onClick: () => naviguer(`/messagerie/${evenement.conversationId}`),
+              },
+            });
+            return;
+          }
+          const message = evenement.message;
+          client.setQueryData(["messages", conversationId], (ancien) => {
+            if (!ancien) return ancien;
+            if (ancien.results.some((m) => m.id === message.id)) return ancien;
+            if (
+              message.idempotencyKey &&
+              ancien.results.some((m) => m.idempotencyKey === message.idempotencyKey)
+            ) {
+              return ancien;
+            }
+            // Cache « plus récent d'abord » → prepend
+            return { ...ancien, results: [message, ...ancien.results] };
+          });
+          break;
+        }
+        case "typing":
+          if (evenement.utilisateurId === monId) return; // anti-écho
+          if (evenement.conversationId === conversationId) {
+            setEtatTyping({ utilisateurId: evenement.utilisateurId, actif: evenement.etat });
+          }
+          break;
+        case "presence":
+          if (evenement.utilisateurId === monId) return; // anti-écho
+          if (evenement.conversationId === conversationId) {
+            setPresence(evenement.enLigne);
+          }
+          break;
+        case "message.lu":
+          if (evenement.parUserId === monId) return; // anti-écho
+          if (evenement.conversationId === conversationId) {
+            setLuJusqua((ancien) => ({
+              parUserId: evenement.parUserId,
+              jusquaMessageId: Math.max(ancien?.jusquaMessageId ?? 0, evenement.jusquaMessageId),
+            }));
+          }
+          break;
+        default:
+          break;
+      }
+    },
+  });
+
+  // Join à chaque ouverture de conversation (le connect initial ne couvre que
+  // la première — navigation list↔conversation comprise).
+  useEffect(() => {
+    if (conversationId) envoyerBrut({ type: "join", conversationId });
+  }, [conversationId, envoyerBrut]);
+
+  // Retour du lien WS → rejouer la file d'envois (idempotence garantie).
+  const etatPrecedent = useRef(etatConnexion);
+  useEffect(() => {
+    if (etatPrecedent.current === "reconnexion" && etatConnexion === "connecte") {
+      const aRejouer = fileAttente.current;
+      fileAttente.current = [];
+      for (const envoi of aRejouer) mutation.mutate(envoi);
+    }
+    etatPrecedent.current = etatConnexion;
+  }, [etatConnexion, mutation]);
+
   const envoyer = useCallback(() => {
     const contenu = brouillon.trim();
     if (!contenu) return;
@@ -102,9 +166,12 @@ export function useMessages(conversationId) {
   }, [brouillon, mutation]);
 
   const marquerLu = useCallback(async () => {
-    // Cache « plus récent d'abord » → le dernier VRAI message = results[0].
-    // (at(-1) renvoyait le plus ancien : le serveur marquait lu le mauvais message.)
-    const dernier = client.getQueryData(["messages", conversationId])?.results?.[0];
+    // Cache « plus récent d'abord » → le dernier VRAI message = premier id
+    // NUMÉRIQUE de results (une bulle optimiste `optimiste-…` peut occuper la
+    // tête juste après un envoi — la PATCH refuse tout id non numérique).
+    const dernier = (client.getQueryData(["messages", conversationId])?.results ?? []).find(
+      (m) => typeof m.id === "number",
+    );
     if (!dernier) return;
     try {
       await messagerieApi.marquerLu(conversationId, dernier.id);
@@ -144,5 +211,10 @@ export function useMessages(conversationId) {
     setBrouillon,
     envoyer,
     chargerAnciens,
+    envoyerBrut,
+    etatConnexion,
+    etatTyping,
+    presence,
+    luJusqua,
   };
 }
