@@ -14,6 +14,7 @@ import MessagerieListPage from "@features/messagerie/pages/MessagerieListPage";
 import ConversationPage from "@features/messagerie/pages/ConversationPage";
 import RendezVousPage from "@features/rendez-vous/pages/RendezVousPage";
 import RendezVousDetailPage from "@features/rendez-vous/pages/RendezVousDetailPage";
+import FilPage from "@features/fil/pages/FilPage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -44,7 +45,7 @@ function AppRoutes() {
         <Route path="/messagerie" element={<MessagerieListPage />}>
           <Route path=":conversationId" element={<ConversationPage />} />
         </Route>
-        <Route path="/fil" element={<PlaceholderPage titre="Fil" spec="doc 09 — P19" />} />
+        <Route path="/fil" element={<FilPage />} />
         <Route path="/evenements" element={<PlaceholderPage titre="Événements" spec="doc 10 — P20" />} />
         <Route path="/evenements/:evenementId" element={<PlaceholderPage titre="Détail événement" spec="doc 10 §5 — P21" />} />
         <Route path="/offres" element={<PlaceholderPage titre="Offres" spec="doc 14 — P22" />} />

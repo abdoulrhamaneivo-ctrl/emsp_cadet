@@ -113,6 +113,8 @@ class Command(BaseCommand):
             binome.statut = Binome.Statut.ACTIF
             binome.save()
 
+        self._seed_fil(ivo, awa, yann, salim)
+
         if Conversation.objects.filter(participants=ivo).exists():
             self.stdout.write("Déjà seedé — rien à faire.")
             return
@@ -207,4 +209,70 @@ class Command(BaseCommand):
             self.style.SUCCESS(
                 "Seed démo posé : 4 comptes (mdp `demo`), 2 conversations, 3 RDV."
             )
+        )
+
+    def _seed_fil(self, ivo, awa, yann, salim):
+        """Fil doc 09 — publications + réactions + commentaires (idempotent).
+
+        auto_now_add écrase les dates du constructeur (leçon T3b §9.6) :
+        les dates sont réécrites via .update() pour un feed vivant
+        (« il y a 3 h », « hier »…) — jamais tout le fil à « à l'instant ».
+        """
+        from datetime import timedelta as delai
+
+        from django.utils import timezone as tz
+
+        from fil.models import Commentaire, Publication, Reaction
+
+        if Publication.objects.exists():
+            return
+        maintenant = tz.localtime()
+        pub1 = Publication.objects.create(
+            type=Publication.Type.SUCCES,
+            auteur=ivo,
+            contenu=(
+                "Premier lab Packet Tracer réussi avec Awa — "
+                "le modèle OSI n'a plus de secret !"
+            ),
+        )
+        Publication.objects.filter(pk=pub1.pk).update(
+            date_creation=maintenant - delai(hours=3)
+        )
+        pub2 = Publication.objects.create(
+            type=Publication.Type.ANNONCE,
+            auteur=awa,
+            contenu=(
+                "Je partage ma fiche de révision sur les sous-réseaux — "
+                "utile avant l'éval de réseaux."
+            ),
+        )
+        Publication.objects.filter(pk=pub2.pk).update(
+            date_creation=maintenant - delai(days=1)
+        )
+        Publication.objects.create(
+            type=Publication.Type.QUESTION,
+            auteur=yann,
+            contenu="Comment bien choisir sa filière en L2 ? Je cherche des retours d'expérience.",
+        )
+        Reaction.objects.create(publication=pub2, utilisateur=ivo, code=Reaction.Code.UTILE)
+        Reaction.objects.create(publication=pub2, utilisateur=salim, code=Reaction.Code.UTILE)
+        Reaction.objects.create(publication=pub1, utilisateur=awa, code=Reaction.Code.BRAVO)
+        commentaire1 = Commentaire.objects.create(
+            publication=pub1,
+            auteur=awa,
+            contenu="Bravo ! On attaque le subnetting à la prochaine séance.",
+        )
+        Commentaire.objects.filter(pk=commentaire1.pk).update(
+            date_creation=maintenant - delai(hours=2)
+        )
+        commentaire2 = Commentaire.objects.create(
+            publication=pub1, auteur=ivo, contenu="Avec plaisir, merci Awa !"
+        )
+        Commentaire.objects.filter(pk=commentaire2.pk).update(
+            date_creation=maintenant - delai(hours=1)
+        )
+        Commentaire.objects.create(
+            publication=pub2,
+            auteur=salim,
+            contenu="Super ressource, merci !",
         )

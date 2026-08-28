@@ -225,3 +225,18 @@ Boucle temps réel complète côté front (`useWebSocketChat` reconnexion expo 1
 - Emoji « 📍 » signalé en vision devant « Salle B12 » : **faux positif** — c'est l'icône lucide `MapPin` (SVG) OCR-isée par le modèle vision ; zéro emoji dans le code (vérifié grep).
 
 **Chaîne qualité** — vitest 46/46, lint 0, build vert, pytest 22/22 + ruff 0, overflow 0 (375/768/1280), E2E temps réel et accusé de lecture verts sur backend réel, capture `/tmp/t3d-lu-accuse.png` revue vision avec zoom ×2 (double coche or confirmée sur bulles couvertes par `jusquaMessageId`).
+
+### 9.9 Tranche T4a « Fil d'actualité » (doc 09) — première tranche 100% backend réel
+
+Le Fil (feed + réactions fermées + commentaires à un niveau + signalements) est codé DIRECTEMENT sur Django/DRF — plus de phase MSW-first : les mocks ne servent qu'aux tests Vitest par test (`server.use`), comme T3a les utilisait au runtime. Backend app `fil/` (Publication/Reaction/Commentaire/Signalement), règles serveur : 1 question/jour (409), édition/suppression seulement à 0 commentaire (409), réactions toggle par contrainte unique, réponses APLATIES niveau 1 (parent remonté à la racine, mention `@Prénom` dans le texte), signalement → `masquee=True` (l'auteur voit toujours sa publication, panneau modération ; les autres ne la voient plus).
+
+**Pièges T4a (leçons)** —
+- **Idempotent = replay 201** (pas 200) : précédent messagerie doc 21 — le front ne distingue pas création et replay, même code HTTP 201. Testé rouge puis corrigé.
+- **`questions-restantes/` AVANT `<int:pk>/`** : piège T3a réappliqué — une route littérale déclarée après la route paramétrée n'est JAMAIS atteinte.
+- **auto_now_add, encore lui** (leçon T3b §9.6) : le seed fil affichait tout le feed « il y a 12 minutes » → dates réécrites via `.update()` (il y a 3 h / hier / à l'instant) pour un feed vivant. Toute donnée seedée datée DOIT être réécrite après insert.
+- **Pyright et les nouvelles apps Django** : le LSP râle « Cannot access attribute objects » sur toute app fraîchement créée (il ne voit pas le manager dynamique) — du bruit PUR. La porte qualité du backend reste `ruff check .` + `pytest`.
+- **Captures vision : deux faux défauts d'animation** (réappliqués et généralisés) : zone commentaires capturée PENDANT l'expansion height 0→auto = « troncature » inventée → attendre 600 ms après le clic ; page mobile capturée pendant le chargement = « cartes vides/squelettes majeur » → attendre un texte de CONTENU réel, jamais le titre seul.
+- **Ligne méta mobile : l'ordre de troncature est une décision produit** — avatar | nom+chip | méta | menu : la date relative DOIT être en tête de méta (info critique jamais tronquée), la filière en fin de ligne (troncature acceptable, vérifié vision en 2 passes). Un `truncate` unique sur « filière · date » avalait l'unité de temps (« il y a 15 … »).
+- **Infinite query feed** : `useInfiniteQuery` + `getNextPageParam` sur count cumulé ; stagger framer-motion plafonné aux 20 premiers items (doc 09 §6, perf scroll long) — au-delà, fade simple sans transform.
+
+**Chaîne qualité** — backend : pytest 40/40 (18 nouveaux fil), ruff 0, migration 0001, seed idempotent étendu (3 publications, réactions, commentaires datés). Front : vitest 51/51 (5 nouveaux), lint 0, build vert, overflow 3/3. E2E `t4a-fil-e2e.mjs` sur backend réel (publier par la vraie UI → apparaît dans le feed → commenter). 3 captures (`shoot-t4a.mjs`) revues vision — 1 vrai bug mobile corrigé (noms tronqués), 2 faux positifs d'animation documentés.
