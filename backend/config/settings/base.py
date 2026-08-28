@@ -33,6 +33,7 @@ LOCAL_APPS = [
     "comptes",
     "messagerie",
     "rendezvous",
+    "fil",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
