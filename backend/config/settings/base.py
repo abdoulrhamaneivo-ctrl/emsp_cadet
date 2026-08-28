@@ -102,6 +102,7 @@ REST_FRAMEWORK = {
         "comptes.permissions.EstActif",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "TOKEN_OBTAIN_SERIALIZER": "comptes.serializers.JetonConnexionSerializer",
 }
 
 SIMPLE_JWT = {

@@ -35,6 +35,7 @@ def test_mauvais_mot_de_passe_401(api, users):
         "/api/auth/connexion/", {"email": "ivo@emsp.int", "password": "faux"}, format="json"
     )
     assert reponse.status_code == 401
+    assert "incorrect" in reponse.json()["detail"].lower()
 
 
 def test_compte_suspendu_423_avec_motif_et_fin(api, users):

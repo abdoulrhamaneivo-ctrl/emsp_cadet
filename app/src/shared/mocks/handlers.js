@@ -287,13 +287,17 @@ export const handlers = [
     HttpResponse.json({ estAuthentifie: true, utilisateur: utilisateurs[0] }),
   ),
 
+  // Contrat backend réel (doc 21 §6) : {email, password} → 401 {detail} francisé.
   http.post("*/api/auth/connexion/", async ({ request }) => {
     const body = await request.json();
     const trouve = utilisateurs.find((u) => u.email === body?.email);
-    if (!trouve || !body?.motDePasse) {
-      return HttpResponse.json({ detail: "Identifiants invalides." }, { status: 401 });
+    if (!trouve || !body?.password) {
+      return HttpResponse.json(
+        { detail: "E-mail ou mot de passe incorrect." },
+        { status: 401 },
+      );
     }
-    return HttpResponse.json({ utilisateur: trouve });
+    return HttpResponse.json({ access: "mock-access-token", utilisateur: trouve });
   }),
 
   http.post("*/api/auth/deconnexion/", () => HttpResponse.json({ ok: true })),
