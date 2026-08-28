@@ -15,6 +15,8 @@ import ConversationPage from "@features/messagerie/pages/ConversationPage";
 import RendezVousPage from "@features/rendez-vous/pages/RendezVousPage";
 import RendezVousDetailPage from "@features/rendez-vous/pages/RendezVousDetailPage";
 import FilPage from "@features/fil/pages/FilPage";
+import EvenementsPage from "@features/evenements/pages/EvenementsPage";
+import EvenementDetailPage from "@features/evenements/pages/EvenementDetailPage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -46,8 +48,8 @@ function AppRoutes() {
           <Route path=":conversationId" element={<ConversationPage />} />
         </Route>
         <Route path="/fil" element={<FilPage />} />
-        <Route path="/evenements" element={<PlaceholderPage titre="Événements" spec="doc 10 — P20" />} />
-        <Route path="/evenements/:evenementId" element={<PlaceholderPage titre="Détail événement" spec="doc 10 §5 — P21" />} />
+        <Route path="/evenements" element={<EvenementsPage />} />
+        <Route path="/evenements/:evenementId" element={<EvenementDetailPage />} />
         <Route path="/offres" element={<PlaceholderPage titre="Offres" spec="doc 14 — P22" />} />
         <Route path="/administration" element={<PlaceholderPage titre="Administration" spec="doc 12 — P23 (admin only)" />} />
         <Route path="/moderation" element={<PlaceholderPage titre="Modération" spec="doc 12 — P24 (admin only)" />} />

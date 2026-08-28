@@ -17,14 +17,28 @@ def api():
 
 @pytest.fixture
 def users(db):
+    # classe = niveau en préfixe (convention plateforme) — c'est sur elle que
+    # repose la garde aîné des événements (t4b).
     ivo = User.objects.create_user(
-        email="ivo@emsp.int", password="demo", prenom="Ivo", nom="Abdoul"
+        email="ivo@emsp.int",
+        password="demo",
+        prenom="Ivo",
+        nom="Abdoul",
+        classe="L2 Digitalisation",
     )
     awa = User.objects.create_user(
-        email="awa@emsp.int", password="demo", prenom="Awa", nom="Kouassi"
+        email="awa@emsp.int",
+        password="demo",
+        prenom="Awa",
+        nom="Kouassi",
+        classe="L3 Réseaux",
     )
     salim = User.objects.create_user(
-        email="salim@emsp.int", password="demo", prenom="Salim", nom="Cissé"
+        email="salim@emsp.int",
+        password="demo",
+        prenom="Salim",
+        nom="Cissé",
+        classe="L1 Digitalisation",
     )
     return SimpleNamespace(ivo=ivo, awa=awa, salim=salim)
 

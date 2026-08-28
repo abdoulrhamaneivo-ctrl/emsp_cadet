@@ -50,6 +50,10 @@ class PublicationsView(APIView):
             Publication.objects.select_related("auteur")
             .prefetch_related("reactions", "commentaires")
             .filter(Q(masquee=False) | Q(auteur=request.user))
+            # Les publications porteuses des discussions d'événements ne sont
+            # PAS du contenu du Fil (t4b) — seule leur fiche événement expose
+            # les messages.
+            .filter(evenement_discussion__isnull=True)
         )
         type_filtre = request.query_params.get("type")
         if type_filtre:

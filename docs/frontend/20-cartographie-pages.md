@@ -240,3 +240,19 @@ Le Fil (feed + réactions fermées + commentaires à un niveau + signalements) e
 - **Infinite query feed** : `useInfiniteQuery` + `getNextPageParam` sur count cumulé ; stagger framer-motion plafonné aux 20 premiers items (doc 09 §6, perf scroll long) — au-delà, fade simple sans transform.
 
 **Chaîne qualité** — backend : pytest 40/40 (18 nouveaux fil), ruff 0, migration 0001, seed idempotent étendu (3 publications, réactions, commentaires datés). Front : vitest 51/51 (5 nouveaux), lint 0, build vert, overflow 3/3. E2E `t4a-fil-e2e.mjs` sur backend réel (publier par la vraie UI → apparaît dans le feed → commenter). 3 captures (`shoot-t4a.mjs`) revues vision — 1 vrai bug mobile corrigé (noms tronqués), 2 faux positifs d'animation documentés.
+
+### 9.10 Tranche T4b « Événements » (doc 10) — discussion réutilisant le fil, inscription toggle
+
+Événements complets : création aîné|admin (garde `_est_aine` sur le préfixe de `classe`, insensible à la casse), inscription TOGGLE (201 ajout / 200 retrait), capacité stricte 409, désinscription bloquée H-2h (422), organisateur jamais désistable, discussion = `fil.Commentaire` rattaché à une « publication PORTEUSE » cachée (`evenement_discussion__isnull=True` exclue du feed — UN seul modèle de commentaire plateforme), annonce automatique sur le Fil à l'annulation, participants toujours visibles.
+
+**Pièges T4b (leçons)** —
+- **Related manager ≠ queryset nu** : `evenement.inscriptions.all().create(...)` perd le lien FK → `NOT NULL constraint failed: evenement_id` ; c'est `evenement.inscriptions.create(...)` (related manager DIRECT) qui le porte. Testé rouge puis corrigé — le test unitaire a attrapé ce que le sanity curl n'aurait jamais vu.
+- **Comparaison de niveaux : minuscules aux DEUX bouts** — `_est_aine` comparait `"l3 réseaux"` (classe en base) à un tuple `("L2","L3",…)` en MAJUSCULES : TOUJOURS False → un vrai aîné L3 du seed était refusé. Baisser les deux côtés.
+- **Un client API PAR acteur** : réutiliser la même instance `APIClient` avec plusieurs `force_authenticate` = le dernier écrase les autres → le « toggle d'Ivo » testait en réalité Awa (message d'erreur du print DEBUG : « L'organisateur ne peut pas quitter »). Séquence d'isolation pour trancher un échec de test.
+- **Règle produit fixée par le test** : après désistement, la place LIBRE peut être reprise (réinscription 201) — le 409 protège uniquement la course au DERNIER place (événement plein + jamais inscrit), pas une réinscription ordinaire. Mon premier test affirmait l'inverse : c'est le produit qui a gagné, pas le test.
+- **Jauge N segments : jamais à côté d'un titre** — 12 segments posés sur la ligne « Ta participation » débordaient de la carte sticky ET repliaient le titre. La jauge vit sur SA propre ligne (vision ×2).
+- **Chaîne min-w-0 (leçon T1) réappliquée à la carte événement** : `motion.div > Link > Card > colonne` — sans elle, la jauge pousse la carte au-delà du viewport mobile (titre coupé NET sans ellipsis, compteur 2/12 hors écran). Vision valide : ellipsis propre + jauge entière.
+- **Identifiants JAMAIS dans une commande shell** (curl avec mot de passe en clair = blocage de la couche sécurité) — la vérification API passe par les scripts E2E, qui s'auto-connectent via l'app.
+- Capture mobile Événements : le lien de nav vit dans le drawer fermé → attendre un texte de CONTENU (leçon §9.7 réappliquée), sinon timeout 20 s sur un élément `hidden`.
+
+**Chaîne qualité** — backend : pytest 55/55 (15 nouveaux evenements), ruff 0, migration 0001, seed +2 événements. Front : vitest 56/56 (5 nouveaux), lint 0, build vert, overflow 3/3. E2E `t4b-evenements-e2e.mjs` (liste → fiche → message en discussion → désister → se réinscrire). Captures `shoot-t4b.mjs` revues vision — 2 vrais bugs corrigés (jauge débordante desktop, carte mobile hors viewport).
