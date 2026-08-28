@@ -114,6 +114,7 @@ class Command(BaseCommand):
             binome.save()
 
         self._seed_fil(ivo, awa, yann, salim)
+        self._seed_evenements(awa, ivo, salim)
 
         if Conversation.objects.filter(participants=ivo).exists():
             self.stdout.write("Déjà seedé — rien à faire.")
@@ -276,3 +277,55 @@ class Command(BaseCommand):
             auteur=salim,
             contenu="Super ressource, merci !",
         )
+
+    def _seed_evenements(self, awa, ivo, salim):
+        """Événements doc 10 — atelier à venir + révision passé (idempotent).
+
+        Dates réécrites après insert (auto_now_add, leçon §9.6/§9.9) ; inscrits
+        par `update_or_create` pour rester idempotent au re-run.
+        """
+        from datetime import timedelta as delai
+
+        from django.utils import timezone as tz
+
+        from evenements.models import Evenement, Inscription
+
+        if Evenement.objects.exists():
+            return
+        maintenant = tz.localtime()
+        atelier = Evenement.objects.create(
+            type="Atelier",
+            titre="Atelier SQL — jointures et agrégats",
+            description=(
+                "Deux heures pour démuscler tes requêtes : jointures internes et "
+                "externes, GROUP BY bien tenu, HAVING vs WHERE, et un jeu de "
+                "données EMSP pour t'entraîner. Apporte ton PC, on finit par un "
+                "mini-défaut à corriger ensemble."
+            ),
+            organisateur=awa,
+            date_heure=maintenant + delai(days=3),
+            lieu="Salle B12",
+            en_ligne=False,
+            capacite_max=12,
+        )
+        Evenement.objects.filter(pk=atelier.pk).update(
+            date_creation=maintenant - delai(days=1)
+        )
+        Inscription.objects.update_or_create(evenement=atelier, participant=ivo)
+        Inscription.objects.update_or_create(evenement=atelier, participant=salim)
+
+        passe = Evenement.objects.create(
+            type="Révision",
+            titre="Révision algorithmique — examen L1",
+            description=(
+                "Séance de révision sur les bases : boucles, tableaux, "
+                "complexité, et les pièges classiques du partiel de L1. "
+                "Support partagé après la séance sur le Fil."
+            ),
+            organisateur=awa,
+            date_heure=maintenant - delai(days=2),
+            lieu="Bibliothèque",
+            en_ligne=False,
+            capacite_max=20,
+        )
+        Inscription.objects.update_or_create(evenement=passe, participant=salim)
