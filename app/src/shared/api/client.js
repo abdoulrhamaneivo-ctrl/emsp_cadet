@@ -11,6 +11,23 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
+/**
+ * Access token EN MÉMOIRE uniquement (doc 19 §5.1 — jamais localStorage).
+ * Posé par authApi.connexion / rafraîchissement, lu par l'intercepteur request.
+ */
+let jetonMemoire = null;
+
+export function definirJeton(jeton) {
+  jetonMemoire = jeton;
+}
+
+apiClient.interceptors.request.use((config) => {
+  if (jetonMemoire) {
+    config.headers.Authorization = `Bearer ${jetonMemoire}`;
+  }
+  return config;
+});
+
 let rafraichissementEnCours = null;
 
 apiClient.interceptors.response.use(
@@ -31,10 +48,13 @@ apiClient.interceptors.response.use(
           apiClient.post("/api/auth/refresh/").finally(() => {
             rafraichissementEnCours = null;
           });
-        await rafraichissementEnCours;
+        const rafraichi = await rafraichissementEnCours;
+        // Rotation : le nouvel access remplace l'ancien en mémoire.
+        if (rafraichi?.data?.access) definirJeton(rafraichi.data.access);
         return apiClient({ ...config, __rejoue: true });
       } catch {
         // refresh échoué : session morte, l'app repassera en état "invite"
+        definirJeton(null);
         return Promise.reject(erreur);
       }
     }

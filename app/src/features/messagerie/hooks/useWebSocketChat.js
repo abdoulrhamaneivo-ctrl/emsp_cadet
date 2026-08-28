@@ -1,16 +1,16 @@
 /**
  * useWebSocketChat (doc 08 §2) — connexion WS unique pour toute la session.
  *
- * T3a : si VITE_WS_URL est défini, WS réel (contrat exact : join, message.new,
- * message.lu, typing, presence) ; sinon simulateur branché sur le store MSW
- * (abonnerWS) — les mêmes événements, livrés en in-process. T3b branchera
- * Channels sans toucher aux composants : seul ce fichier connaît le transport.
+ * Transport (seul ce fichier le connaît) : WS réel dès que VITE_WS_URL est
+ * DÉFINI — valeur vide = same-origin via le proxy Vite (doc 21 §9). Sinon
+ * simulateur branché sur le store MSW (abonnerWS). Le token JWT en query est
+ * un best effort ; en mode proxy, le cookie httpOnly Path=/ sert d'identité.
  */
 
 import { useEffect, useRef } from "react";
 import { abonnerWS } from "@shared/mocks/store-t3.js";
 
-const SIMULATEUR = !import.meta.env.VITE_WS_URL;
+const SIMULATEUR = import.meta.env.VITE_WS_URL === undefined;
 
 export function useWebSocketChat({ conversationId, surEvenement }) {
   const refCallback = useRef(surEvenement);

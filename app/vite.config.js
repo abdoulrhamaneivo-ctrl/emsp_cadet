@@ -17,7 +17,16 @@ export default defineConfig({
       "@shared": r("./src/shared"),
     },
   },
-  server: { port: 5200, strictPort: true },
+  server: {
+    port: 5200,
+    strictPort: true,
+    // Bascule T3b (doc 21 §9) : proxy même origine vers le backend Django.
+    // Actif en dev seulement — sans lui, définir VITE_API_URL/VITE_WS_URL directs.
+    proxy: {
+      "/api": "http://localhost:8000",
+      "/ws": { target: "ws://localhost:8000", ws: true },
+    },
+  },
   test: {
     environment: "jsdom",
     globals: true,
