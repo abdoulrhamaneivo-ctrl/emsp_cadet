@@ -21,7 +21,7 @@ const utilisateurs = [
     intentionAnneeSuivante: "inconnu",
     preferencesIA: { matchingEnrichi: true, copilot: true },
     anneePromotion: null,
-    candidatureAineOuverte: false,
+    candidatureAineOuverte: true,
     classe: "L2 Digitalisation",
     filiere: "Digitalisation des services",
     photoUrl: null,
@@ -327,6 +327,170 @@ let monParrainage = {
 
 let prochaineDemandeId = 1000;
 
+/**
+ * État T2 (doc 05) : demandes dans les DEUX sens (débiter/créditer), binômes
+ * actifs et clos, famille, RDV du binôme — tout est mutable via les endpoints.
+ * Le cadet démo (Ivo, L2) porte les DEUX casquettes : il a une Aînée (Awa),
+ * accompagne 2 cadets, reçoit 2 demandes, et a un binôme clos sans avis (RG6).
+ */
+let demandesEntrantes = [
+  {
+    id: 910,
+    cadet: utilisateurs[9], // Nadia Traoré, L1
+    aine: utilisateurs[0],
+    statut: "en_attente",
+    dateDemande: "2026-08-24T16:40:00Z",
+    dateReponse: null,
+    motifRefus: null,
+    message: "Bonjour ! Je débute en réseaux et ton parcours me motive beaucoup. Peux-tu m'accompagner ?",
+  },
+  {
+    id: 911,
+    cadet: {
+      id: 11,
+      prenom: "Chloé",
+      nom: "Aka",
+      email: "chloe.aka@emsp.int",
+      isAdmin: false,
+      niveauEtude: "L1",
+      intentionAnneeSuivante: "inconnu",
+      preferencesIA: { matchingEnrichi: false, copilot: false },
+      anneePromotion: null,
+      candidatureAineOuverte: false,
+      classe: "L1 Digitalisation",
+      filiere: "Digitalisation des services",
+      photoUrl: null,
+      attentes: null,
+      emailVerifie: true,
+      dateInscription: "2026-08-10T08:00:00Z",
+    },
+    aine: utilisateurs[0],
+    statut: "en_attente",
+    dateDemande: "2026-08-26T09:15:00Z",
+    dateReponse: null,
+    motifRefus: null,
+    message: "Salut ! Je voudrais des conseils pour préparer mon PFE en digitalisation.",
+  },
+];
+
+let mesCadets = [
+  {
+    id: 701,
+    autre: {
+      id: 12,
+      prenom: "Yann",
+      nom: "Gbagbo",
+      email: "yann.gbagbo@emsp.int",
+      isAdmin: false,
+      niveauEtude: "L1",
+      intentionAnneeSuivante: "inconnu",
+      preferencesIA: { matchingEnrichi: true, copilot: true },
+      anneePromotion: null,
+      candidatureAineOuverte: false,
+      classe: "L1 Digitalisation",
+      filiere: "Digitalisation des services",
+      photoUrl: null,
+      attentes: null,
+      emailVerifie: true,
+      dateInscription: "2026-08-12T10:00:00Z",
+    },
+    dateDebut: "2026-03-02T00:00:00Z",
+    statut: "actif",
+    avisDonne: false,
+    sens: "donne_a_mon_cadet",
+  },
+  {
+    id: 702,
+    autre: {
+      id: 13,
+      prenom: "Salim",
+      nom: "Cissé",
+      email: "salim.cisse@emsp.int",
+      isAdmin: false,
+      niveauEtude: "L1",
+      intentionAnneeSuivante: "inconnu",
+      preferencesIA: { matchingEnrichi: false, copilot: false },
+      anneePromotion: null,
+      candidatureAineOuverte: false,
+      classe: "L1 Réseaux",
+      filiere: "Réseaux et télécommunications",
+      photoUrl: null,
+      attentes: null,
+      emailVerifie: true,
+      dateInscription: "2026-08-14T11:00:00Z",
+    },
+    dateDebut: "2026-03-09T00:00:00Z",
+    statut: "actif",
+    avisDonne: false,
+    sens: "donne_a_mon_cadet",
+  },
+];
+
+let historiqueRecus = [
+  {
+    id: 901,
+    cadet: utilisateurs[0],
+    aine: utilisateurs[2],
+    statut: "terminee",
+    dateDemande: "2025-11-04T10:00:00Z",
+    dateReponse: "2025-11-05T09:12:00Z",
+    motifRefus: null,
+  },
+];
+let historiqueEnvoyes = [
+  {
+    id: 905,
+    cadet: utilisateurs[0],
+    aine: utilisateurs[6], // Kouassi N'Guessan, alumni
+    statut: "terminee",
+    dateDemande: "2025-09-20T10:00:00Z",
+    dateReponse: "2025-09-21T08:00:00Z",
+    motifRefus: null,
+    avisDonne: false,
+  },
+];
+
+let groupes = [
+  {
+    conversationId: 501,
+    type: "famille",
+    titre: "Ta famille — toi & tes cadets",
+    nbMembres: 3, // Ivo + Yann + Salim (doc 13 : famille auto aîné + cadets)
+  },
+];
+
+let rdvs = [
+  {
+    id: 401,
+    organisateur: utilisateurs[0],
+    invite: {
+      id: 12,
+      prenom: "Yann",
+      nom: "Gbagbo",
+      email: "yann.gbagbo@emsp.int",
+      isAdmin: false,
+      niveauEtude: "L1",
+      intentionAnneeSuivante: "inconnu",
+      preferencesIA: { matchingEnrichi: true, copilot: true },
+      anneePromotion: null,
+      candidatureAineOuverte: false,
+      classe: "L1 Digitalisation",
+      filiere: "Digitalisation des services",
+      photoUrl: null,
+      attentes: null,
+      emailVerifie: true,
+      dateInscription: "2026-08-12T10:00:00Z",
+    },
+    titre: "Point hebdo — préparation du PFE",
+    description: "Revue du plan de travail, apporte tes notes.",
+    dateHeure: "2026-09-02T15:00:00Z",
+    lieu: "Salle info 2",
+    mode: "presentiel",
+    statut: "confirme",
+    contreProposition: null,
+  },
+];
+
 export const handlers = [
   http.get("*/api/auth/session/", () =>
     HttpResponse.json({ estAuthentifie: true, utilisateur: utilisateurs[0] }),
@@ -415,8 +579,27 @@ export const handlers = [
     return HttpResponse.json(enrichir(u));
   }),
 
-  // État parrainage du cadet démo (RG1)
-  http.get("*/api/me/parrainage/", () => HttpResponse.json(monParrainage)),
+  // État parrainage du cadet démo (RG1) — contrat complet doc 05 §2 (double facette)
+  http.get("*/api/me/parrainage/", () =>
+    HttpResponse.json({
+      binomeActif: monParrainage.binomeActif,
+      aineActif: monParrainage.aineActif,
+      demandeEnAttente: monParrainage.demandeEnAttente,
+      monAine: monParrainage.aineActif
+        ? {
+            id: 800,
+            autre: monParrainage.aineActif,
+            dateDebut: "2026-02-10T00:00:00Z",
+            statut: "actif",
+            avisDonne: false,
+            sens: "recu_de_mon_aine",
+          }
+        : null,
+      cadetsActifs: mesCadets,
+      historiqueEnvoyes,
+      historiqueRecus,
+    }),
+  ),
 
   // Demande de parrainage : 201 | 409 RG1 (déjà engagé / attente) | 409 RG3 (complet)
   http.post("*/api/parrains/:id/demande/", async ({ params, request }) => {
@@ -455,6 +638,126 @@ export const handlers = [
       monParrainage = { ...monParrainage, demandeEnAttente: null };
     }
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  // ── T2 (doc 05) : demandes dans les deux sens ────────────────────────────
+  // GET /api/demandes/?sens=envoyees|recues — « recues » vide si candidature fermée
+  http.get("*/api/demandes/", ({ request }) => {
+    const url = new URL(request.url);
+    const sens = url.searchParams.get("sens") || "envoyees";
+    const statut = url.searchParams.get("statut");
+    const moi = utilisateurs[0];
+
+    if (sens === "recues") {
+      if (!moi.candidatureAineOuverte) {
+        return HttpResponse.json({ count: 0, results: [] });
+      }
+      const recues = demandesEntrantes.filter((d) => !statut || d.statut === statut);
+      return HttpResponse.json({ count: recues.length, results: recues });
+    }
+    // Sens « envoyées » : attente live + historique clos (même forme que T1)
+    const attente = monParrainage.demandeEnAttente
+      ? [{ ...monParrainage.demandeEnAttente, statut: "en_attente" }]
+      : [];
+    const envoyees = [...attente, ...historiqueEnvoyes].filter((d) => !statut || d.statut === statut);
+    return HttpResponse.json({ count: envoyees.length, results: envoyees });
+  }),
+
+  // POST /api/demandes/:id/repondre/ — accepter (RG2) ou refuser (motif partagé)
+  http.post("*/api/demandes/:id/repondre/", async ({ params, request }) => {
+    const body = await request.json().catch(() => ({}));
+    const idx = demandesEntrantes.findIndex((d) => d.id === Number(params.id));
+    if (idx === -1) {
+      return HttpResponse.json({ detail: "Demande introuvable." }, { status: 404 });
+    }
+    const d = demandesEntrantes[idx];
+    if (d.statut !== "en_attente") {
+      return HttpResponse.json({ detail: "Cette demande a déjà été traitée." }, { status: 409 });
+    }
+    if (body?.decision === "acceptee") {
+      if (mesCadets.length >= 5) {
+        return HttpResponse.json(
+          { detail: "RG2 : tu accompagnes déjà 5 cadets. Libère une place avant d'accepter." },
+          { status: 409 },
+        );
+      }
+      demandesEntrantes.splice(idx, 1);
+      mesCadets = [
+        ...mesCadets,
+        {
+          id: 700 + mesCadets.length + 40,
+          autre: d.cadet,
+          dateDebut: new Date().toISOString(),
+          statut: "actif",
+          avisDonne: false,
+          sens: "donne_a_mon_cadet",
+        },
+      ];
+      // Doc 13 : accepter un cadet l'ajoute à MA famille existante
+      groupes = groupes.map((g) =>
+        g.type === "famille" ? { ...g, nbMembres: g.nbMembres + 1 } : g,
+      );
+      return HttpResponse.json({ ok: true, statut: "acceptee" });
+    }
+    if (body?.decision === "refusee") {
+      demandesEntrantes.splice(idx, 1);
+      if (body.partagerMotif && body.motifRefus) {
+        historiqueRecus = [
+          { ...d, statut: "refusee", dateReponse: new Date().toISOString(), motifRefus: body.motifRefus },
+          ...historiqueRecus,
+        ];
+      }
+      return HttpResponse.json({ ok: true, statut: "refusee" });
+    }
+    return HttpResponse.json({ detail: "Décision invalide." }, { status: 400 });
+  }),
+
+  // PATCH /api/demandes/:id/annuler/ — demandeur, seulement en_attente (doc 05 §2)
+  http.patch("*/api/demandes/:id/annuler/", ({ params }) => {
+    if (monParrainage.demandeEnAttente?.id === Number(params.id)) {
+      monParrainage = { ...monParrainage, demandeEnAttente: null };
+      return HttpResponse.json({ ok: true });
+    }
+    return HttpResponse.json({ detail: "Seule une demande en attente s'annule." }, { status: 409 });
+  }),
+
+  // GET /api/me/groups-resume/ — points d'entrée Familles & Cercles (doc 13)
+  http.get("*/api/me/groups-resume/", () => HttpResponse.json({ results: groupes })),
+
+  // GET /api/me/rendez-vous/ — aperçu RDV du binôme (carte mini, PanneauMonAine)
+  http.get("*/api/me/rendez-vous/", () => HttpResponse.json({ results: rdvs })),
+
+  // POST /api/parrainages/:id/cloture/ — RG6 : clôture → avis requis
+  http.post("*/api/parrainages/:id/cloture/", ({ params }) => {
+    const id = Number(params.id);
+    const idx = mesCadets.findIndex((b) => b.id === id);
+    if (idx === -1) {
+      return HttpResponse.json({ detail: "Parrainage introuvable." }, { status: 404 });
+    }
+    const [binome] = mesCadets.splice(idx, 1);
+    historiqueRecus = [
+      {
+        id: binome.id,
+        cadet: binome.autre,
+        aine: utilisateurs[0],
+        statut: "terminee",
+        dateDemande: binome.dateDebut,
+        dateReponse: new Date().toISOString(),
+        motifRefus: null,
+      },
+      ...historiqueRecus,
+    ];
+    return HttpResponse.json({ ok: true, avisRequis: true });
+  }),
+
+  // POST /api/parrainages/:id/avis/ — RG6, UN seul avis par binôme (doc 07)
+  http.post("*/api/parrainages/:id/avis/", ({ params }) => {
+    const id = Number(params.id);
+    const h = historiqueEnvoyes.find((x) => x.id === id) ?? historiqueRecus.find((x) => x.id === id);
+    if (!h) return HttpResponse.json({ detail: "Parrainage introuvable." }, { status: 404 });
+    if (h.avisDonne) return HttpResponse.json({ detail: "Un seul avis par parrainage." }, { status: 409 });
+    h.avisDonne = true;
+    return HttpResponse.json({ ok: true }, { status: 201 });
   }),
 
   http.get("*/api/health/", () => HttpResponse.json({ statut: "ok" })),

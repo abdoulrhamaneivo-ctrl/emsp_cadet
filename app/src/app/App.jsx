@@ -7,6 +7,8 @@ import HealthCheck from "@shared/pages/HealthCheck";
 import PlaceholderPage from "@shared/pages/PlaceholderPage";
 import AnnuairePage from "@features/annuaire/pages/AnnuairePage";
 import FicheAinePage from "@features/annuaire/pages/FicheAinePage";
+import MesDemandesPage from "@features/parrainage/pages/MesDemandesPage";
+import MonParrainagePage from "@features/parrainage/pages/MonParrainagePage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -30,8 +32,8 @@ function AppRoutes() {
         <Route path="/profil" element={<PlaceholderPage titre="Profil" spec="doc 11 — P10" />} />
         <Route path="/annuaire" element={<AnnuairePage />} />
         <Route path="/annuaire/:parrainId" element={<FicheAinePage />} />
-        <Route path="/mes-demandes" element={<PlaceholderPage titre="Mes demandes" spec="doc 05 §4 — P13" />} />
-        <Route path="/mon-parrainage" element={<PlaceholderPage titre="Mon parrainage" spec="doc 05 §5 — P14" />} />
+        <Route path="/mes-demandes" element={<MesDemandesPage />} />
+        <Route path="/mon-parrainage" element={<MonParrainagePage />} />
         <Route path="/rendez-vous" element={<PlaceholderPage titre="Rendez-vous" spec="doc 06 — P15" />} />
         <Route path="/rendez-vous/:rdvId" element={<PlaceholderPage titre="Détail rendez-vous" spec="doc 06 §5 — P16" />} />
         <Route path="/messagerie" element={<PlaceholderPage titre="Messagerie" spec="doc 08 — P17" />} />

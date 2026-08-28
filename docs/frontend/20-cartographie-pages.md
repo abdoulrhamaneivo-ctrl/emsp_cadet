@@ -151,4 +151,16 @@ Fondations créées puis déployées sur /annuaire + fiche Aîné. Palette et ke
 
 **Méthode** : captures déterministes (`scripts/shoot-iphone.mjs`, `document.fonts.ready`) revues par vision ; tout défaut constaté a été corrigé puis re-capturé. 23/23 tests (assertion « Suggérés pour toi »→« Suggestions pour toi » suivie), lint 0, build vert, overflow 0 (375/768/1280).
 
+### 9.4 Tranche T2 « Parrainage » (doc 05) — pages P13/P14 réelles
+
+Deux pages du domaine parrainage remplacent les placeholders : **/mes-demandes** (P13, doc 05 §4) et **/mon-parrainage** (P14, doc 05 §5). Feature `src/features/parrainage/` : `api.js`, `rules.js`, hooks, 8 composants, 2 pages, tests.
+
+**Contrat données étendu (mocks MSW)** — GET /api/me/parrainage/ renvoie la double facette (`monAine`, `cadetsActifs`, `historiqueEnvoyes`, `historiqueRecus` en plus du trio T1) ; GET /api/demandes/?sens=envoyees|recues ; POST /api/demandes/:id/repondre/ (acceptee|refusee) ; PATCH /api/demandes/:id/annuler/ ; GET /api/me/groups-resume/ ; GET /api/me/rendez-vous/ ; POST /api/parrainages/:id/cloture/ ; POST /api/parrainages/:id/avis/. État démo : Ivo porte les DEUX casquettes (session L2 avec `candidatureAineOuverte: true`), 2 cadets actifs, 2 demandes reçues, 1 binôme clos sans avis (flux RG6 démontrable). L'état parrainage mock reste « cadet libre » au départ — les 23 tests T1 (suggestions si libre) ne bougent pas ; le binôme s'obtient via le flux réel POST.
+
+**Règles rendues visibles (doc 05 §6)** — RG2 (5/5, accepter désactivé + chip « Complet — libère une place », `peutAccepter`), RG6 (binôme clos → CTA « Donner mon avis », modale note 1–5 étoiles or + commentaire 20–600, un seul avis par binôme — serveur 409), RG7 (L1 jamais aîné), RG8 (onglet Reçues + bloc Mes cadets seulement si candidature ouverte). Invalidation croisée : toute mutation → `["mon-parrainage"]`, `["demandes"]`, `["groups-resume"]`, `["parrains"]`, `["suggestions"]`.
+
+**Piège de facette (leçon majeure)** — les titres de section posés SUR LE FOND VERT doivent être crème ≥/90, pas `text-primary` (encre crème-cartes) : premier tour vision = « vert sur vert ≈ 1,5:1 » sur « Mes cadets »/« Familles & cercles »/« Historique ». Même piège : EmptyState n'est PAS un panneau (fond transparent) → toujours l'envelopper dans une Card sur fond vert. Jauge en `surFonce` sur fond vert. 3 tours vision, conforme final.
+
+**Divers** — `AuthProvider` accepte `initialUser` (injection de tests, prioritaire sur VITE_DEMO_SESSION) ; script `scripts/shoot-t2.mjs` (4 captures incl. onglet Reçues cliqué) ; formatteur fr `utils/dates.js` (Intl, pas de date-fns). 29/29 tests, lint 0, build vert, overflow 0 (375/768/1280).
+
 
