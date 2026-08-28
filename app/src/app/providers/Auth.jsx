@@ -13,10 +13,12 @@ const AuthContext = createContext(null);
  */
 export function AuthProvider({ children, initialUser }) {
   const [user, setUser] = useState(initialUser ?? null);
-  const [statut, setStatut] = useState(initialUser ? "authentifie" : "chargement"); // chargement | authentifie | invite
+  const [statut, setStatut] = useState(
+    initialUser !== undefined ? "authentifie" : "chargement",
+  ); // chargement | authentifie | invite
 
   useEffect(() => {
-    if (initialUser) return; // injection de test : ne jamais résoudre la session par-dessus
+    if (initialUser !== undefined) return; // injection de test (même null = figé)
     if (import.meta.env.VITE_DEMO_SESSION === "1") {
       if (import.meta.env.VITE_ENABLE_MOCKS === "1") {
         // Démo sur mocks MSW : l'utilisateur mocké (comportement T0/T3a).

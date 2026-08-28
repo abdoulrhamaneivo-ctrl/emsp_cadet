@@ -1,10 +1,11 @@
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { AppProviders } from "@app/providers";
 import PublicShell from "@layout/shells/PublicShell";
 import ProtectedShell from "@layout/shells/ProtectedShell";
 import NotFoundPage from "@shared/pages/NotFoundPage";
 import HealthCheck from "@shared/pages/HealthCheck";
 import PlaceholderPage from "@shared/pages/PlaceholderPage";
+import ConnexionPage from "@features/authentification/pages/ConnexionPage";
 import AnnuairePage from "@features/annuaire/pages/AnnuairePage";
 import FicheAinePage from "@features/annuaire/pages/FicheAinePage";
 import MesDemandesPage from "@features/parrainage/pages/MesDemandesPage";
@@ -21,7 +22,7 @@ function AppRoutes() {
       {/* Shell public */}
       <Route element={<PublicShell />}>
         <Route path="/" element={<PlaceholderPage titre="Landing" spec="adaptation template Home (T0) — P01" />} />
-        <Route path="/connexion" element={<PlaceholderPage titre="Connexion" spec="T0 — P02" />} />
+        <Route path="/connexion" element={<ConnexionPage />} />
         <Route path="/inscription" element={<PlaceholderPage titre="Inscription" spec="T0 — P03" />} />
         <Route path="/mot-de-passe-oublie" element={<PlaceholderPage titre="Mot de passe oublié" spec="T0 — P04" />} />
         <Route path="/reinitialiser-mot-de-passe/:uid/:token" element={<PlaceholderPage titre="Réinitialiser le mot de passe" spec="T0 — P05" />} />
