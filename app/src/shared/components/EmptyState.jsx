@@ -2,7 +2,7 @@
  * État vide contextualisé (doc 03 §6.11) — illustration = icône lucide
  * dans un disque crème-alt 64px, jamais d'emoji.
  */
-export default function EmptyState({ icon: Icone, title, description, actionLabel, onAction }) {
+export default function EmptyState({ icon: Icone, title, description, actionLabel, onAction, children }) {
   return (
     <div className="flex flex-col items-center justify-center text-center py-12 px-6">
       <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--emsp-cream-alt)] mb-4">
@@ -21,6 +21,7 @@ export default function EmptyState({ icon: Icone, title, description, actionLabe
           {actionLabel}
         </button>
       )}
+      {children && <div className="mt-5">{children}</div>}
     </div>
   );
 }

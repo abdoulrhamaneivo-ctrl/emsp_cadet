@@ -5,6 +5,7 @@ import { useAuth } from "@app/providers/Auth";
 import Avatar from "@shared/components/Avatar";
 import { Menu, MoonIcon, SunIcon, X, Home, Users, Link2, MessageCircle, Newspaper, CalendarDays, Clock, Briefcase, UserRound, LogOut, ShieldCheck } from "lucide-react";
 import menuProtege from "@/data/menu-protege.json";
+import { useTotalNonLus } from "@features/messagerie/hooks/useConversations";
 import { cx } from "@shared/utils/cx";
 
 const icones = {
@@ -32,6 +33,7 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOuvert, setMobileOuvert] = useState(false);
+  const totalNonLus = useTotalNonLus();
 
   const deco = user ? `${user.prenom} ${user.nom}` : "Invité";
 
@@ -46,6 +48,7 @@ export default function Sidebar() {
     <ul role="list" className="flex flex-col gap-1">
       {menuProtege.data.map((item) => {
         const Icone = iconesParTitre[item.title];
+        const actifOuBadge = item.link.startsWith("/messagerie") && totalNonLus > 0;
         return (
           <li key={item.id} className="list-none">
             <NavLink
@@ -54,12 +57,22 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 cx(
                   "flex items-center gap-3 rounded-[var(--radius-chip)] px-3.5 py-2.5 text-sm transition-colors",
-                  isActive ? lienActif : lienInactif,
+                  isActive || actifOuBadge ? lienActif : lienInactif,
                 )
               }
             >
               {Icone && <Icone size={17} aria-hidden="true" />}
               {item.title}
+              {item.link.startsWith("/messagerie") && totalNonLus > 0 && (
+                <span
+                  className={cx(
+                    "ml-auto inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold tabular-nums",
+                    "bg-[#16281c] text-[var(--emsp-gold)]",
+                  )}
+                >
+                  {totalNonLus > 99 ? "99+" : totalNonLus}
+                </span>
+              )}
             </NavLink>
           </li>
         );
@@ -194,13 +207,21 @@ export default function Sidebar() {
                   to={item.link}
                   className={({ isActive }) =>
                     cx(
-                      "flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium",
+                      "relative flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium",
                       isActive ? "text-[var(--emsp-gold)]" : "text-[var(--emsp-cream)]/85",
                     )
                   }
                 >
                   {Icone && <Icone size={19} aria-hidden="true" />}
                   {item.title}
+                  {item.link.startsWith("/messagerie") && totalNonLus > 0 && (
+                    <span
+                      className="absolute right-[calc(50%-1.15rem)] top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--emsp-gold)] px-1 text-[9px] font-bold text-[#16281c] tabular-nums"
+                      aria-label={`${totalNonLus} messages non lus`}
+                    >
+                      {totalNonLus > 99 ? "99+" : totalNonLus}
+                    </span>
+                  )}
                 </NavLink>
               </li>
             );
