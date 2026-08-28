@@ -1,6 +1,6 @@
-import { apiClient } from "./client";
+import { apiClient, definirJeton } from "./client";
 
-/** Endpoints d'authentification (contrat doc 02 §5 / doc 19). */
+/** Endpoints d'authentification (contrat doc 02 §5 / doc 19 / doc 21 §6). */
 export const authApi = {
   /** Session courante ; renvoie l'utilisateur ou null si invité. */
   session: async () => {
@@ -11,9 +11,17 @@ export const authApi = {
       return null;
     }
   },
-  connexion: async (identifiants) =>
-    (await apiClient.post("/api/auth/connexion/", identifiants)).data,
+  connexion: async (identifiants) => {
+    const { data } = await apiClient.post("/api/auth/connexion/", identifiants);
+    // Access token en mémoire (jamais localStorage — doc 19 §5.1) ; le refresh
+    // repart en cookie httpOnly posé par le backend.
+    definirJeton(data.access);
+    return data;
+  },
   inscription: async (formulaire) =>
     (await apiClient.post("/api/auth/inscription/", formulaire)).data,
-  deconnexion: async () => apiClient.post("/api/auth/deconnexion/"),
+  deconnexion: async () => {
+    definirJeton(null);
+    return apiClient.post("/api/auth/deconnexion/");
+  },
 };

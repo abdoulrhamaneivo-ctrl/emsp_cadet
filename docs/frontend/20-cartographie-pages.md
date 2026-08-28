@@ -181,4 +181,21 @@ Messagerie (P17/P18, doc 08) et Rendez-vous (P15/P16, doc 06) réelles — le ba
 
 **Chaîne qualité** — 40/40 tests (messagerie 3 : garde §1, idempotence, badge lu ; RDV 8 : matrice `peutRepondre` + zod date passée ; T1/T2 intacts), lint 0, build vert, overflow 0 (375/768/1280), captures `scripts/shoot-t3.mjs` revues vision : 8 bugs réels trouvés, corrigés, re-capturés (dont le token mort et l'ordre du fil).
 
+### 9.6 Tranche T3b « Backend Django » (doc 21) — la bascule réelle
+
+Backend `backend/` fondé ex nihilo : Django 5 + DRF + Channels (uv, Python 3.13, SQLite dev), apps `comptes`/`messagerie`/`rendezvous`. **Le contrat REST/WS est verbatim des mocks T3a** — le front n'a pas changé une ligne de features pour la bascule. 21 tests pytest (18 REST + 3 WS dont un E2E Channels Communicator), ruff 0. Rituel : commit → merge → tag `t3b-backend`.
+
+**Architecture** — JWT : access en réponse, **refresh en cookie httpOnly** (rotation + blacklist) ; **le consumer WS authentifie via le cookie** (`Path=/`) quand le front ne peut pas poser de token en query — le front n'écrit rien en sessionStorage (doc 19 §5.1 respecté à la lettre). Le `message.new` est publié par le viewset REST (source de vérité) via `channel_layer`, le consumer redistribue et **réécrit `envoyeParMoi` par destinataire**. `GET /api/auth/session/` {estAuthentifie, utilisateur} = contrat T0 pour AuthProvider ; `/prochain/` déclaré avant `/:id` ; 423 suspension levée par la permission (pas un middleware — l'auth DRF tourne dans la vue).
+
+**Bascule front (doc 21 §9)** — proxy Vite `/api` + `/ws` → :8000 ; `VITE_WS_URL=` (défini mais vide = same-origin) — la porte du transport est `VITE_WS_URL === undefined` (pas falsy), sinon le simulateur resterait actif ; auto-connexion dev `VITE_DEMO_EMAIL/PASSWORD` dans AuthProvider quand mocks OFF ; access token **en mémoire** via `definirJeton` + interceptor request (jamais localStorage). **E2E prouvé** (`scripts/t3b-e2e.mjs`) : messagerie rendue depuis Django via proxy, message POSTé par Awa apparait en direct chez Ivo (WS `HANDSHAKING → CONNECT` dans le log serveur), bannière J-1 « dans 27 h » vivante, revue vision conforme. 40/40 front, build ✓, overflow 0.
+
+**Pièges T3b (leçons)** —
+- Custom `User` email = USERNAME_FIELD ⇒ **manager custom obligatoire** (`create_user` sans username, `username` aligné sur l'email sinon collision sur `""` unique).
+- `auto_now_add` écrase toute date passée au constructeur : les seeds réécrivent `date_envoi` via `.update()` après save.
+- Q-OR simple (`Q(a,c) | Q(c,a)`) : **« internal query planner error » SQLite** → deux requêtes simples.
+- Permission par défaut globale (EstActif) bloque la connexion : `AllowAny` explicite sur /api/auth/*.
+- Channels×pytest-django : fixtures invisibles du thread consumer → `@pytest.mark.django_db(transaction=True)` ; `RefreshToken.for_user()` persiste un OutstandingToken → **générer les jetons hors de la boucle async**.
+- Consumer ASYNC : toute ORM via `database_sync_to_async`, sinon SynchronousOnlyOperation.
+- Seed : conversation = date du DERNIER MESSAGE (Max messages__date_envoi), jamais le pk (les seeds réécrivent l'historique).
+
 

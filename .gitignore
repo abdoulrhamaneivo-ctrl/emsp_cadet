@@ -4,6 +4,13 @@ dist/
 build/
 *.tsbuildinfo
 
+# Python (backend/)
+.venv/
+__pycache__/
+*.py[cod]
+db.sqlite3
+*.sqlite3
+
 # Caches
 .vite/
 .eslintcache

@@ -18,14 +18,38 @@ export function AuthProvider({ children, initialUser }) {
   useEffect(() => {
     if (initialUser) return; // injection de test : ne jamais résoudre la session par-dessus
     if (import.meta.env.VITE_DEMO_SESSION === "1") {
-      // Session de démo : l'utilisateur mocké par MSW
-      setUser(window.__sessionDemo ?? {
-        id: 1, prenom: "Ivo", nom: "Abdoul", isAdmin: false,
-        niveauEtude: "L2", classe: "L2 Digitalisation",
-        candidatureAineOuverte: true,
-      });
-      setStatut("authentifie");
-      return;
+      if (import.meta.env.VITE_ENABLE_MOCKS === "1") {
+        // Démo sur mocks MSW : l'utilisateur mocké (comportement T0/T3a).
+        setUser(window.__sessionDemo ?? {
+          id: 1, prenom: "Ivo", nom: "Abdoul", isAdmin: false,
+          niveauEtude: "L2", classe: "L2 Digitalisation",
+          candidatureAineOuverte: true,
+        });
+        setStatut("authentifie");
+        return;
+      }
+      // Bascule T3b (doc 21 §9) : auto-connexion dev contre le VRAI backend.
+      // Identifiants de démo uniquement (compte seedé), jamais en prod.
+      let actif = true;
+      authApi
+        .connexion({
+          email: import.meta.env.VITE_DEMO_EMAIL,
+          password: import.meta.env.VITE_DEMO_PASSWORD,
+        })
+        .then(() => authApi.session())
+        .then((u) => {
+          if (!actif) return;
+          setUser(u);
+          setStatut(u ? "authentifie" : "invite");
+        })
+        .catch(() => {
+          if (!actif) return;
+          setUser(null);
+          setStatut("invite");
+        });
+      return () => {
+        actif = false;
+      };
     }
     let actif = true;
     authApi
