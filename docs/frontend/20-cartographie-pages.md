@@ -30,12 +30,12 @@
 | P10 | `/profil` | ProfilePage | `features/profil/pages/ProfilePage.jsx` | **doc 11** (+15 intention) | T2* | ⬜ à construire |
 | P11 | `/annuaire` | AnnuairePage | `features/annuaire/pages/AnnuairePage.jsx` | **doc 04** | T1 | ✅ fait (T1) |
 | P12 | `/annuaire/:parrainId` | FicheAinePage | `features/annuaire/pages/FicheAinePage.jsx` | **doc 04 §5** | T1 | ✅ fait (T1) |
-| P13 | `/mes-demandes` | MesDemandesPage | `features/parrainage/pages/MesDemandesPage.jsx` | **doc 05 §4** | T2 | ⬜ à construire |
-| P14 | `/mon-parrainage` | MonParrainagePage | `features/parrainage/pages/MonParrainagePage.jsx` | **doc 05 §5** (double facette) | T2 | ⬜ à construire |
-| P15 | `/rendez-vous` | RendezVousPage | `features/rendez-vous/pages/RendezVousPage.jsx` | **doc 06 §4** | T3 | ⬜ à construire |
-| P16 | `/rendez-vous/:rdvId` | RendezVousDetailPage | `features/rendez-vous/pages/RendezVousDetailPage.jsx` | **doc 06 §5** | T3 | ⬜ à construire |
-| P17 | `/messagerie` | MessagerieListPage | `features/messagerie/pages/MessagerieListPage.jsx` | **doc 08 §4** | T3 | ⬜ à construire |
-| P18 | `/messagerie/:conversationId` | ConversationPage | `features/messagerie/pages/ConversationPage.jsx` | **doc 08 §5** (+ groupes doc 13 §5) | T3 | ⬜ à construire |
+| P13 | `/mes-demandes` | MesDemandesPage | `features/parrainage/pages/MesDemandesPage.jsx` | **doc 05 §4** | T2 | ✅ fait (T2) |
+| P14 | `/mon-parrainage` | MonParrainagePage | `features/parrainage/pages/MonParrainagePage.jsx` | **doc 05 §5** (double facette) | T2 | ✅ fait (T2) |
+| P15 | `/rendez-vous` | RendezVousPage | `features/rendez-vous/pages/RendezVousPage.jsx` | **doc 06 §4** | T3 | ✅ fait (T3a) |
+| P16 | `/rendez-vous/:rdvId` | RendezVousDetailPage | `features/rendez-vous/pages/RendezVousDetailPage.jsx` | **doc 06 §5** | T3 | ✅ fait (T3a) |
+| P17 | `/messagerie` | MessagerieListPage | `features/messagerie/pages/MessagerieListPage.jsx` | **doc 08 §4** | T3 | ✅ fait (T3a) |
+| P18 | `/messagerie/:conversationId` | ConversationPage | `features/messagerie/pages/ConversationPage.jsx` | **doc 08 §5** (+ groupes doc 13 §5) | T3 | ✅ fait (T3a) |
 
 *T0* : HomePage version minimale (accueil + progression onboarding) livrée dès T0, enrichie en T2/T3.
 
@@ -162,5 +162,23 @@ Deux pages du domaine parrainage remplacent les placeholders : **/mes-demandes**
 **Piège de facette (leçon majeure)** — les titres de section posés SUR LE FOND VERT doivent être crème ≥/90, pas `text-primary` (encre crème-cartes) : premier tour vision = « vert sur vert ≈ 1,5:1 » sur « Mes cadets »/« Familles & cercles »/« Historique ». Même piège : EmptyState n'est PAS un panneau (fond transparent) → toujours l'envelopper dans une Card sur fond vert. Jauge en `surFonce` sur fond vert. 3 tours vision, conforme final.
 
 **Divers** — `AuthProvider` accepte `initialUser` (injection de tests, prioritaire sur VITE_DEMO_SESSION) ; script `scripts/shoot-t2.mjs` (4 captures incl. onglet Reçues cliqué) ; formatteur fr `utils/dates.js` (Intl, pas de date-fns). 29/29 tests, lint 0, build vert, overflow 0 (375/768/1280).
+
+### 9.5 Tranche T3a « Communication » (docs 08+06) — front sur mocks MSW
+
+Messagerie (P17/P18, doc 08) et Rendez-vous (P15/P16, doc 06) réelles — le backend Django/Channels arrive en T3b, le front bascule via `VITE_WS_URL`. Features `src/features/messagerie/` et `src/features/rendez-vous/` (api, schemas zod, rules, hooks, composants, pages) ; mocks partagés `store-t3.js` (source unique) + `handlers-t3.js` + `utilisateurs.js` ; simulateur WS (join/message.new/message.lu/typing/presence, reconnexion expo 1s→30s).
+
+**Contrat exact (doc 08 §2 / doc 06)** — messages : pagination curseur descendante (plus récents d'abord, taille 8), POST idempotent (clé déjà vue → même message, zéro doublon), PATCH `/lu/` ; RDV : machine propose→confirme/refuse/contre_propose→(organisateur tranche)→annule/passe ; GET `/prochain/` alimente la bannière J-1 (confirmé < 48h ET rappel non vu ; X masque, n'annule PAS le RDV) auto-portée par ProtectedShell. Contre-proposition acceptée = organisateur applique dateHeure/lieu. Invalidation croisée `["conversations"]`/`["messages"]`/`["rdv"]`/`["prochain-rdv"]`/`["mon-parrainage"]`.
+
+**RG visibles** — messagerie sans binôme → EmptyState (enveloppé Card, CTA annuaire) ; messages 1..2000 chars (compteur live) ; RDV dateHeure > now+5 min, lieu requis si présentiel ; seul l'invité répond à une `propose`, seul l'organisateur tranche une `contre_propose` (`peutRepondre(rdv, user)` — pas de hook dans une règle). Badge non-lus : sidebar desktop ET bottom-nav mobile (`useTotalNonLus`, cap 99+).
+
+**Pièges T3 (leçons coûteuses)** —
+- Handlers MSW : route littérale (`/prochain/`) AVANT route `:param` (`/:id/`) — premier match gagne, sinon 404 silencieux.
+- Cache TanStack « plus récents d'abord » : le fil doit être inversé AU RENDU ; les appends optimistes sont des prepend ; `marquerLu` vise `results[0]` (avec `at(-1)` on marquait lu le plus ANCIEN).
+- Token CSS `--emsp-green` n'existait pas (seuls `green-deep/mid/bright/luminous`) → 3 fonds invisibles d'un coup (bulles « moi », avatar famille, toggle mode RDV). Un token mort = plusieurs symptômes : grep `var(--emsp-*)` contre globals.css AVANT la passe vision.
+- Chip `success` (texte `accent-green` #0f5132) illisible sur en-tête vert profond → pilule or/encre sur fond vert.
+- Split-view : `Outlet` dans un conteneur `lg:block` → la Card grandit sans borne et le composer passe sous le pli → `lg:flex lg:flex-col`.
+- Donnée démo datée en dur (RDV « 2026-08-27 ») → la bannière J-1 meurt le lendemain : `dateHeure` calculée « demain 14h » au chargement des mocks.
+
+**Chaîne qualité** — 40/40 tests (messagerie 3 : garde §1, idempotence, badge lu ; RDV 8 : matrice `peutRepondre` + zod date passée ; T1/T2 intacts), lint 0, build vert, overflow 0 (375/768/1280), captures `scripts/shoot-t3.mjs` revues vision : 8 bugs réels trouvés, corrigés, re-capturés (dont le token mort et l'ordre du fil).
 
 

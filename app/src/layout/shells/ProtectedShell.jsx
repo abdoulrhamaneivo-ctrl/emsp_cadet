@@ -4,6 +4,14 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@app/providers/Auth";
 import Sidebar from "@layout/sidebar/Sidebar";
 import ErrorBoundary from "@shared/components/ErrorBoundary";
+import BanniereRappel from "@features/rendez-vous/components/BanniereRappel";
+import { useProchainRappel } from "@features/rendez-vous/hooks/useRendezVous";
+
+/** Bannière J-1 auto-portée par le shell (doc 06 §6) — null si aucun rappel. */
+function BanniereRappelAuto() {
+  const { data } = useProchainRappel();
+  return <BanniereRappel rdv={data?.result ?? null} />;
+}
 
 /**
  * Shell protégé (doc 03 §4) : sidebar 260px desktop, contenu max-w-7xl,
@@ -34,6 +42,7 @@ export default function ProtectedShell() {
       <Sidebar />
       <main id="main">
         <ErrorBoundary label="page">
+          <BanniereRappelAuto />
           <motion.div {...pageTransition}>
             <div className="mx-auto w-full max-w-7xl px-5 py-6 lg:px-10 lg:py-8">
               <Outlet />

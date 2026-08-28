@@ -1,4 +1,7 @@
 import { http, HttpResponse } from "msw";
+import { utilisateurs } from "./utilisateurs.js";
+import { rdvs } from "./store-t3.js";
+import { t3Handlers } from "./handlers-t3.js";
 
 /**
  * Données de démo conformes au contrat (docs 02 §5 / 04) — MSW (doc 19).
@@ -10,188 +13,6 @@ import { http, HttpResponse } from "msw";
  *  - id 3/7: alumni → chip « ALUMNI · Promo » (RG10)
  */
 
-const utilisateurs = [
-  {
-    id: 1,
-    prenom: "Ivo",
-    nom: "Abdoul",
-    email: "ivo.abdoul@emsp.int",
-    isAdmin: false,
-    niveauEtude: "L2",
-    intentionAnneeSuivante: "inconnu",
-    preferencesIA: { matchingEnrichi: true, copilot: true },
-    anneePromotion: null,
-    candidatureAineOuverte: true,
-    classe: "L2 Digitalisation",
-    filiere: "Digitalisation des services",
-    photoUrl: null,
-    attentes: "Comprendre les bases de données et préparer mon projet de fin d'année.",
-    emailVerifie: true,
-    dateInscription: "2026-08-20T09:00:00Z",
-  },
-  {
-    id: 2,
-    prenom: "Awa",
-    nom: "Kouassi",
-    email: "awa.kouassi@emsp.int",
-    isAdmin: false,
-    niveauEtude: "L3",
-    intentionAnneeSuivante: "master",
-    preferencesIA: { matchingEnrichi: true, copilot: false },
-    anneePromotion: null,
-    candidatureAineOuverte: true,
-    classe: "L3 Réseaux",
-    filiere: "Réseaux et télécommunications",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2025-10-02T10:30:00Z",
-  },
-  {
-    id: 3,
-    prenom: "Marius",
-    nom: "Tanoh",
-    email: "marius.tanoh@emsp.int",
-    isAdmin: false,
-    niveauEtude: "alumni",
-    intentionAnneeSuivante: "alumni",
-    preferencesIA: { matchingEnrichi: false, copilot: false },
-    anneePromotion: "2024",
-    candidatureAineOuverte: true,
-    classe: "Alumni 2024",
-    filiere: "Digitalisation des services",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2023-09-15T08:00:00Z",
-  },
-  {
-    id: 4,
-    prenom: "Fatou",
-    nom: "Bamba",
-    email: "fatou.bamba@emsp.int",
-    isAdmin: false,
-    niveauEtude: "L2",
-    intentionAnneeSuivante: "inconnu",
-    preferencesIA: { matchingEnrichi: true, copilot: true },
-    anneePromotion: null,
-    candidatureAineOuverte: true,
-    classe: "L2 Digitalisation",
-    filiere: "Digitalisation des services",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2025-11-03T14:00:00Z",
-  },
-  {
-    id: 5,
-    prenom: "Serge",
-    nom: "Kouadio",
-    email: "serge.kouadio@emsp.int",
-    isAdmin: false,
-    niveauEtude: "L3",
-    intentionAnneeSuivante: "master",
-    preferencesIA: { matchingEnrichi: false, copilot: false },
-    anneePromotion: null,
-    candidatureAineOuverte: true,
-    classe: "L3 Digitalisation",
-    filiere: "Digitalisation des services",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2025-09-10T08:30:00Z",
-  },
-  {
-    id: 6,
-    prenom: "Aline",
-    nom: "Koffi",
-    email: "aline.koffi@emsp.int",
-    isAdmin: false,
-    niveauEtude: "M2",
-    intentionAnneeSuivante: "master",
-    preferencesIA: { matchingEnrichi: true, copilot: false },
-    anneePromotion: null,
-    candidatureAineOuverte: true,
-    classe: "M2 Réseaux",
-    filiere: "Réseaux et télécommunications",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2024-10-01T09:00:00Z",
-  },
-  {
-    id: 7,
-    prenom: "Kouassi",
-    nom: "N'Guessan",
-    email: "kouassi.nguessan@emsp.int",
-    isAdmin: false,
-    niveauEtude: "alumni",
-    intentionAnneeSuivante: "alumni",
-    preferencesIA: { matchingEnrichi: false, copilot: false },
-    anneePromotion: "2023",
-    candidatureAineOuverte: true,
-    classe: "Alumni 2023",
-    filiere: "Réseaux et télécommunications",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2022-09-05T08:00:00Z",
-  },
-  {
-    id: 8,
-    prenom: "Grace",
-    nom: "Adjoua",
-    email: "grace.adjoua@emsp.int",
-    isAdmin: false,
-    niveauEtude: "L2",
-    intentionAnneeSuivante: "inconnu",
-    preferencesIA: { matchingEnrichi: true, copilot: true },
-    anneePromotion: null,
-    candidatureAineOuverte: true,
-    classe: "L2 Gestion postale",
-    filiere: "Gestion des services postaux",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2025-11-12T11:00:00Z",
-  },
-  {
-    id: 9,
-    prenom: "Ibrahim",
-    nom: "Ouattara",
-    email: "ibrahim.ouattara@emsp.int",
-    isAdmin: false,
-    niveauEtude: "M1",
-    intentionAnneeSuivante: "master",
-    preferencesIA: { matchingEnrichi: false, copilot: true },
-    anneePromotion: null,
-    candidatureAineOuverte: true,
-    classe: "M1 Digitalisation",
-    filiere: "Digitalisation des services",
-    photoUrl: null,
-    attentes: null,
-    emailVerifie: true,
-    dateInscription: "2024-09-20T10:00:00Z",
-  },
-  {
-    id: 10,
-    prenom: "Nadia",
-    nom: "Traoré",
-    email: "nadia.traore@emsp.int",
-    isAdmin: false,
-    niveauEtude: "L1",
-    intentionAnneeSuivante: "inconnu",
-    preferencesIA: { matchingEnrichi: true, copilot: true },
-    anneePromotion: null,
-    candidatureAineOuverte: false,
-    classe: "L1 Réseaux",
-    filiere: "Réseaux et télécommunications",
-    photoUrl: null,
-    attentes: "Trouver une aînée pour m'aider à prendre mes repères.",
-    emailVerifie: true,
-    dateInscription: "2026-08-15T07:45:00Z",
-  },
-];
 
 /** Enrichissement ProfilAine (doc 02 §5) — ambitions ≥3, projets ≥1, forts ≥2, faibles ≥1 (RG8). */
 const profilsAine = {
@@ -459,37 +280,7 @@ let groupes = [
   },
 ];
 
-let rdvs = [
-  {
-    id: 401,
-    organisateur: utilisateurs[0],
-    invite: {
-      id: 12,
-      prenom: "Yann",
-      nom: "Gbagbo",
-      email: "yann.gbagbo@emsp.int",
-      isAdmin: false,
-      niveauEtude: "L1",
-      intentionAnneeSuivante: "inconnu",
-      preferencesIA: { matchingEnrichi: true, copilot: true },
-      anneePromotion: null,
-      candidatureAineOuverte: false,
-      classe: "L1 Digitalisation",
-      filiere: "Digitalisation des services",
-      photoUrl: null,
-      attentes: null,
-      emailVerifie: true,
-      dateInscription: "2026-08-12T10:00:00Z",
-    },
-    titre: "Point hebdo — préparation du PFE",
-    description: "Revue du plan de travail, apporte tes notes.",
-    dateHeure: "2026-09-02T15:00:00Z",
-    lieu: "Salle info 2",
-    mode: "presentiel",
-    statut: "confirme",
-    contreProposition: null,
-  },
-];
+// RDV : source unique = store-t3.js (id 401 « confirme » sert à la bannière J-1)
 
 export const handlers = [
   http.get("*/api/auth/session/", () =>
@@ -724,8 +515,15 @@ export const handlers = [
   // GET /api/me/groups-resume/ — points d'entrée Familles & Cercles (doc 13)
   http.get("*/api/me/groups-resume/", () => HttpResponse.json({ results: groupes })),
 
-  // GET /api/me/rendez-vous/ — aperçu RDV du binôme (carte mini, PanneauMonAine)
-  http.get("*/api/me/rendez-vous/", () => HttpResponse.json({ results: rdvs })),
+  // GET /api/me/rendez-vous/ — aperçu RDV du binôme (carte mini, PanneauMonAine T2)
+  // Source unique : le store T3 (mêmes objets que /api/rendez-vous/).
+  http.get("*/api/me/rendez-vous/", () => {
+    const maintenant = new Date();
+    const aVenir = rdvs
+      .filter((r) => r.statut !== "passe" && new Date(r.dateHeure) >= maintenant)
+      .sort((a, b) => new Date(a.dateHeure) - new Date(b.dateHeure));
+    return HttpResponse.json({ results: aVenir });
+  }),
 
   // POST /api/parrainages/:id/cloture/ — RG6 : clôture → avis requis
   http.post("*/api/parrainages/:id/cloture/", ({ params }) => {
@@ -759,6 +557,8 @@ export const handlers = [
     h.avisDonne = true;
     return HttpResponse.json({ ok: true }, { status: 201 });
   }),
+
+  ...t3Handlers,
 
   http.get("*/api/health/", () => HttpResponse.json({ statut: "ok" })),
 ];

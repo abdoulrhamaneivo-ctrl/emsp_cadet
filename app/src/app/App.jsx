@@ -9,6 +9,10 @@ import AnnuairePage from "@features/annuaire/pages/AnnuairePage";
 import FicheAinePage from "@features/annuaire/pages/FicheAinePage";
 import MesDemandesPage from "@features/parrainage/pages/MesDemandesPage";
 import MonParrainagePage from "@features/parrainage/pages/MonParrainagePage";
+import MessagerieListPage from "@features/messagerie/pages/MessagerieListPage";
+import ConversationPage from "@features/messagerie/pages/ConversationPage";
+import RendezVousPage from "@features/rendez-vous/pages/RendezVousPage";
+import RendezVousDetailPage from "@features/rendez-vous/pages/RendezVousDetailPage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -34,10 +38,11 @@ function AppRoutes() {
         <Route path="/annuaire/:parrainId" element={<FicheAinePage />} />
         <Route path="/mes-demandes" element={<MesDemandesPage />} />
         <Route path="/mon-parrainage" element={<MonParrainagePage />} />
-        <Route path="/rendez-vous" element={<PlaceholderPage titre="Rendez-vous" spec="doc 06 — P15" />} />
-        <Route path="/rendez-vous/:rdvId" element={<PlaceholderPage titre="Détail rendez-vous" spec="doc 06 §5 — P16" />} />
-        <Route path="/messagerie" element={<PlaceholderPage titre="Messagerie" spec="doc 08 — P17" />} />
-        <Route path="/messagerie/:conversationId" element={<PlaceholderPage titre="Conversation" spec="doc 08 §5 — P18" />} />
+        <Route path="/rendez-vous" element={<RendezVousPage />} />
+        <Route path="/rendez-vous/:rdvId" element={<RendezVousDetailPage />} />
+        <Route path="/messagerie" element={<MessagerieListPage />}>
+          <Route path=":conversationId" element={<ConversationPage />} />
+        </Route>
         <Route path="/fil" element={<PlaceholderPage titre="Fil" spec="doc 09 — P19" />} />
         <Route path="/evenements" element={<PlaceholderPage titre="Événements" spec="doc 10 — P20" />} />
         <Route path="/evenements/:evenementId" element={<PlaceholderPage titre="Détail événement" spec="doc 10 §5 — P21" />} />
