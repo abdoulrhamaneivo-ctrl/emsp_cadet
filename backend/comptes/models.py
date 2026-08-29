@@ -65,6 +65,13 @@ class User(AbstractUser):
     points_forts = models.JSONField(default=list, blank=True)
     points_faibles = models.JSONField(default=list, blank=True)
     photo = models.FileField("photo", upload_to="photos/", null=True, blank=True)
+    # IA responsable (doc 17 §3) — opt-in strict (RG12.4), défaut FALSE.
+    preferences_ia = models.JSONField(
+        "préférences IA",
+        default=dict,
+        blank=True,
+        help_text="matchingEnrichi, copilot — consentement révocable.",
+    )
     # RG11 (doc 19 §4.1) : suspension → 423 avec {motif, fin}.
     est_suspendu = models.BooleanField("suspendu", default=False)
     fin_suspension = models.DateTimeField("fin de suspension", null=True, blank=True)

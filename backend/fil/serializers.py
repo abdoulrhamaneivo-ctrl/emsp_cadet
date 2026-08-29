@@ -47,8 +47,11 @@ class PublicationSerializer(serializers.ModelSerializer):
             "maReaction",
             "nbCommentaires",
             "masquee",
+            "enVerification",
         ]
-        read_only_fields = ["masquee"]
+        read_only_fields = ["masquee", "enVerification"]
+
+    enVerification = serializers.BooleanField(source="en_verification", read_only=True)
 
     def get_reactions(self, obj):
         decompte = {"bravo": 0, "merci": 0, "utile": 0}

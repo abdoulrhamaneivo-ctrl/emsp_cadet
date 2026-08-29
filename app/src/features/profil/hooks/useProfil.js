@@ -10,6 +10,13 @@ export function useVisibilite() {
   return useQuery({ queryKey: ["visibilite-annuaire"], queryFn: profilApi.visibilite });
 }
 
+export function usePreferencesIA() {
+  return useQuery({
+    queryKey: ["preferences-ia"],
+    queryFn: () => profilApi.preferencesIA().then((r) => r.data ?? {}),
+  });
+}
+
 /** PATCH me — sauvegarde explicite (jamais d'autosave, doc 11 §5). */
 export function useModifierProfil() {
   const client = useQueryClient();

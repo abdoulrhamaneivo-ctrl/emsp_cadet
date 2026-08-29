@@ -92,6 +92,7 @@ class ProfilMoiSerializer(serializers.ModelSerializer):
             "intentionAnneeSuivante",
             "photoUrl",
             "dateInscription",
+            "preferencesIA",
         ]
         read_only_fields = ["id", "email", "photoUrl", "dateInscription"]
 
@@ -104,6 +105,7 @@ class ProfilMoiSerializer(serializers.ModelSerializer):
     # ── Mapping camelCase (contrat front) ────────────────────────────────────
     pointsForts = serializers.JSONField(source="points_forts", required=False)
     pointsFaibles = serializers.JSONField(source="points_faibles", required=False)
+    preferencesIA = serializers.JSONField(source="preferences_ia", required=False)
     niveauEtude = serializers.ChoiceField(
         choices=User.Niveau.choices, source="niveau_etude", required=False
     )
@@ -114,6 +116,12 @@ class ProfilMoiSerializer(serializers.ModelSerializer):
             donnees = {
                 **donnees,
                 "candidature_aine_ouverte": donnees["candidatureAineOuverte"],
+            }
+        # `preferencesIA` → `preferences_ia` (RG12.4).
+        if "preferencesIA" in donnees:
+            donnees = {
+                **donnees,
+                "preferences_ia": donnees["preferencesIA"],
             }
         return super().to_internal_value(donnees)
 

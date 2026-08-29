@@ -289,3 +289,29 @@ Profil complet : User v2 (`niveau_etude` devient un champ RÉEL avec choix L1…
 - **E501 : les compréhensions longues se coupent** — style project 100 chars.
 
 **Chaîne qualité** — backend : pytest 80/80 (11 nouveaux parrainage+transition), ruff 0, migrations 0001 parrainage + 0004 comptes. Front : vitest 65/65 (3 nouveaux règles promo), lint 0, build vert. E2E `t5b-parrainage-transition-e2e.mjs` : annuaire réel, garde admin, transition API 200 (4 modifiées, binômes conservés ≥1 — RÈGLE n°1 vérifiée). Captures shoot-t5b.mjs (annuaire, blocage promo fiche, admin).
+
+### 9.13 Tranche T6 « IA responsable » (doc 17)
+
+**RÈGLES RG12 adoptées (verbatim doc 17 §1)** —
+1. L'IA propose, l'humain dispose : AUCUNE décision automatique (ni masquage, ni sanction, ni refus) sans action humaine.
+2. Ligne rouge vie privée : conversations privées binôme/groupes JAMAIS analysées — méta-données uniquement.
+3. Transparence totale : TOUTE sortie IA visible porte ChipIA (Sparkles + étiquette « Généré par IA »).
+4. Opt-in pour le personnel : matchingEnrichi, copilot = consentement explicite révocable dans /profil (défaut FALSE).
+5. Désactivable : toggle utilisateur + kill-switch global admin (RG12.5).
+6. Traçabilité : chaque appel loggé (AppelIA — feature, score, raison, cible polymorphe).
+7. Contenu filtré : prompts sortants anonymisés/tronqués côté backend.
+
+**IA-1 — Modération préventive (phase 3, première livrée)** —
+- Backend `ia/` : service heuristique locale (spam 60, harcèlement 55, PII 55 ; seuil 55), modèle AppelIA (traçabilité), config kill-switch IA_DESACTIVEE, branchement dans `fil.views` : Publication/Commentaire → analyse à la création → score ≥ 55 ⇒ Signalement source IA déposé + `en_verification=true` (VISIBLE par l'auteur, JAMAIS masquée auto — RG12.1). AppelIA journalisé à chaque fois.
+- Front : champ `enVerification` exposé dans PublicationSerializer → CartePublication affiche ChipIA quand `enVerification=true` (RG12.3). Pas de blocage parcours (dégradation silencieuse si IA indisponible).
+- Préférences IA dans /profil : ToggleConsentementIA (opt-in strict, défaut false) pour matchingEnrichi (IA-2) + copilot (IA-3) ; ChipIA + PanneauSuggestionsIA + ToggleConsentementIA partagés.
+- SessionView fallback JWT (Authorization header) — utile scripts/E2E.
+
+**Pièges T6** —
+- **Seuil heuristique** : spam 60 > 55 → signalé ; harcèlement 55 = signalé ; PII 55 = signalé ; score combiné plafonné 95 (jamais 100 = vérification humaine OBLIGATOIRE).
+- **Kill-switch** : IA_DESACTIVEE dans settings → `analyser_apres_creation` sort immédiatement `None` (0 impact parcours).
+- **RG12.2 respecté** : l'heuristique ne reçoit QUE Publication/Commentaire (pas de conversation privée).
+- **Tests IA-1** : spam/harcelement/PII → 201 + en_verification=true + Signalement IA déposé ; normal → 201 + en_verification=false ; kill-switch ON → spam passe sans flag.
+- **Front 65/65, backend 86/86, lint 0, build vert, ruff 0**.
+
+**Prochaine** : IA-2 (matching enrichi suggestions), IA-3 (copilot profil), IA-4 (FAQ L1), IA-5 (binômes silencieux), IA-6 (offres alumni) — en fonction des priorités Ivo.

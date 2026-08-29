@@ -78,6 +78,17 @@ class VisibiliteAnnuaireView(APIView):
         return Response({"visible": not motifs, "motifs": motifs})
 
 
+class PreferencesIAView(APIView):
+    """GET /api/me/preferences-ia/ — préférences IA (doc 17 §3 / RG12.4)."""
+
+    def get(self, request):
+        prefs = request.user.preferences_ia or {}
+        return Response({
+            "matchingEnrichi": bool(prefs.get("matchingEnrichi")),
+            "copilot": bool(prefs.get("copilot")),
+        })
+
+
 class PhotoMoiView(APIView):
     """POST /api/me/photo/ — multipart {photo} ≤ 5 Mo, jpg/png/webp.
 

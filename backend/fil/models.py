@@ -20,6 +20,11 @@ class Publication(models.Model):
     masquee = models.BooleanField(
         default=False, help_text="Masquée après signalement — en attente de modération."
     )
+    # IA-1 (doc 17) : score ≥ seuil → file « en vérification » VISIBLE par
+    # tous (RG12.1 : l'IA ne masque rien, elle signale ; l'admin tranche).
+    en_verification = models.BooleanField(
+        default=False, help_text="Flaguée par l'IA — en attente de décision admin."
+    )
     date_creation = models.DateTimeField(auto_now_add=True)
 
     class Meta:
