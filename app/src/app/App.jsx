@@ -17,6 +17,7 @@ import RendezVousDetailPage from "@features/rendez-vous/pages/RendezVousDetailPa
 import FilPage from "@features/fil/pages/FilPage";
 import EvenementsPage from "@features/evenements/pages/EvenementsPage";
 import EvenementDetailPage from "@features/evenements/pages/EvenementDetailPage";
+import ProfilePage from "@features/profil/pages/ProfilePage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -37,7 +38,7 @@ function AppRoutes() {
       {/* Shell protégé */}
       <Route element={<ProtectedShell />}>
         <Route path="/accueil" element={<PlaceholderPage titre="Accueil" spec="T0* — P09" />} />
-        <Route path="/profil" element={<PlaceholderPage titre="Profil" spec="doc 11 — P10" />} />
+        <Route path="/profil" element={<ProfilePage />} />
         <Route path="/annuaire" element={<AnnuairePage />} />
         <Route path="/annuaire/:parrainId" element={<FicheAinePage />} />
         <Route path="/mes-demandes" element={<MesDemandesPage />} />

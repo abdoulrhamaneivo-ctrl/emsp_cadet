@@ -21,6 +21,7 @@ DEMO = {
         "nom": "Abdoul",
         "classe": "L2 Digitalisation",
         "filiere": "Digitalisation des services",
+        "niveau_etude": "L2",
     },
     "awa": {
         "email": "awa.kouassi@emsp.int",
@@ -28,6 +29,7 @@ DEMO = {
         "nom": "Kouassi",
         "classe": "L3 Réseaux",
         "filiere": "Réseaux et télécommunications",
+        "niveau_etude": "L3",
     },
     "yann": {
         "email": "yann.gbagbo@emsp.int",
@@ -35,6 +37,7 @@ DEMO = {
         "nom": "Gbagbo",
         "classe": "L1 Digitalisation",
         "filiere": "Digitalisation des services",
+        "niveau_etude": "L1",
     },
     "salim": {
         "email": "salim.cisse@emsp.int",
@@ -42,6 +45,7 @@ DEMO = {
         "nom": "Cissé",
         "classe": "L1 Digitalisation",
         "filiere": "Digitalisation des services",
+        "niveau_etude": "L1",
     },
 }
 
@@ -97,8 +101,12 @@ class Command(BaseCommand):
             )[0]
             for cle, infos in DEMO.items()
         }
-        for u in utilisateurs.values():
+        for cle, u in utilisateurs.items():
             u.set_password("demo")
+            # User v2 (doc 11, t5) : le niveau est mis à jour même sur un compte
+            # préexistant (get_or_create ne touche que les nouveaux) — RG7 en
+            # dépend directement.
+            u.niveau_etude = DEMO[cle].get("niveau_etude", "L1")
             u.save()
 
         ivo, awa, yann, salim = (

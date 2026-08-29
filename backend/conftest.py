@@ -18,13 +18,15 @@ def api():
 @pytest.fixture
 def users(db):
     # classe = niveau en préfixe (convention plateforme) — c'est sur elle que
-    # repose la garde aîné des événements (t4b).
+    # repose la garde aîné des événements (t4b). niveau_etude = champ réel v2
+    # (doc 11, t5) — RG7 s'appuie DÉSORMAIS sur lui, pas sur le préfixe.
     ivo = User.objects.create_user(
         email="ivo@emsp.int",
         password="demo",
         prenom="Ivo",
         nom="Abdoul",
         classe="L2 Digitalisation",
+        niveau_etude="L2",
     )
     awa = User.objects.create_user(
         email="awa@emsp.int",
@@ -32,6 +34,7 @@ def users(db):
         prenom="Awa",
         nom="Kouassi",
         classe="L3 Réseaux",
+        niveau_etude="L3",
     )
     salim = User.objects.create_user(
         email="salim@emsp.int",
@@ -39,6 +42,7 @@ def users(db):
         prenom="Salim",
         nom="Cissé",
         classe="L1 Digitalisation",
+        niveau_etude="L1",
     )
     return SimpleNamespace(ivo=ivo, awa=awa, salim=salim)
 

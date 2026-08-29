@@ -256,3 +256,17 @@ Le Fil (feed + réactions fermées + commentaires à un niveau + signalements) e
 - Capture mobile Événements : le lien de nav vit dans le drawer fermé → attendre un texte de CONTENU (leçon §9.7 réappliquée), sinon timeout 20 s sur un élément `hidden`.
 
 **Chaîne qualité** — backend : pytest 55/55 (15 nouveaux evenements), ruff 0, migration 0001, seed +2 événements. Front : vitest 56/56 (5 nouveaux), lint 0, build vert, overflow 3/3. E2E `t4b-evenements-e2e.mjs` (liste → fiche → message en discussion → désister → se réinscrire). Captures `shoot-t4b.mjs` revues vision — 2 vrais bugs corrigés (jauge débordante desktop, carte mobile hors viewport).
+
+### 9.11 Tranche T5 « Profil » (doc 11) — le grand interrupteur RG8
+
+Profil complet : User v2 (`niveau_etude` devient un champ RÉEL avec choix L1…M2/alumni — la convention « préfixe de classe » reste en repli de compatibilité), PATCH /api/me/ (champs autorisés seulement, email immuable RG4, roles JAMAIS exposés RG5), candidature RG8 (toggle → 422 en L1 via validate(), modales de conséquences activation/désactivation, promotion L1→L2 → `promotionDisponible` pour le toast-action — JAMAIS d'auto-ouverture), visibilité annuaire = checklist 1:1 des motifs API, photo multipart ≤5Mo (crop côté client), suppression self-serve par prénom (désactivation + anonymisation email, JAMAIS un delete physique).
+
+**Pièges T5 (leçons)** —
+- **Serializer DRF : champ camelCase dans `fields` = déclaration OBLIGATOIRE** — `niveauEtude`/`candidatureAineOuverte` non déclarés levèrent `ImproperlyConfigured` au runtime (masqué tant qu'aucune vue ne sérialisait le User v2). Chaque nom camel ajouté à `fields` exige son `SerializerMethodField()`/`BooleanField(source=…)`.
+- **validate() DRF reçoit les clés INTERNES (snake_case)** — un validateur RG7 sur `candidature_aine_ouverte` ne courait jamais car la clé arrivait via `initial_data` camelCase non mappée ; la garde vit désormais dans `validate()` avec lecture de `initial_data.candidatureAineOuverte` en secours. (Même famille que la leçon t4b.)
+- **Contrat 422 : DRF 400 traduit explicitement** — les erreurs de serializer (RG7, vitrine) sortent en 400 DRF par défaut ; `MoiView` les enveloppe en `ErreurValidation` (422) pour tenir le contrat doc 21. Le front affiche `detail` tel quel.
+- **seed et get_or_create : les champs v2 des comptes PRÉEXISTANTS ne sont pas touchés** — la migration posait `niveau_etude=L1` par défaut sur Ivo/Awa déjà en base → le switch RG8 apparaissait DISABLED chez un L2. Le seed re-force désormais `niveau_etude` à chaque run (comme les mots de passe). Symptôme : E2E bloqué sur « element is not enabled ».
+- **Débordement mobile : la vision trompe, la mesure tranche** — la capture suggérait un débordement du FORMULAIRE académique ; la sonde playwright (`scrollWidth` + culprits taggés) a pointé les inputs Prénom/Nom de la section IDENTité sans `w-full` (min-width:auto en grid). Mesure avant/après : 389 → 375.
+- **Panneau translucide sur fond vert (règle §9.4 réappliquée)** — `bg-[var(--emsp-gold)]/10` rendait le texte muted presque illisible ; remplacé par `--emsp-cream-alt` opaque + bordure or pleine.
+
+**Chaîne qualité** — backend : pytest 69/69 (14 nouveaux profil), ruff 0, migration 0003. Front : vitest 62/62 (6 nouveaux), lint 0, build vert, overflow 3/3 (sonde 375px = 375 exact). E2E `t5-profil-e2e.mjs` (pipeline, save dirty, bascule RG8 ON→OFF, toast). Captures `shoot-t5.mjs` revues vision — 1 panneau translucide corrigé, 1 débordement mobile corrigé par mesure.
