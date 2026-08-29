@@ -80,7 +80,7 @@ export default function FicheAinePage() {
     );
   }
 
-  const verdict = canRequest(aine, monParrainage);
+  const verdict = canRequest(aine, monParrainage, user);
   const consultationAdmin = user?.isAdmin === true;
   const demandeEnAttente = monParrainage?.demandeEnAttente ?? null;
 
@@ -279,6 +279,13 @@ export default function FicheAinePage() {
                 {verdict.code === "plein" && (
                   <>
                     <Chip tone="gold">Complet 5/5</Chip>
+                    <p className="mt-3 text-sm text-[var(--emsp-cream)]/90">{verdict.raison}</p>
+                  </>
+                )}
+
+                {verdict.code === "mauvaise_promo" && (
+                  <>
+                    <Chip tone="info">Promo {aine.niveauEtude}</Chip>
                     <p className="mt-3 text-sm text-[var(--emsp-cream)]/90">{verdict.raison}</p>
                   </>
                 )}

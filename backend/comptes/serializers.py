@@ -19,6 +19,7 @@ class UtilisateurLegereSerializer(serializers.ModelSerializer):
     photoUrl = serializers.SerializerMethodField()
     niveauEtude = serializers.SerializerMethodField()
     candidatureAineOuverte = serializers.SerializerMethodField()
+    isAdmin = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -31,6 +32,7 @@ class UtilisateurLegereSerializer(serializers.ModelSerializer):
             "photoUrl",
             "niveauEtude",
             "candidatureAineOuverte",
+            "isAdmin",
         ]
 
     def get_photoUrl(self, obj):
@@ -38,6 +40,9 @@ class UtilisateurLegereSerializer(serializers.ModelSerializer):
 
     def get_niveauEtude(self, obj):
         return obj.niveau_etude or _niveau_de_classe(obj.classe)
+
+    def get_isAdmin(self, obj):
+        return bool(obj.is_staff or obj.is_superuser)
 
     def get_candidatureAineOuverte(self, obj):
         return obj.candidature_aine_ouverte
@@ -61,6 +66,9 @@ class ProfilMoiSerializer(serializers.ModelSerializer):
 
     photoUrl = serializers.SerializerMethodField(read_only=True)
     dateInscription = serializers.DateTimeField(source="date_joined", read_only=True)
+    intentionAnneeSuivante = serializers.CharField(
+        source="intention_annee_suivante", required=False, allow_blank=True
+    )
     candidatureAineOuverte = serializers.BooleanField(
         source="candidature_aine_ouverte", required=False
     )
@@ -81,6 +89,7 @@ class ProfilMoiSerializer(serializers.ModelSerializer):
             "projets",
             "pointsForts",
             "pointsFaibles",
+            "intentionAnneeSuivante",
             "photoUrl",
             "dateInscription",
         ]
@@ -129,6 +138,20 @@ class ProfilMoiSerializer(serializers.ModelSerializer):
         return valeur
 
     def validate(self, attributs):
+        # RG7 garde (voir ci-dessus) + validation de l'intention (doc 15).
+        intention = attributs.get("intention_annee_suivante")
+        if intention is not None:
+            niveau = (
+                self.instance.niveau_etude if self.instance else None
+            ) or "L1"
+            if intention not in ("", "inconnu", "master", "alumni"):
+                raise serializers.ValidationError("Intention inconnue.")
+            # CA doc 15 n°4 : un M2 ne peut PAS déclarer « master ».
+            if intention == "master" and niveau == "M2":
+                raise serializers.ValidationError(
+                    "Le M2 est la dernière année — l'intention « master » n'est pas possible."
+                )
+            attributs["intention_annee_suivante"] = intention or "inconnu"
         # Le validateur par champ ne court jamais pour `candidatureAineOuverte`
         # (source pointe sur le champ modèle) : la règle RG7 passe ici. DRF
         # fournit `validate()` en clés INTERNES (snake_case, cf. t4b leçons).

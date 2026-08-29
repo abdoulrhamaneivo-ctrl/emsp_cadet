@@ -9,6 +9,8 @@ import axios from "axios";
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
   withCredentials: true,
+  // Le proxy Vite forward les cookies pour le refresh token
+  headers: { "Content-Type": "application/json" },
 });
 
 /**

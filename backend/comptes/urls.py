@@ -2,6 +2,13 @@
 
 from django.urls import path
 
+from .annuaire_views import (
+    GroupsResumeView,
+    MesRendezVousView,
+    ParrainDetailView,
+    ParrainsView,
+    SuggestionsView,
+)
 from .profil_views import (
     MoiView,
     PhotoMoiView,
@@ -19,4 +26,9 @@ urlpatterns = [
     path("me/visibilite-annuaire/", VisibiliteAnnuaireView.as_view()),
     path("me/photo/", PhotoMoiView.as_view()),
     path("me/compte/", SupprimerCompteView.as_view()),
+    path("me/groups-resume/", GroupsResumeView.as_view()),
+    path("me/rendez-vous/", MesRendezVousView.as_view()),
+    path("parrains/", ParrainsView.as_view()),
+    path("parrains/suggestions/", SuggestionsView.as_view()),
+    path("parrains/<int:parrain_id>/", ParrainDetailView.as_view()),
 ]

@@ -2,6 +2,7 @@
  * Règles de gestion annuaire — traduction front exacte (doc 04 / doc 02 §3).
  * Le backend garantit ; le front les rend visibles et impossibles à contourner en UX.
  */
+import { niveauDe, peutDemander, raisonCTADesactive } from "@features/parrainage/rules";
 
 /** RG2/RG3 : un Aîné à 5/5 est complet. */
 export function estComplet(aine) {
@@ -9,12 +10,14 @@ export function estComplet(aine) {
 }
 
 /**
- * RG1 + RG3 : peut-on envoyer une demande à cet Aîné ?
+ * RG1 + RG3 + RÈGLE IVO n°2 (promo devançante) : peut-on envoyer une demande
+ * à cet Aîné ?
  * @param {import("@shared/types/models").ProfilAine|null} aine
  * @param {import("@shared/types/models").MonParrainage|null} monParrainage
- * @returns {{ok: boolean, code: "ok"|"deja_engage"|"attente"|"plein"|"introuvable", raison: string|null}}
+ * @param {{niveauEtude?: string, classe?: string}|null} cadet — l'utilisateur connecté
+ * @returns {{ok: boolean, code: "ok"|"deja_engage"|"attente"|"plein"|"mauvaise_promo"|"introuvable", raison: string|null}}
  */
-export function canRequest(aine, monParrainage) {
+export function canRequest(aine, monParrainage, cadet = null) {
   if (!aine) {
     return { ok: false, code: "introuvable", raison: "Cet Aîné est introuvable." };
   }
@@ -38,6 +41,10 @@ export function canRequest(aine, monParrainage) {
       code: "attente",
       raison: "Tu as déjà une demande en attente de réponse. Annule-la avant d'en envoyer une autre.",
     };
+  }
+  // RÈGLE IVO n°2 — promo devançante uniquement (serveur revalide en 422).
+  if (cadet && !peutDemander(niveauDe(cadet), aine.niveauEtude)) {
+    return { ok: false, code: "mauvaise_promo", raison: raisonCTADesactive(niveauDe(cadet)) };
   }
   return { ok: true, code: "ok", raison: null };
 }
