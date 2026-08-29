@@ -313,11 +313,23 @@ Profil complet : User v2 (`niveau_etude` devient un champ RÉEL avec choix L1…
 - Front `CarteAine` : `raisonIA` affichée avec `ChipIA` (RG12.3) dans le pied de carte aligné.
 - Respecte RG12.4 : opt-in strict, défaut FALSE ; RG12.5 : kill-switch global via `IA_DESACTIVEE` → `SuggestionsView` ignore l'IA.
 
-**Pièges T6 (complément IA-2)** —
-- **Stop words FR** : liste volontairement courte mais suffisante — attention aux faux amis (ex: "et" dans "reseau" = pas stop word).
-- **Seuil implicite** : score 0 si attentes vides → suggestion sans IA (fallback promo devançante).
-- **RG12.4** : opt-in par défaut false — le tri IA ne s'active qu'après action utilisateur explicite dans /profil.
-- **Tests** : unitaires matching (score 0 vide, score >0 termes communs, raisonIA contient termes) ; intégration suggestions (opt-in true → tri score IA + raisonIA, opt-in false → fallback promo devançante).
-- **Front 65/65, backend 88/88, lint 0, build vert, ruff 0**.
+**IA-3 — Copilot profil (phase 4, livré)** —
+- Backend `ia/copilot.py` : gabarits par section (attentes/ambitions/projets/forces/faibles) à partir de 2-3 mots-clés → 3 propositions de phrases complètes ; endpoint `/api/me/copilot/` {section, motsCles} → {propositions: [...]} ; opt-in RG12.4 via `preferences_ia.copilot` ; journalisation `AppelIA`.
+- Front `PanneauCopilot` : 3 propositions cliquables avec `ChipIA` (RG12.3), insertion explicite dans le textarea (action utilisateur), auto-fermeture.
+- Branchement : `SectionAcademique` (attentes) + `SectionVitrineAine` (ambitions/projets/forces/faibles) — bouton « M'aider à rédiger » (Sparkles) qui ouvre le panneau, opt-in strict via `preferences_ia.copilot`.
+- Respecte RG12.1/3 : IA propose, humain insère (clic = action explicite) ; ChipIA sur chaque proposition ; RG12.4 : opt-in strict défaut false ; RG12.5 : kill-switch global.
 
-**Prochaine** : IA-3 (copilot profil), IA-4 (FAQ L1), IA-5 (binômes silencieux), IA-6 (offres alumni) — en fonction des priorités Ivo.
+**IA-4 — FAQ L1 (phase 4, livré)** —
+- Backend `ia/faq.py` : base connaissances 9 entrées (inscription, parrainage, fil, événements, profil, messagerie, RDV, admin, etc.) ; recherche similarité cosinus (sac de mots, stop words FR) sur question utilisateur vs base validée admin ; seuil 0.15 → réponse + sources ; sinon `trouve=false`.
+- Endpoint `/api/faq/` public (AllowAny) : POST {question} → {trouve, reponse, sources, score} ; kill-switch `IA_DESACTIVEE`.
+- Front `WidgetFAQ` : modal overlay (bottom-right) — saisie question + envoi → réponse avec `ChipIA` + sources si trouvée ; sinon bouton « Poser à la communauté » → redirection `/fil/nouvelle` (doc 17 §2). Historique conversation, scroll auto, loading state, erreur dégradation silencieuse.
+- Page d'accueil `AccueilPage` : Hero + KPIs + 4 fonctionnalités + WidgetFAQ (bouton « Essayer l'assistant IA »).
+- Route `/api/faq/` publique (AllowAny) ; route `/accueil` réelle.
+
+**Pièges T6 (complément IA-3/4)** —
+- **IA-3** : gabarits par section (5 sections) — attention aux placeholders « ... » si < 3 mots-clés fournis ; insertion explicite = clic proposition → texte inséré dans textarea + panneau fermé.
+- **IA-4** : base statique V1 (9 entrées) — V2 aura CRUD admin ; similarité cosinus simple, seuil 0.15 empirique (ajuster si faux positifs) ; réponse naturelle ne contient pas forcément le mot-clé exact → tests vérifient `trouve + reponse non vide + score > 0` ; dégradation silencieuse si IA indisponible ; bouton « Poser à la communauté » → `/fil/nouvelle` (doc 17 §2).
+- **Tests** : IA-3 unitaires (gabarits) + intégration copilot (opt-in true/false) ; IA-4 unitaires (recherche) + intégration endpoint (AllowAny, trouve/non-trouve) ; IA-1/2 déjà couverts.
+- **Front 65/65, backend 94/94, lint 0, build vert, ruff 0**.
+
+**Prochaine** : IA-5 (binômes silencieux), IA-6 (offres alumni) — en fonction des priorités Ivo.
