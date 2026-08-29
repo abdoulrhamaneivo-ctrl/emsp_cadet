@@ -34,3 +34,6 @@ Thumbs.db
 # Photos brutes (210 Mo d'événements — à trier avant de versionner)
 Photos/
 
+
+# Médias uploadés (tests/dev) — jamais versionnés
+backend/photos/
