@@ -13,6 +13,7 @@ from comptes.serializers import (
     _niveau_de_classe,
 )
 from config.exceptions import ErreurValidation
+from ia.integration_copilot import appeler_copilot
 
 
 class MoiView(APIView):
@@ -87,6 +88,26 @@ class PreferencesIAView(APIView):
             "matchingEnrichi": bool(prefs.get("matchingEnrichi")),
             "copilot": bool(prefs.get("copilot")),
         })
+
+
+class CopilotView(APIView):
+    """POST /api/me/copilot/ {section, motsCles} → {propositions: [...]}.
+
+    IA-3 (doc 17 §2) — Copilot de profil : à partir de 2-3 mots-clés,
+    renvoie 3 propositions de phrases pour la section demandée.
+    Opt-in RG12.4 : copilot=true requis dans preferences_ia.
+    L'utilisateur choisit d'insérer (action explicite, RG12.1/3).
+    """
+
+    def post(self, request):
+        prefs = request.user.preferences_ia or {}
+        if not prefs.get("copilot"):
+            raise ErreurValidation("Copilot désactivé — active-le dans tes préférences IA.")
+        section = (request.data or {}).get("section")
+        mots_cles = (request.data or {}).get("motsCles", "")
+        if section not in ("attentes", "ambitions", "projets", "pointsForts", "pointsFaibles"):
+            raise ErreurValidation("Section invalide.")
+        return Response(appeler_copilot(request, section, mots_cles))
 
 
 class PhotoMoiView(APIView):

@@ -19,6 +19,13 @@ export const profilApi = {
     const { data } = await apiClient.get("/api/me/preferences-ia/");
     return data; // { matchingEnrichi: boolean, copilot: boolean }
   },
+  async copilot(section, motsCles) {
+    const { data } = await apiClient.post("/api/me/copilot/", {
+      section,
+      motsCles,
+    });
+    return data; // { propositions: [...] }
+  },
   async photo(fichier) {
     const corps = new FormData();
     corps.append("photo", fichier);

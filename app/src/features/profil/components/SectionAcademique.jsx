@@ -2,6 +2,11 @@
  * Section académique (doc 11 §4) — classe, filière, NIVEAU select (RG7 :
  * conditionne la candidature) et attentes visibles par les futurs Aînés.
  */
+import { useState, useRef, useEffect } from "react";
+import PanneauCopilot from "@shared/components/PanneauCopilot";
+import { profilApi } from "../api";
+import { Sparkles } from "lucide-react";
+
 const NIVEAUX = [
   { valeur: "L1", libelle: "L1 — première année" },
   { valeur: "L2", libelle: "L2 — tu peux aider les nouveaux" },
@@ -12,6 +17,7 @@ const NIVEAUX = [
 ];
 
 export default function SectionAcademique({ moi, surChamp }) {
+  const [copilotAttentes, setCopilotAttentes] = useState({ ouvert: false, motsCles: "" });
   return (
     <section
       aria-labelledby="titre-academique"
@@ -71,6 +77,26 @@ export default function SectionAcademique({ moi, surChamp }) {
           value={moi.attentes ?? ""}
           onChange={(e) => surChamp("attentes", e.target.value)}
           placeholder="Ce que tu veux apprendre, comment tu aimes travailler…"
+        />
+        {/* Copilot IA-3 (doc 17 §2) — opt-in strict via preferences_ia.copilot */}
+        {moi.preferencesIA?.copilot && (
+          <div className="mt-2 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCopilotAttentes({ ouvert: true, motsCles: "" })}
+              className="flex items-center gap-1.5 rounded-full border border-[var(--emsp-cream)]/30 px-3 py-1.5 text-xs font-semibold text-[var(--emsp-gold)] hover:bg-[var(--emsp-cream)]/10"
+            >
+              <Sparkles size={13} aria-hidden="true" />
+              <span>M'aider à rédiger</span>
+            </button>
+          </div>
+        )}
+        <PanneauCopilot
+          section="attentes"
+          motsCles={copilotAttentes.motsCles}
+          surInsertion={(texte) => surChamp("attentes", texte)}
+          surFermeture={() => setCopilotAttentes({ ouvert: false, motsCles: "" })}
+          desactive={false}
         />
       </label>
     </section>

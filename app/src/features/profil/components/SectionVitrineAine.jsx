@@ -1,11 +1,14 @@
-import { Plus, X } from "lucide-react";
+import { useState } from "react";
+import { Plus, X, Sparkles } from "lucide-react";
+import PanneauCopilot from "@shared/components/PanneauCopilot";
+import { profilApi } from "../api";
 
 /**
  * Section vitrine Aîné (doc 11 §4) — 4 listes CRUD simples (ambitions ≥ 3,
  * projets ≥ 1, points forts ≥ 2, points faibles ≥ 1 : ce sont LES seuils de
  * complétude annuaire). Visible même candidature fermée — prépare l'avenir.
  */
-function ListeVitrine({ titre, hint, seuil, items, surChanger }) {
+function ListeVitrine({ titre, hint, seuil, items, surChanger, copilot, surCopilot }) {
   const ajouter = () => surChanger([...items, ""]);
   const modifier = (index, valeur) =>
     surChanger(items.map((item, i) => (i === index ? valeur : item)));
@@ -56,6 +59,24 @@ function ListeVitrine({ titre, hint, seuil, items, surChanger }) {
       >
         <Plus size={13} aria-hidden="true" /> Ajouter
       </button>
+      {/* Copilot IA-3 (doc 17 §2) — opt-in strict via preferences_ia.copilot */}
+      {copilot && (
+        <PanneauCopilot
+          section={titre.toLowerCase() === "points forts" ? "pointsForts" : titre.toLowerCase() === "points faibles" ? "pointsFaibles" : titre.toLowerCase()}
+          motsCles={surCopilot?.motsCles ?? ""}
+          surInsertion={(texte) => {
+            // Trouve le premier item vide ou ajoute
+            const idx = items.findIndex((i) => !i.trim());
+            if (idx >= 0) {
+              surChanger(items.map((item, i) => (i === idx ? texte : item)));
+            } else {
+              surChanger([...items, texte]);
+            }
+          }}
+          surFermeture={() => {}}
+          desactive={false}
+        />
+      )}
     </div>
   );
 }
@@ -80,6 +101,8 @@ export default function SectionVitrineAine({ moi, surChamp }) {
           seuil={3}
           items={moi.ambitions ?? []}
           surChanger={(liste) => surChamp("ambitions", liste)}
+          copilot={moi.preferencesIA?.copilot}
+          surCopilot={{}}
         />
         <ListeVitrine
           titre="Projets"
@@ -87,6 +110,8 @@ export default function SectionVitrineAine({ moi, surChamp }) {
           seuil={1}
           items={moi.projets ?? []}
           surChanger={(liste) => surChamp("projets", liste)}
+          copilot={moi.preferencesIA?.copilot}
+          surCopilot={{}}
         />
         <ListeVitrine
           titre="Points forts"
@@ -94,6 +119,8 @@ export default function SectionVitrineAine({ moi, surChamp }) {
           seuil={2}
           items={moi.pointsForts ?? []}
           surChanger={(liste) => surChamp("pointsForts", liste)}
+          copilot={moi.preferencesIA?.copilot}
+          surCopilot={{}}
         />
         <ListeVitrine
           titre="Points faibles"
@@ -101,6 +128,8 @@ export default function SectionVitrineAine({ moi, surChamp }) {
           seuil={1}
           items={moi.pointsFaibles ?? []}
           surChanger={(liste) => surChamp("pointsFaibles", liste)}
+          copilot={moi.preferencesIA?.copilot}
+          surCopilot={{}}
         />
       </div>
     </section>

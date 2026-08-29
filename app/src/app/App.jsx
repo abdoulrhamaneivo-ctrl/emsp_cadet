@@ -19,6 +19,7 @@ import EvenementsPage from "@features/evenements/pages/EvenementsPage";
 import EvenementDetailPage from "@features/evenements/pages/EvenementDetailPage";
 import ProfilePage from "@features/profil/pages/ProfilePage";
 import AdminDashboardPage from "@features/admin/pages/AdminDashboardPage";
+import AccueilPage from "@features/accueil/pages/AccueilPage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -38,7 +39,7 @@ function AppRoutes() {
 
       {/* Shell protégé */}
       <Route element={<ProtectedShell />}>
-        <Route path="/accueil" element={<PlaceholderPage titre="Accueil" spec="T0* — P09" />} />
+        <Route path="/accueil" element={<AccueilPage />} />
         <Route path="/profil" element={<ProfilePage />} />
         <Route path="/annuaire" element={<AnnuairePage />} />
         <Route path="/annuaire/:parrainId" element={<FicheAinePage />} />
