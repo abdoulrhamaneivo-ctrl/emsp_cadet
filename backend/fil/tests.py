@@ -253,3 +253,82 @@ def test_pagination_feed(api, users):
     assert page1["count"] == 12
     assert len(page1["results"]) == 10
     assert len(page2["results"]) == 2
+
+
+# ── IA-1 Modération préventive (doc 17 §2) ─────────────────────────────────
+def test_ia1_spam_signale(api, users):
+    """Score ≥ seuil → signalement IA déposé + publication en_verification=True."""
+    reponse = _force_auth(api, users.awa).post(
+        "/api/publications/",
+        {"type": "question", "contenu": "Gagnez de l'argent facile bitcoin crypto ici !"},
+        format="json",
+    )
+    assert reponse.status_code == 201
+    assert reponse.json()["enVerification"] is True
+    # Un signalement IA existe
+    from fil.models import Signalement
+    assert Signalement.objects.filter(raison=Signalement.Raison.SPAM).count() >= 1
+
+
+def test_ia1_harcelement_signale(api, users):
+    reponse = _force_auth(api, users.awa).post(
+        "/api/publications/",
+        {"type": "question", "contenu": "Tu es un idiot et je te menace"},
+        format="json",
+    )
+    assert reponse.status_code == 201
+    assert reponse.json()["enVerification"] is True
+    from fil.models import Signalement
+    assert Signalement.objects.filter(raison=Signalement.Raison.INFO).count() >= 1
+
+
+def test_ia1_pii_signale(api, users):
+    reponse = _force_auth(api, users.awa).post(
+        "/api/publications/",
+        {"type": "question", "contenu": "Mon tel +225 07 08 09 10 appelez-moi"},
+        format="json",
+    )
+    assert reponse.status_code == 201
+    assert reponse.json()["enVerification"] is True
+
+
+def test_ia1_normal_pas_signale(api, users):
+    reponse = _force_auth(api, users.awa).post(
+        "/api/publications/",
+        {"type": "question", "contenu": "Comment réviser efficacement pour les partiels ?"},
+        format="json",
+    )
+    assert reponse.status_code == 201
+    assert reponse.json()["enVerification"] is False
+
+
+def test_ia1_commentaires_aussi_analyses(api, users, publication):
+    """Les commentaires passent aussi par l'analyse IA."""
+    from ia.integration import analyser_apres_creation
+    from fil.models import Commentaire
+    reponse = _force_auth(api, users.salim).post(
+        f"/api/publications/{publication.pk}/commentaires/",
+        {"contenu": "C'est du spam bitcoin ici !", "idempotencyKey": "test-ia-comment-1"},
+        format="json",
+    )
+    assert reponse.status_code == 201
+    com = Commentaire.objects.get(pk=reponse.json()["id"])
+    # Un signalement IA a été déposé pour le commentaire
+    assert com.signalements.count() >= 1
+
+
+def test_ia1_kill_switch_desactive(api, users, settings):
+    """RG12.5 : IA_DESACTIVEE=True → plus d'analyse."""
+    from ia.integration import kill_switch_actif
+    settings.IA_DESACTIVEE = True
+    assert kill_switch_actif() is True
+    # La publication normale passe sans en_verification
+    reponse = _force_auth(api, users.awa).post(
+        "/api/publications/",
+        {"type": "question", "contenu": "Gagnez de l'argent facile !"},
+        format="json",
+    )
+    assert reponse.status_code == 201
+    # L'IA est désactivée → pas de flag (même spam)
+    assert reponse.json()["enVerification"] is False
+    settings.IA_DESACTIVEE = False

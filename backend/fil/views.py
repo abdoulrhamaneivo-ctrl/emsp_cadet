@@ -86,6 +86,13 @@ class PublicationsView(APIView):
         publication = Publication.objects.create(
             auteur=request.user, type=type_pub, contenu=contenu
         )
+        # IA-1 (doc 17) : analyse à la soumission — l'IA signale, jamais masque.
+        from ia.integration import analyser_apres_creation
+
+        resultat_ia = analyser_apres_creation(publication)
+        if resultat_ia:
+            publication.en_verification = True
+            publication.save(update_fields=["en_verification"])
         return Response(
             PublicationSerializer(publication, context={"request": request}).data, status=201
         )
@@ -187,6 +194,10 @@ class CommentairesView(APIView):
                 contenu=contenu,
                 idempotency_key=cle,
             )
+        # IA-1 (doc 17) : les commentaires passent aussi par l'analyse.
+        from ia.integration import analyser_apres_creation
+
+        analyser_apres_creation(commentaire)
         return Response(
             CommentaireSerializer(commentaire, context={"request": request}).data, status=201
         )

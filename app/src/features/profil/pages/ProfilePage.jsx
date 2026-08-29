@@ -3,12 +3,16 @@ import { motion } from "framer-motion";
 import Modal from "@shared/components/Modal";
 import Button from "@shared/components/Button";
 import { SkeletonCard } from "@shared/components/Skeleton";
+import ToggleConsentementIA from "@shared/components/ToggleConsentementIA";
+import ChipIA from "@shared/components/ChipIA";
+import PanneauSuggestionsIA from "@shared/components/PanneauSuggestionsIA";
 import { useAuth } from "@app/providers/Auth";
 import {
   useBasculeCandidature,
   useEnvoyerPhoto,
   useModifierProfil,
   useMoi,
+  usePreferencesIA,
   useSupprimerCompte,
   useVisibilite,
 } from "../hooks/useProfil";
@@ -30,6 +34,7 @@ export default function ProfilePage() {
   const { logout } = useAuth();
   const { data: moiCharge, isLoading } = useMoi();
   const { data: visibilite } = useVisibilite();
+  const { data: preferencesIA } = usePreferencesIA();
   const [form, setForm] = useState(null); // null = reflète le serveur
   const [basculeDemandee, setBasculeDemandee] = useState(null); // true|false|null
   const modifier = useModifierProfil();
@@ -133,6 +138,33 @@ export default function ProfilePage() {
           surChamp={(v) => surChamp("intentionAnneeSuivante", v)}
         />
       )}
+
+      {/* Section IA responsable (doc 17 §3) — opt-in strict, RG12.4. */}
+      <section aria-labelledby="titre-prefs-ia" className="rounded-[var(--radius-card)] border border-[var(--emsp-cream)]/20 bg-[var(--bg-panel)] p-5">
+        <h2 id="titre-prefs-ia" className="font-display text-base font-bold text-[var(--text-primary)] mb-3">
+          IA responsable — tes préférences
+        </h2>
+        <p className="text-sm text-[var(--text-muted)] mb-4">
+          L'IA ne propose, l'humain dispose (RG12.1). Tes données privées ne sont jamais analysées
+          (RG12.2). Consentement révocable à tout moment.
+        </p>
+        <div className="flex flex-col gap-3">
+          <ToggleConsentementIA
+            label="Matching enrichi"
+            description="Suggestions de parrains classées par similarité attentes↔vitrine (IA-2)"
+            checked={preferencesIA?.matchingEnrichi ?? false}
+            onChange={(e) => surChamp("preferencesIA", { ...moi.preferencesIA, matchingEnrichi: e.target.checked })}
+            desactive={false}
+          />
+          <ToggleConsentementIA
+            label="Copilot de profil"
+            description="Aide à rédiger attentes, ambitions, projets à partir de mots-clés (IA-3)"
+            checked={preferencesIA?.copilot ?? false}
+            onChange={(e) => surChamp("preferencesIA", { ...moi.preferencesIA, copilot: e.target.checked })}
+            desactive={false}
+          />
+        </div>
+      </section>
 
       <ZoneDanger
         prenom={moi.prenom}

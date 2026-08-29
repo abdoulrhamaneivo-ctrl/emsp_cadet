@@ -10,6 +10,7 @@ import {
   MessageCircle,
   ThumbsUp,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import Avatar from "@shared/components/Avatar";
@@ -21,6 +22,7 @@ import { ilYA } from "../relatif";
 import { useInvaliderFil } from "../hooks/usePublications";
 import FilCommentaires from "./FilCommentaires";
 import ModaleSignaler from "./ModaleSignaler";
+import ChipIA from "@shared/components/ChipIA";
 
 const TONS = { annonce: "info", question: "gold", succes: "success" };
 const LIBELLES = { annonce: "Annonce", question: "Question", succes: "Succès" };
@@ -84,6 +86,7 @@ export default function CartePublication({ publication, monId, suiAdmin = false,
 
   const [premiere, ...suite] = publication.contenu.split("\n");
   const animer = index < 20; // perf : stagger sur les 20 premiers, fade simple ensuite
+  const enVerification = publication.enVerification;
 
   return (
     <motion.article
@@ -110,6 +113,9 @@ export default function CartePublication({ publication, monId, suiAdmin = false,
               <Chip tone={TONS[publication.type]} className="shrink-0">
                 {LIBELLES[publication.type]}
               </Chip>
+              {enVerification && (
+                <ChipIA />
+              )}
             </p>
             <p className="truncate text-xs text-[var(--text-muted)]">
               {ilYA(publication.dateCreation)}

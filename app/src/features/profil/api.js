@@ -15,6 +15,10 @@ export const profilApi = {
     const { data } = await apiClient.get("/api/me/visibilite-annuaire/");
     return data; // { visible, motifs }
   },
+  async preferencesIA() {
+    const { data } = await apiClient.get("/api/me/preferences-ia/");
+    return data; // { matchingEnrichi: boolean, copilot: boolean }
+  },
   async photo(fichier) {
     const corps = new FormData();
     corps.append("photo", fichier);

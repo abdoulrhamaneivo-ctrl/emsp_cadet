@@ -12,6 +12,7 @@ from .annuaire_views import (
 from .profil_views import (
     MoiView,
     PhotoMoiView,
+    PreferencesIAView,
     SupprimerCompteView,
     VisibiliteAnnuaireView,
 )
@@ -24,6 +25,7 @@ urlpatterns = [
     path("auth/session/", SessionView.as_view()),
     path("me/", MoiView.as_view()),
     path("me/visibilite-annuaire/", VisibiliteAnnuaireView.as_view()),
+    path("me/preferences-ia/", PreferencesIAView.as_view()),
     path("me/photo/", PhotoMoiView.as_view()),
     path("me/compte/", SupprimerCompteView.as_view()),
     path("me/groups-resume/", GroupsResumeView.as_view()),
