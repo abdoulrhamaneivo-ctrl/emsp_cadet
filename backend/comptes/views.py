@@ -89,15 +89,6 @@ class DeconnexionView(APIView):
         return response
 
 
-class MoiView(APIView):
-    """GET /api/auth/me/ — profil courant (shape Utilisateur doc 21 §3.1)."""
-
-    def get(self, request):
-        from comptes.serializers import UtilisateurLegereSerializer
-
-        return Response(UtilisateurLegereSerializer(request.user).data)
-
-
 class SessionView(APIView):
     """GET /api/auth/session/ — contrat front T0 : {estAuthentifie, utilisateur}.
 

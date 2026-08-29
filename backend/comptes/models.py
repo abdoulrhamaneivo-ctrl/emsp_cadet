@@ -28,6 +28,14 @@ class GestionnaireUtilisateur(BaseUserManager):
 class User(AbstractUser):
     """Identifiant = email @emsp.int (jamais de username public)."""
 
+    class Niveau(models.TextChoices):
+        L1 = "L1", "L1"
+        L2 = "L2", "L2"
+        L3 = "L3", "L3"
+        M1 = "M1", "M1"
+        M2 = "M2", "M2"
+        ALUMNI = "alumni", "Alumni"
+
     objects = GestionnaireUtilisateur()
 
     email = models.EmailField("email", unique=True)
@@ -35,6 +43,23 @@ class User(AbstractUser):
     nom = models.CharField("nom", max_length=80, blank=True)
     filiere = models.CharField("filière", max_length=120, blank=True)
     classe = models.CharField("classe", max_length=40, blank=True)
+    # User v2 (doc 11) — le niveau devient un champ réel (RG7 : conditionne
+    # la candidature Aîné) ; `classe` reste le libellé d'affichage.
+    niveau_etude = models.CharField(
+        "niveau d'étude", max_length=10, choices=Niveau.choices, default=Niveau.L1
+    )
+    # RG8 — LE grand interrupteur : ouvrir la candidature rend visible dans
+    # l'annuaire (si vitrine complète). Fermer ne casse JAMAIS les binômes.
+    candidature_aine_ouverte = models.BooleanField("candidature Aîné ouverte", default=False)
+    attentes = models.TextField(
+        "attentes", blank=True, help_text="Visible par les futurs Aînés (candidat cadet)."
+    )
+    # Vitrine Aîné (doc 11 §2 n°7) — complétude = conditions de visibilité.
+    ambitions = models.JSONField(default=list, blank=True)
+    projets = models.JSONField(default=list, blank=True)
+    points_forts = models.JSONField(default=list, blank=True)
+    points_faibles = models.JSONField(default=list, blank=True)
+    photo = models.FileField("photo", upload_to="photos/", null=True, blank=True)
     # RG11 (doc 19 §4.1) : suspension → 423 avec {motif, fin}.
     est_suspendu = models.BooleanField("suspendu", default=False)
     fin_suspension = models.DateTimeField("fin de suspension", null=True, blank=True)
