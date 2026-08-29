@@ -35,3 +35,46 @@ export function statutFacetteAinee(user) {
   if (user.niveauEtude === "L1") return "l1";
   return user.candidatureAineOuverte ? "ouvert" : "ferme";
 }
+
+/* ── RÈGLE IVO n°2 : promo devançante (t5b) ──────────────────────────────── */
+
+const DEVANCANT = {
+  L1: "L2",
+  L2: "L3",
+  L3: "M1",
+  M1: "M2",
+  M2: null,
+  alumni: null,
+};
+
+/** Niveau réel du compte (champ v2, repli préfixe classe). */
+export function niveauDe(utilisateur) {
+  if (!utilisateur) return "L1";
+  if (utilisateur.niveauEtude) return utilisateur.niveauEtude;
+  const prefixe = (utilisateur.classe || "").trim().toLowerCase();
+  for (const niveau of ["l2", "l3", "m1", "m2", "alumni"]) {
+    if (prefixe.startsWith(niveau)) {
+      return niveau === "alumni" ? "alumni" : niveau.toUpperCase();
+    }
+  }
+  return "L1";
+}
+
+/** La promo qui peut parrainer ce niveau (ou null). */
+export function promoDevancante(niveau) {
+  return DEVANCANT[niveau] ?? null;
+}
+
+/** Le cadet peut-il demander CET aîné ? (garde CTA, le serveur revalide) */
+export function peutDemander(niveauCadet, niveauAine) {
+  return promoDevancante(niveauCadet) === niveauAine;
+}
+
+/** Message d'aide pour un CTA désactivé (doc 04 §5). */
+export function raisonCTADesactive(niveauCadet) {
+  const devancant = promoDevancante(niveauCadet);
+  if (!devancant) {
+    return "Ton niveau est le dernier du parcours — plus d'Aîné à demander.";
+  }
+  return `Tu ne peux demander qu'un Aîné de la promo ${devancant} — celle qui devance directement la tienne.`;
+}

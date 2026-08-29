@@ -18,6 +18,7 @@ import FilPage from "@features/fil/pages/FilPage";
 import EvenementsPage from "@features/evenements/pages/EvenementsPage";
 import EvenementDetailPage from "@features/evenements/pages/EvenementDetailPage";
 import ProfilePage from "@features/profil/pages/ProfilePage";
+import AdminDashboardPage from "@features/admin/pages/AdminDashboardPage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -52,7 +53,7 @@ function AppRoutes() {
         <Route path="/evenements" element={<EvenementsPage />} />
         <Route path="/evenements/:evenementId" element={<EvenementDetailPage />} />
         <Route path="/offres" element={<PlaceholderPage titre="Offres" spec="doc 14 — P22" />} />
-        <Route path="/administration" element={<PlaceholderPage titre="Administration" spec="doc 12 — P23 (admin only)" />} />
+        <Route path="/administration" element={<AdminDashboardPage />} />
         <Route path="/moderation" element={<PlaceholderPage titre="Modération" spec="doc 12 — P24 (admin only)" />} />
       </Route>
 

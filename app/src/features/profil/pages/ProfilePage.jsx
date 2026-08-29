@@ -18,6 +18,7 @@ import SectionAcademique from "../components/SectionAcademique";
 import SectionCandidatureAine from "../components/SectionCandidatureAine";
 import SectionVitrineAine from "../components/SectionVitrineAine";
 import PipelineCompletude from "../components/PipelineCompletude";
+import SectionIntention from "../components/SectionIntention";
 import ZoneDanger from "../components/ZoneDanger";
 
 /**
@@ -124,6 +125,14 @@ export default function ProfilePage() {
       />
 
       <SectionVitrineAine moi={moi} surChamp={surChamp} />
+
+      {(moi.niveauEtude === "L3" || moi.niveauEtude === "M2") && (
+        <SectionIntention
+          valeur={moi.intentionAnneeSuivante ?? "inconnu"}
+          niveau={moi.niveauEtude}
+          surChamp={(v) => surChamp("intentionAnneeSuivante", v)}
+        />
+      )}
 
       <ZoneDanger
         prenom={moi.prenom}

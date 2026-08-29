@@ -48,6 +48,11 @@ class User(AbstractUser):
     niveau_etude = models.CharField(
         "niveau d'étude", max_length=10, choices=Niveau.choices, default=Niveau.L1
     )
+    # Doc 15 §1 — déclaratif L3/M2 : master|alumni|inconnu (vérifié à la
+    # transition, jamais une admission officielle).
+    intention_annee_suivante = models.CharField(
+        "intention année suivante", max_length=10, blank=True, default="inconnu"
+    )
     # RG8 — LE grand interrupteur : ouvrir la candidature rend visible dans
     # l'annuaire (si vitrine complète). Fermer ne casse JAMAIS les binômes.
     candidature_aine_ouverte = models.BooleanField("candidature Aîné ouverte", default=False)

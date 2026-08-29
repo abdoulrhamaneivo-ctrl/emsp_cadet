@@ -270,3 +270,22 @@ Profil complet : User v2 (`niveau_etude` devient un champ RÉEL avec choix L1…
 - **Panneau translucide sur fond vert (règle §9.4 réappliquée)** — `bg-[var(--emsp-gold)]/10` rendait le texte muted presque illisible ; remplacé par `--emsp-cream-alt` opaque + bordure or pleine.
 
 **Chaîne qualité** — backend : pytest 69/69 (14 nouveaux profil), ruff 0, migration 0003. Front : vitest 62/62 (6 nouveaux), lint 0, build vert, overflow 3/3 (sonde 375px = 375 exact). E2E `t5-profil-e2e.mjs` (pipeline, save dirty, bascule RG8 ON→OFF, toast). Captures `shoot-t5.mjs` revues vision — 1 panneau translucide corrigé, 1 débordement mobile corrigé par mesure.
+
+### 9.12 Tranche T5b « Parrainage réel + Transition annuelle » (docs 05/15 + règles Ivo)
+
+**DEUX RÈGLES PRODUIT DURES (Ivo, verbatim 29/08)** —
+1. « en fin d'année on ne perd pas ses aînés et filleuls » → la transition annuelle monte les niveaux mais ne touche JAMAIS comptes.Binome (testé : binôme actif avant/après transition, `binomesConserves` renvoyé).
+2. « on peut avoir un aîné que de la promo qui nous devance » → l'aîné doit être du niveau IMMÉDIATEMENT SUPÉRIEUR (L1→L2, L2→L3, L3→M1, M1→M2 ; M2/alumni : personne). Implémentée en miroir backend `parrainage/rules.py` (DEVANCANT dict) / front `parrainage/rules.js` — le serveur revalide TOUJOURS en 422 avec message francisé (« Tu ne peux demander qu'un Aîné de la promo X »).
+
+**Backend** — app `parrainage/` (Demande + Avis, binôme reste comptes.Binome) : 7 endpoints contrat front verbatim (me/parrainage, parrains/:id/demande, demandes + repondre/annuler, parrainages/:id/cloture|avis). Annuaire V2 `comptes/annuaire_views.py` : /api/parrains/ alimenté par les comptes RÉELS (candidature ouverte + vitrine complète + RG7), suggestions triées promo-devançante d'abord (raisonIA libellé humain), /api/me/groups-resume + /api/me/rendez-vous. Transition : `intention_annee_suivante` (master|alumni|inconnu, M2 ne peut PAS déclarer master → 422), GET aperçu (promotions/finsDeCycle/anomalies), POST exécuter ATOMIQUE (select_for_update, une seule transaction, rien à moitié fait), stats admin.
+
+**Front** — garde CTA `mauvaise_promo` dans canRequest (FicheAinePage affiche le blocage avec la raison), SectionIntention profil (radios master/alumni/inconnu, visible L3/M2 seulement), /administration réelle (KPI stats + ModaleTransition 3 étapes : récapitulatif compteur, table ajustements par ligne, confirmation forte « TRANSITION <année> »), UtilisateurLegereSerializer expose isAdmin (garde route).
+
+**Pièges T5b** —
+- **Fixtures tests : emails uniques par fixture** — `promotions` collidait avec `users` globale (ids non déterministes → 404 « No User matches ») ; suffixe `.test` sur tous les emails de fixture.
+- **La vue de demande exige candidature_aine_ouverte=True** (porte RG8) — 404 « n'est pas visible » pour un aîné fermé ; les fixtures ouvrent la candidature des L2+.
+- **Ordre produit : règle promo (422) AVANT RG1 (409)** — message plus parlant ; assumé et testé.
+- **Session JWT cross-origin : access token en mémoire meurt au rechargement** — le refresh httpOnly cookie pose bien (Path=/, Domain=localhost) mais l'intercepteur ne rejoue PAS un refresh au boot : /api/auth/session/ reçoit un 200 « estAuthentifie:false ». Fallback JWT dans SessionView (Authorization header) OK en curl, mais le front n'a plus le token après reload — **cookie access_token à poser (prochaine passe), session Playwright instable en attendant**. DÉBT CONNU, documenté.
+- **E501 : les compréhensions longues se coupent** — style project 100 chars.
+
+**Chaîne qualité** — backend : pytest 80/80 (11 nouveaux parrainage+transition), ruff 0, migrations 0001 parrainage + 0004 comptes. Front : vitest 65/65 (3 nouveaux règles promo), lint 0, build vert. E2E `t5b-parrainage-transition-e2e.mjs` : annuaire réel, garde admin, transition API 200 (4 modifiées, binômes conservés ≥1 — RÈGLE n°1 vérifiée). Captures shoot-t5b.mjs (annuaire, blocage promo fiche, admin).

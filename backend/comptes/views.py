@@ -94,6 +94,7 @@ class SessionView(APIView):
 
     AllowAny : un invité reçoit {estAuthentifie: false} (200) plutôt qu'un 401,
     c'est le hook de résolution de session de AuthProvider (shared/api/auth.js).
+    Accepte l'authentification par session Django OU par JWT (via Authorization header).
     """
 
     permission_classes = [AllowAny]
@@ -101,11 +102,30 @@ class SessionView(APIView):
     def get(self, request):
         from comptes.serializers import UtilisateurLegereSerializer
 
-        if not request.user.is_authenticated:
-            return Response({"estAuthentifie": False, "utilisateur": None})
-        return Response(
-            {
-                "estAuthentifie": True,
-                "utilisateur": UtilisateurLegereSerializer(request.user).data,
-            }
-        )
+        # Session Django classique
+        if request.user.is_authenticated:
+            return Response(
+                {
+                    "estAuthentifie": True,
+                    "utilisateur": UtilisateurLegereSerializer(request.user).data,
+                }
+            )
+
+        # Fallback JWT : tenter d'authentifier via le header Authorization
+        from rest_framework_simplejwt.authentication import JWTAuthentication
+
+        jwt_auth = JWTAuthentication()
+        try:
+            auth_result = jwt_auth.authenticate(request)
+            if auth_result:
+                user, _ = auth_result
+                return Response(
+                    {
+                        "estAuthentifie": True,
+                        "utilisateur": UtilisateurLegereSerializer(user).data,
+                    }
+                )
+        except Exception:
+            pass
+
+        return Response({"estAuthentifie": False, "utilisateur": None})
