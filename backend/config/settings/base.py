@@ -114,33 +114,14 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
-    # Refresh token en cookie httpOnly — domaine racine localhost pour
-    # partager entre :8000 (backend) et :5200 (frontend via proxy).
-    "AUTH_COOKIE": "refresh_token",
-    "AUTH_COOKIE_DOMAIN": "localhost",
-    "AUTH_COOKIE_SECURE": False,
-    "AUTH_COOKIE_HTTP_ONLY": True,
-    "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "Lax",
-    # Access token aussi en cookie pour que le frontend puisse le lire
-    # (le frontend le mettra dans Authorization header via intercepteur)
-    "AUTH_COOKIE_ACCESS": "access_token",
-    "AUTH_COOKIE_ACCESS_PATH": "/",
-    "AUTH_COOKIE_ACCESS_SAMESITE": "Lax",
-    "AUTH_COOKIE_ACCESS_HTTP_ONLY": True,
-    "AUTH_COOKIE_ACCESS_SECURE": False,
+    # Clés lues par comptes.views._parametres_cookie() — le cookie doit
+    # couvrir TOUT le site (le front le renvoie same-origin via le proxy).
+    "REFRESH_TOKEN_COOKIE_PATH": "/",
+    "REFRESH_TOKEN_COOKIE_SAMESITE": "Lax",
 }
 
 # Refresh token : cookie httpOnly uniquement (jamais exposé au JS, doc 19 §5.1).
 SIMPLE_JWT_REFRESH_COOKIE = "refresh_token"
-
-# Session / CSRF cookies pour la session Django (api/auth/session/)
-SESSION_COOKIE_DOMAIN = "localhost"
-SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_DOMAIN = "localhost"
-CSRF_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SECURE = False
 
 CORS_ALLOWED_ORIGINS = [os.environ.get("FRONT_ORIGIN", "http://localhost:5200")]
 CORS_ALLOW_CREDENTIALS = True

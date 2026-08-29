@@ -85,7 +85,10 @@ class DeconnexionView(APIView):
             except TokenError:
                 pass  # déjà révoqué/expiré — la déconnexion reste un succès
         response = Response({"ok": True})
-        response.delete_cookie(settings.SIMPLE_JWT_REFRESH_COOKIE, path="/api/auth/")
+        response.delete_cookie(
+            settings.SIMPLE_JWT_REFRESH_COOKIE,
+            path=settings.SIMPLE_JWT.get("REFRESH_TOKEN_COOKIE_PATH", "/api/auth/"),
+        )
         return response
 
 
