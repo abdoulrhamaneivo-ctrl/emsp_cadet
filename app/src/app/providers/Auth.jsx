@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { authApi } from "@shared/api/auth";
+import { apiClient, definirJeton } from "@shared/api/client";
 
 const AuthContext = createContext(null);
 
@@ -54,17 +55,30 @@ export function AuthProvider({ children, initialUser }) {
       };
     }
     let actif = true;
-    authApi
-      .session()
-      .then((u) => {
-        if (!actif) return;
-        setUser(u);
-        setStatut(u ? "authentifie" : "invite");
+    // Résolution de session AU RECHARGEMENT (t5b) : l'access en mémoire est
+    // mort, mais le refresh httpOnly cookie est toujours là. On tente d'abord
+    // un refresh silencieux — s'il réussit, la session part avec un jeton
+    // frais ; s'il échoue (401, pas de cookie), on part réellement invité.
+    apiClient
+      .post("/api/auth/refresh/")
+      .then((r) => {
+        if (r?.data?.access) definirJeton(r.data.access);
       })
-      .catch(() => {
+      .catch(() => {}) // pas de cookie → session() renverra un invité propre
+      .finally(() => {
         if (!actif) return;
-        setUser(null);
-        setStatut("invite");
+        authApi
+          .session()
+          .then((u) => {
+            if (!actif) return;
+            setUser(u);
+            setStatut(u ? "authentifie" : "invite");
+          })
+          .catch(() => {
+            if (!actif) return;
+            setUser(null);
+            setStatut("invite");
+          });
       });
     return () => {
       actif = false;
