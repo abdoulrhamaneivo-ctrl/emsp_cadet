@@ -7,6 +7,7 @@ import JaugeCapacite from "@shared/components/JaugeCapacite";
 import ScoreFiabilite from "@shared/components/ScoreFiabilite";
 import { estComplet, estAlumni, estDernierePlace } from "../rules";
 import { cx } from "@shared/utils/cx";
+import ChipIA from "@shared/components/ChipIA";
 
 /**
  * Carte Aîné de l'annuaire (doc 04 §4 anatomy, ~210px) :
@@ -73,12 +74,12 @@ export default function CarteAine({ aine, enVedette = false, raison = null }) {
 
       {/* Raison de la suggestion (IA-2) — DANS la carte : les pieds des cartes
           d'une même grille restent alignés, la note ne flotte pas dessous */}
-      {raison && (
+      {(raison && (
         <p className="mt-3 flex items-start gap-1.5 rounded-[var(--radius-chip)] bg-[#175cd3]/8 px-2.5 py-1.5 text-xs leading-snug text-[#175cd3]">
-          <Sparkles size={13} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <ChipIA />
           <span>{raison}</span>
         </p>
-      )}
+      ))}
 
       {/* Pied — jauge à gauche, action à droite : la carte se termine net */}
       <div className="mt-4 flex items-center justify-between gap-2 border-t border-[var(--border-soft)] pt-3.5">
