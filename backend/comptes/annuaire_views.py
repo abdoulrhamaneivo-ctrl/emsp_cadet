@@ -107,9 +107,10 @@ def _complet(user):
 
 
 class SuggestionsView(APIView):
-    """GET /api/parrains/suggestions/ — max 3, même promo-devançante d'abord.
+    """GET /api/parrains/suggestions/ — max 3, enrichi par l'IA (IA-2).
 
-    raisonIA = pourquoi ce profil (doc 04 §9, libellé humain — pas encore l'IA T6).
+    raisonIA = pourquoi ce profil (similarité attentes↔vitrine).
+    Respecte RG12.4 : si matchingEnrichi=false → tri promo-devançante seul (sans IA).
     """
 
     def get(self, request):
@@ -128,20 +129,40 @@ class SuggestionsView(APIView):
             if _complet(u)
             and Binome.objects.filter(aine=u, statut=Binome.Statut.ACTIF).count() < 5
         ]
-        # Priorité : promo devançante exacte, puis les autres éligibles.
-        candidats.sort(key=lambda u: 0 if u.niveau_etude == devancant else 1)
+
+        # IA-2 : matching enrichi si consentement actif
+        prefs_ia = moi.preferences_ia or {}
+        if prefs_ia.get("matchingEnrichi"):
+            from ia.matching import calculer_score_matching, generer_raison_ia
+
+            for u in candidats:
+                vitrine = {
+                    "ambitions": u.ambitions or [],
+                    "projets": u.projets or [],
+                    "pointsForts": u.points_forts or [],
+                    "pointsFaibles": u.points_faibles or [],
+                }
+                u._score_ia = calculer_score_matching(moi.attentes or "", vitrine)
+                u._raison_ia = generer_raison_ia(moi.attentes or "", vitrine)
+
+            # Tri par score IA décroissant (promo devançante = bonus implicite via vitrine)
+            candidats.sort(key=lambda u: u._score_ia, reverse=True)
+
+        else:
+            # Fallback : promo devançante d'abord (comportement pré-IA)
+            candidats.sort(key=lambda u: 0 if u.niveau_etude == devancant else 1)
+
         resultats = []
         for u in candidats[:3]:
-            resultats.append(
-                {
-                    **_profil_aine(u, moi),
-                    "raisonIA": (
-                        f"De la promo qui devance directement la tienne ({devancant})."
-                        if u.niveau_etude == devancant
-                        else "Profil complet proche de ta filière."
-                    ),
-                }
-            )
+            item = _profil_aine(u, moi)
+            if hasattr(u, "_raison_ia"):
+                item["raisonIA"] = u._raison_ia
+            elif u.niveau_etude == devancant:
+                item["raisonIA"] = f"De la promo qui devance directement la tienne ({devancant})."
+            else:
+                item["raisonIA"] = "Profil complet proche de ta filière."
+            resultats.append(item)
+
         return Response({"results": resultats})
 
 

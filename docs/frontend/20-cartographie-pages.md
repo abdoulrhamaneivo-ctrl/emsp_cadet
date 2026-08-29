@@ -307,11 +307,17 @@ Profil complet : User v2 (`niveau_etude` devient un champ RÉEL avec choix L1…
 - Préférences IA dans /profil : ToggleConsentementIA (opt-in strict, défaut false) pour matchingEnrichi (IA-2) + copilot (IA-3) ; ChipIA + PanneauSuggestionsIA + ToggleConsentementIA partagés.
 - SessionView fallback JWT (Authorization header) — utile scripts/E2E.
 
-**Pièges T6** —
-- **Seuil heuristique** : spam 60 > 55 → signalé ; harcèlement 55 = signalé ; PII 55 = signalé ; score combiné plafonné 95 (jamais 100 = vérification humaine OBLIGATOIRE).
-- **Kill-switch** : IA_DESACTIVEE dans settings → `analyser_apres_creation` sort immédiatement `None` (0 impact parcours).
-- **RG12.2 respecté** : l'heuristique ne reçoit QUE Publication/Commentaire (pas de conversation privée).
-- **Tests IA-1** : spam/harcelement/PII → 201 + en_verification=true + Signalement IA déposé ; normal → 201 + en_verification=false ; kill-switch ON → spam passe sans flag.
-- **Front 65/65, backend 86/86, lint 0, build vert, ruff 0**.
+**IA-2 — Matching enrichi suggestions (phase 3, livré)** —
+- Backend `ia/matching.py` : similarité cosinus (sac de mots, stop words FR) entre attentes cadet (texte libre) et vitrine aîné (ambitions 40% + projets 35% + forces 15% + faibles 10%) → score 0..100 ; `generer_raison_ia` extrait les 3 termes communs les plus significatifs → libellé humain « Proche de tes attentes : reseau, securite ».
+- Branchement `SuggestionsView` : si `matchingEnrichi=true` (opt-in RG12.4) → candidats notés + tri score IA décroissant + `raisonIA` injectée ; sinon fallback promo devançante (comportement pré-IA).
+- Front `CarteAine` : `raisonIA` affichée avec `ChipIA` (RG12.3) dans le pied de carte aligné.
+- Respecte RG12.4 : opt-in strict, défaut FALSE ; RG12.5 : kill-switch global via `IA_DESACTIVEE` → `SuggestionsView` ignore l'IA.
 
-**Prochaine** : IA-2 (matching enrichi suggestions), IA-3 (copilot profil), IA-4 (FAQ L1), IA-5 (binômes silencieux), IA-6 (offres alumni) — en fonction des priorités Ivo.
+**Pièges T6 (complément IA-2)** —
+- **Stop words FR** : liste volontairement courte mais suffisante — attention aux faux amis (ex: "et" dans "reseau" = pas stop word).
+- **Seuil implicite** : score 0 si attentes vides → suggestion sans IA (fallback promo devançante).
+- **RG12.4** : opt-in par défaut false — le tri IA ne s'active qu'après action utilisateur explicite dans /profil.
+- **Tests** : unitaires matching (score 0 vide, score >0 termes communs, raisonIA contient termes) ; intégration suggestions (opt-in true → tri score IA + raisonIA, opt-in false → fallback promo devançante).
+- **Front 65/65, backend 88/88, lint 0, build vert, ruff 0**.
+
+**Prochaine** : IA-3 (copilot profil), IA-4 (FAQ L1), IA-5 (binômes silencieux), IA-6 (offres alumni) — en fonction des priorités Ivo.
