@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles, Loader2, ClipboardCheck } from "lucide-react";
 import { cx } from "@shared/utils/cx";
@@ -33,12 +33,18 @@ export default function PanneauCopilot({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [surFermeture]);
 
-  async function generer() {
+  const generer = useCallback(async () => {
     if (!motsCles?.trim() || chargement) return;
     setChargement(true);
     setErreur(null);
     try {
-      const { data } = await window.profilApi?.copilot?.(section, motsCles);
+      const api = window.profilApi;
+      if (!api?.copilot) {
+        setErreur("Service copilot indisponible.");
+        setChargement(false);
+        return;
+      }
+      const { data } = await api.copilot(section, motsCles);
       if (data?.propositions?.length) {
         setPropositions(data.propositions);
       } else {
@@ -49,12 +55,16 @@ export default function PanneauCopilot({
     } finally {
       setChargement(false);
     }
-  }
+  }, [section, motsCles, chargement]);
 
   // Auto-génération au montage si motsCles fourni
   useEffect(() => {
-    if (motsCles?.trim() && !propositions.length) generer();
-  }, [motsCles, section]);
+    let mounted = true;
+    if (motsCles?.trim() && !propositions.length && mounted) {
+      generer();
+    }
+    return () => { mounted = false; };
+  }, [motsCles, section, propositions.length, generer]);
 
   if (!motsCles?.trim() && !propositions.length) return null;
 
