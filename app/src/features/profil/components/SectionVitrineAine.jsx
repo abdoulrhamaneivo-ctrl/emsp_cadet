@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { Plus, X, Sparkles } from "lucide-react";
 import PanneauCopilot from "@shared/components/PanneauCopilot";
-import { profilApi } from "../api";
 
 /**
  * Section vitrine Aîné (doc 11 §4) — 4 listes CRUD simples (ambitions ≥ 3,

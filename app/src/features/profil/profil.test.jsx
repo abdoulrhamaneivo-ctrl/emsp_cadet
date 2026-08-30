@@ -72,7 +72,6 @@ describe("Profil (doc 11)", () => {
   });
 
   it("bascule RG8 : confirmation modale → PATCH {candidatureAineOuverte:true}", async () => {
-    const corps = vi.fn ? undefined : undefined; // garde-fou lisible
     let recu = null;
     mockMoi();
     server.use(

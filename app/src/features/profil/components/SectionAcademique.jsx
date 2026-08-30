@@ -2,9 +2,8 @@
  * Section académique (doc 11 §4) — classe, filière, NIVEAU select (RG7 :
  * conditionne la candidature) et attentes visibles par les futurs Aînés.
  */
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import PanneauCopilot from "@shared/components/PanneauCopilot";
-import { profilApi } from "../api";
 import { Sparkles } from "lucide-react";
 
 const NIVEAUX = [
