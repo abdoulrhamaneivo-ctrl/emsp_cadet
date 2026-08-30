@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from comptes.models import Binome, User
 from comptes.serializers import UtilisateurLegereSerializer
 from config.exceptions import ErreurValidation
+from ia.silence import detecter_binomes_silencieux, creer_nudge_binome
 
 ORDRE = ["L1", "L2", "L3", "M1", "M2", "alumni"]
 
@@ -136,3 +137,45 @@ class TransitionExecuterView(APIView):
                 ),
             }
         )
+
+
+class BinomesSilencieuxView(APIView):
+    """GET /api/admin/binomes-silencieux/ — liste des binômes à risque (IA-5).
+
+    Critères (métas only RG12.2) : dernier message Famille > 21j OU
+    ≥ 3 RDV annulés sur 30j. Retourne liste avec raisons + option nudge.
+    """
+
+    def get(self, request):
+        _garde_admin(request)
+        from ia.silence import detecter_binomes_silencieux
+
+        silencieux = detecter_binomes_silencieux()
+        # Enrichir avec infos utilisateur
+        resultats = []
+        for s in silencieux:
+            from comptes.serializers import UtilisateurLegereSerializer
+            from comptes.models import User
+            aine = User.objects.get(pk=s["aine_id"])
+            cadet = User.objects.get(pk=s["cadet_id"])
+            resultats.append({
+                "binomeId": s["binome_id"],
+                "aine": UtilisateurLegereSerializer(aine).data,
+                "cadet": UtilisateurLegereSerializer(cadet).data,
+                "raisons": s["raisons"],
+            })
+        return Response({"results": resultats, "count": len(resultats)})
+
+    def post(self, request):
+        """POST {binomeId} → envoie un nudge bienveillant aux DEUX membres (IA-5)."""
+        _garde_admin(request)
+        binome_id = (request.data or {}).get("binomeId")
+        if not binome_id:
+            raise ErreurValidation("binomeId requis.")
+        from ia.silence import detecter_binomes_silencieux, creer_nudge_binome
+        silencieux = detecter_binomes_silencieux()
+        cible = next((s for s in silencieux if s["binome_id"] == binome_id), None)
+        if not cible:
+            raise ErreurValidation("Binôme non trouvé dans la liste des silencieux.")
+        creer_nudge_binome(binome_id, cible["raisons"])
+        return Response({"ok": True, "message": "Nudge envoyé aux deux membres."})

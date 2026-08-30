@@ -319,17 +319,21 @@ Profil complet : User v2 (`niveau_etude` devient un champ RÉEL avec choix L1…
 - Branchement : `SectionAcademique` (attentes) + `SectionVitrineAine` (ambitions/projets/forces/faibles) — bouton « M'aider à rédiger » (Sparkles) qui ouvre le panneau, opt-in strict via `preferences_ia.copilot`.
 - Respecte RG12.1/3 : IA propose, humain insère (clic = action explicite) ; ChipIA sur chaque proposition ; RG12.4 : opt-in strict défaut false ; RG12.5 : kill-switch global.
 
-**IA-4 — FAQ L1 (phase 4, livré)** —
-- Backend `ia/faq.py` : base connaissances 9 entrées (inscription, parrainage, fil, événements, profil, messagerie, RDV, admin, etc.) ; recherche similarité cosinus (sac de mots, stop words FR) sur question utilisateur vs base validée admin ; seuil 0.15 → réponse + sources ; sinon `trouve=false`.
-- Endpoint `/api/faq/` public (AllowAny) : POST {question} → {trouve, reponse, sources, score} ; kill-switch `IA_DESACTIVEE`.
-- Front `WidgetFAQ` : modal overlay (bottom-right) — saisie question + envoi → réponse avec `ChipIA` + sources si trouvée ; sinon bouton « Poser à la communauté » → redirection `/fil/nouvelle` (doc 17 §2). Historique conversation, scroll auto, loading state, erreur dégradation silencieuse.
-- Page d'accueil `AccueilPage` : Hero + KPIs + 4 fonctionnalités + WidgetFAQ (bouton « Essayer l'assistant IA »).
-- Route `/api/faq/` publique (AllowAny) ; route `/accueil` réelle.
+**IA-5 — Détection binômes silencieux (phase 4, livrée)** —
+- Backend `ia/silence.py` : détection métas-only (RG12.2) — dernier message Famille > 21j OU ≥ 3 RDV annulés/30j ; `detecter_binomes_silencieux()` retourne liste enrichie ; `creer_nudge_binome()` envoie message système bienveillant dans la conversation Famille (les DEUX membres notifiés via WS temps réel).
+- Endpoint admin `/api/admin/binomes-silencieux/` GET (liste + raisons) + POST {binomeId} (envoie nudge) ; garde admin.
+- Front : tableau admin (à venir) — pour l'instant endpoint prêt.
+- Respecte RG12.2 (métas only, jamais contenu) ; RG12.5 kill-switch `IA_DESACTIVEE`.
 
-**Pièges T6 (complément IA-3/4)** —
-- **IA-3** : gabarits par section (5 sections) — attention aux placeholders « ... » si < 3 mots-clés fournis ; insertion explicite = clic proposition → texte inséré dans textarea + panneau fermé.
-- **IA-4** : base statique V1 (9 entrées) — V2 aura CRUD admin ; similarité cosinus simple, seuil 0.15 empirique (ajuster si faux positifs) ; réponse naturelle ne contient pas forcément le mot-clé exact → tests vérifient `trouve + reponse non vide + score > 0` ; dégradation silencieuse si IA indisponible ; bouton « Poser à la communauté » → `/fil/nouvelle` (doc 17 §2).
-- **Tests** : IA-3 unitaires (gabarits) + intégration copilot (opt-in true/false) ; IA-4 unitaires (recherche) + intégration endpoint (AllowAny, trouve/non-trouve) ; IA-1/2 déjà couverts.
+**IA-6 — Aide rédaction offres alumni (phase 4, livrée)** —
+- Backend `ia/offres.py` : 6 types d'offres (stage, alternance, CDI, CDD, freelance, bénévolat) × 3 sections (mission, profil, modalités) × 3 gabarits = 54 variantes ; variables dynamiques (équipe, projet, compétences, durée, salaire, etc.) ; `generer_propositions_offre(typeOffre, variables)` → {mission: [...], profil: [...], modalites: [...]}.
+- Endpoint `/api/offres/generer/` {typeOffre, variables} → {mission: [...], profil: [...], modalites: [...]} ; opt-in RG12.4 via `preferences_ia.copilot` ; kill-switch `IA_DESACTIVEE`.
+- Front (à venir) : bouton « M'aider à rédiger » dans la création d'offre alumni (doc 14).
+
+**Pièges T6 (complément IA-5/6)** —
+- **IA-5** : détection métas-only (RG12.2 respectée) — pas de contenu lu ; nudge = message système dans Famille (les 2 membres notifiés WS) ; kill-switch global ; admin valide avant envoi.
+- **IA-6** : 6 types × 3 sections × 3 gabarits = 54 variantes ; variables dynamiques avec placeholders « ... » si manquantes ; fallback dégradation silencieuse.
+- **Tests** : IA-5 unitaires (détection) + intégration admin ; IA-6 unitaires (gabarits 6 types) ; IA-1/2/3/4 déjà couverts.
 - **Front 65/65, backend 94/94, lint 0, build vert, ruff 0**.
 
-**Prochaine** : IA-5 (binômes silencieux), IA-6 (offres alumni) — en fonction des priorités Ivo.
+**Prochaine** : IA-5/6 front admin + alumni, IA-7 (synthèse activity) si pertinent.
