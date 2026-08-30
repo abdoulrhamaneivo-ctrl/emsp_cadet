@@ -24,7 +24,9 @@ import EvenementsPage from "@features/evenements/pages/EvenementsPage";
 import EvenementDetailPage from "@features/evenements/pages/EvenementDetailPage";
 import ProfilePage from "@features/profil/pages/ProfilePage";
 import AdminDashboardPage from "@features/admin/pages/AdminDashboardPage";
+import ModerationPage from "@features/admin/pages/ModerationPage";
 import AccueilPage from "@features/accueil/pages/AccueilPage";
+import OffresPage from "@features/offres/pages/OffresPage";
 
 /** Routes par domaine (docs 02 §4 / 20). Les vraies pages arrivent tranche par tranche. */
 function AppRoutes() {
@@ -58,9 +60,9 @@ function AppRoutes() {
         <Route path="/fil" element={<FilPage />} />
         <Route path="/evenements" element={<EvenementsPage />} />
         <Route path="/evenements/:evenementId" element={<EvenementDetailPage />} />
-        <Route path="/offres" element={<PlaceholderPage titre="Offres" spec="doc 14 — P22" />} />
+        <Route path="/offres" element={<OffresPage />} />
         <Route path="/administration" element={<AdminDashboardPage />} />
-        <Route path="/moderation" element={<PlaceholderPage titre="Modération" spec="doc 12 — P24 (admin only)" />} />
+        <Route path="/moderation" element={<ModerationPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />
