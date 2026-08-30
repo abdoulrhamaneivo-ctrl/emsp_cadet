@@ -208,8 +208,6 @@ export default function WidgetFAQ({
                 "focus:border-[var(--emsp-gold)] focus:outline-none",
                 "placeholder:text-[var(--text-muted)]/60"
               )}
-              placeholder="Ta question (ex: Comment m'inscrire ?)..."
-              onKeyDown={handleKeyDown}
               disabled={chargement}
               style={{ minHeight: "40px", maxHeight: "120px" }}
             />

@@ -4,8 +4,13 @@ import PublicShell from "@layout/shells/PublicShell";
 import ProtectedShell from "@layout/shells/ProtectedShell";
 import NotFoundPage from "@shared/pages/NotFoundPage";
 import HealthCheck from "@shared/pages/HealthCheck";
-import PlaceholderPage from "@shared/pages/PlaceholderPage";
+import LandingPage from "@features/landing/pages/LandingPage";
 import ConnexionPage from "@features/authentification/pages/ConnexionPage";
+import InscriptionPage from "@features/authentification/pages/InscriptionPage";
+import MotDePasseOubliePage from "@features/authentification/pages/MotDePasseOubliePage";
+import ReinitialiserMotDePassePage from "@features/authentification/pages/ReinitialiserMotDePassePage";
+import VerifierEmailPage from "@features/authentification/pages/VerifierEmailPage";
+import CompteSuspenduPage from "@features/authentification/pages/CompteSuspenduPage";
 import AnnuairePage from "@features/annuaire/pages/AnnuairePage";
 import FicheAinePage from "@features/annuaire/pages/FicheAinePage";
 import MesDemandesPage from "@features/parrainage/pages/MesDemandesPage";
@@ -27,13 +32,13 @@ function AppRoutes() {
     <Routes>
       {/* Shell public */}
       <Route element={<PublicShell />}>
-        <Route path="/" element={<PlaceholderPage titre="Landing" spec="adaptation template Home (T0) — P01" />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/connexion" element={<ConnexionPage />} />
-        <Route path="/inscription" element={<PlaceholderPage titre="Inscription" spec="T0 — P03" />} />
-        <Route path="/mot-de-passe-oublie" element={<PlaceholderPage titre="Mot de passe oublié" spec="T0 — P04" />} />
-        <Route path="/reinitialiser-mot-de-passe/:uid/:token" element={<PlaceholderPage titre="Réinitialiser le mot de passe" spec="T0 — P05" />} />
-        <Route path="/verifier-email/:uid/:token" element={<PlaceholderPage titre="Vérification e-mail" spec="T0 — P06" />} />
-        <Route path="/compte-suspendu" element={<PlaceholderPage titre="Compte suspendu" spec="doc 16 — P07" />} />
+        <Route path="/inscription" element={<InscriptionPage />} />
+        <Route path="/mot-de-passe-oublie" element={<MotDePasseOubliePage />} />
+        <Route path="/reinitialiser-mot-de-passe/:uid/:token" element={<ReinitialiserMotDePassePage />} />
+        <Route path="/verifier-email/:uid/:token" element={<VerifierEmailPage />} />
+        <Route path="/compte-suspendu" element={<CompteSuspenduPage />} />
         <Route path="/health" element={<HealthCheck />} />
       </Route>
 
