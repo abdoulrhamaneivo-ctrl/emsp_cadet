@@ -18,6 +18,9 @@ from .profil_views import (
     VisibiliteAnnuaireView,
 )
 from ia.faq_view import FAQView
+from ia.offres_view import GenererOffreView
+from ia.silence import detecter_binomes_silencieux  # noqa: F401 - used in admin_views
+from .admin_views import BinomesSilencieuxView
 from .views import ConnexionView, DeconnexionView, RafraichirView, SessionView
 
 urlpatterns = [
@@ -34,6 +37,8 @@ urlpatterns = [
     path("me/groups-resume/", GroupsResumeView.as_view()),
     path("me/rendez-vous/", MesRendezVousView.as_view()),
     path("faq/", FAQView.as_view()),  # IA-4 public (AllowAny)
+    path("admin/binomes-silencieux/", BinomesSilencieuxView.as_view()),  # IA-5 admin
+    path("offres/generer/", GenererOffreView.as_view()),  # IA-6 alumni
     path("parrains/", ParrainsView.as_view()),
     path("parrains/suggestions/", SuggestionsView.as_view()),
     path("parrains/<int:parrain_id>/", ParrainDetailView.as_view()),
