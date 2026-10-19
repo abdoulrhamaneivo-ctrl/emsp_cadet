@@ -1,7 +1,8 @@
 {
   "data": [
     { "id": 1, "title": "Accueil", "link": "/" },
-    { "id": 2, "title": "Connexion", "link": "/connexion" },
-    { "id": 3, "title": "Inscription", "link": "/inscription" }
+    { "id": 2, "title": "Fonctionnalités", "link": "#fonctionnalites" },
+    { "id": 3, "title": "Preuves", "link": "#preuves" },
+    { "id": 4, "title": "Pré-inscription", "link": "#preinscription" }
   ]
 }

@@ -1,333 +1,194 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { ArrowRight, Users, MessageCircle, Calendar, Shield, Target, Sparkles, Mail, Lock, Eye, CheckCircle } from "lucide-react";
-import Card from "@shared/components/Card";
-import Button from "@shared/components/Button";
-import { Input } from "@shared/components/Input";
+import { useReducedMotion } from "framer-motion";
+import {
+  ArrowRight,
+  Bell,
+  BriefcaseBusiness,
+  CalendarDays,
+  Heart,
+  MessageCircle,
+  UsersRound,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import PlatformRail from "../components/PlatformRail";
+import SchoolIllustration from "../components/SchoolIllustration";
+import StoryCarousel from "../components/StoryCarousel";
 
-/**
- * Landing page publique EMSP Connect — P01 (doc 02 §4, doc 03 §6).
- * Adaptation du template Home (doc 09 §5) : hero, KPIs, fonctionnalités,
- * pré-inscription email, preuve sociale, footer.
- */
+const ruban = [
+  "Parrainage", "Stages", "Événements", "Mentorat", "Messagerie", "Rendez-vous", "Communauté", "Offres",
+];
+
 export default function LandingPage() {
-  const [email, setEmail] = useState("");
-  const [inscription, setInscription] = useState("idle"); // idle | loading | success | error
-
-  const kpis = [
-    { icone: Users, label: "Étudiants connectés", valeur: "1 247" },
-    { icone: MessageCircle, label: "Messages cette semaine", valeur: "3 892" },
-    { icone: Calendar, label: "Événements à venir", valeur: "12" },
-    { icone: Shield, label: "Binômes actifs", valeur: "614" },
-  ];
-
-  const fonctionnalites = [
-    { icone: Target, titre: "Parrainage intelligent", desc: "Matching IA selon tes attentes et la vitrine de ton aîné", lien: "/annuaire" },
-    { icone: MessageCircle, titre: "Fil d'actualité", desc: "Questions, annonces, réussites — échanges publics entre promotions", lien: "/fil" },
-    { icone: Calendar, titre: "Événements", desc: "Inscris-toi en un clic, discute avec les participants", lien: "/evenements" },
-    { icone: Users, titre: "Messagerie temps réel", desc: "Privée avec ton binôme, groupes Famille & Cercles", lien: "/messagerie" },
-  ];
-
-  const preuves = [
-    { icone: CheckCircle, texte: "Authentification @emsp.int exclusive — sécurité totale" },
-    { icone: CheckCircle, texte: "Parrainage officiel : aîné = promo qui devance (L1→L2, L2→L3…)" },
-    { icone: CheckCircle, texte: "Transition annuelle sans casser les binômes (règle Ivo n°1)" },
-    { icone: CheckCircle, texte: "IA responsable : modération, matching, copilot, FAQ, détection silence, offres" },
-  ];
-
-  async function handlePreInscription(e) {
-    e.preventDefault();
-    if (!email.includes("@emsp.int")) {
-      setInscription("error");
-      return;
-    }
-    setInscription("loading");
-    try {
-      // TODO: appel API pré-inscription (à créer)
-      await new Promise((r) => setTimeout(r, 800));
-      setInscription("success");
-      setEmail("");
-    } catch {
-      setInscription("error");
-    }
-  }
+  const reducedMotion = useReducedMotion();
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navbar publique légère */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[var(--emsp-green-deep)]/95 backdrop-blur-sm border-b border-[var(--border-soft)]">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-              <Sparkles size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-              <span className="text-xs font-semibold text-[var(--emsp-gold)]">EMSP Connect</span>
-            </div>
-          </div>
-          <nav className="flex items-center gap-4">
-            <a href="/connexion" className="text-sm font-medium text-[var(--emsp-cream)]/90 hover:text-[var(--emsp-cream)]">Connexion</a>
-            <Button size="sm" onClick={() => document.getElementById("preinscription")?.scrollIntoView({ behavior: "smooth" })}>
-              Rejoindre
-            </Button>
-          </nav>
-        </div>
-      </header>
+    <div className="landing-page page">
+      <div className="progtop" aria-hidden="true" />
 
-      {/* Hero */}
-      <section className="relative flex items-center justify-center px-4 pt-20 pb-16 md:pt-32 md:pb-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[var(--emsp-green-deep)]" />
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zM0 36v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 6v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-6V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 36v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0-30V6H4v4H0v2h4v4h2v-4h4v-2H6zm0-30V6H4v4H0v2h4v4h2v-4h4v-2H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-        <div className="relative max-w-5xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col items-center gap-4"
-          >
-            <div className="flex items-center justify-center gap-2">
-              <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-                <Sparkles size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-                <span className="text-xs font-semibold text-[var(--emsp-gold)]">
-                  EMSP Connect
-                </span>
-              </div>
-            </div>
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-[var(--emsp-cream)] leading-tight">
-              Ta plateforme de parrainage <br />
-              <span className="text-[var(--emsp-gold)]">EMSP Abidjan</span>
+      <section className="hero2 paper">
+        <div className="wrap h2g">
+          <div className="hero2-copy">
+            <p className="eyebrow">Pour les étudiants et leurs Aînés</p>
+            <h1 className="hw" aria-label="Votre réseau de promo, à portée de clic.">
+              <span aria-hidden="true">Votre</span><span aria-hidden="true">réseau</span><span aria-hidden="true">de</span>
+              <span className="serif" aria-hidden="true">promo,</span><span aria-hidden="true">à</span>
+              <span aria-hidden="true">portée</span><span aria-hidden="true">de</span><span aria-hidden="true"><u>clic.</u></span>
             </h1>
-            <p className="max-w-2xl mx-auto text-lg text-[var(--emsp-cream)]/90">
-              Annuaire, parrainage, fil d'actualité, événements, messagerie temps réel —
-              tout pour réussir ton parcours à l'École Multinationale des Postes.
+            <p className="lead2">
+              Trouve un Aîné qui t’accompagne, échange avec ta communauté, organise tes rendez-vous
+              et découvre les événements et opportunités de l’EMSP.
             </p>
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3"
-            >
-              <Button size="lg" onClick={() => document.getElementById("preinscription")?.scrollIntoView({ behavior: "smooth" })} startIcon={<Sparkles size={18} />}>
-                Rejoindre la liste d'attente
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => window.location.href = "/connexion"}>
-                Déjà un compte ? Connexion
-              </Button>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* KPIs */}
-      <section className="px-4 py-12 bg-[var(--bg-page)]">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {kpis.map((kpi, i) => (
-              <motion.div
-                key={kpi.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * i }}
-                className="rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-5 shadow-[var(--shadow-card)]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="rounded-full bg-[var(--emsp-cream)]/10 p-2">
-                    <kpi.icone size={20} className="text-[var(--emsp-gold)]" aria-hidden="true" />
-                  </div>
-                </div>
-                <p className="mt-3 text-sm font-medium text-[var(--text-muted)]">{kpi.label}</p>
-                <p className="mt-1 font-display text-2xl font-bold text-[var(--text-primary)]">{kpi.valeur}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Preuve sociale / Garanties */}
-      <section className="px-4 py-12 bg-[var(--bg-page)]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="font-display text-2xl font-bold text-[var(--text-primary)]">
-              Pourquoi EMSP Connect ?
-            </h2>
-            <p className="mt-1 text-[var(--text-muted)]">
-              Conçu par et pour les étudiants de l'EMSP — règles métier verrouillées, IA responsable.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {preuves.map((p, i) => (
-              <motion.div
-                key={p.texte}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * i }}
-                className="group rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-5 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-panel)]"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 rounded-full bg-[var(--emsp-cream)]/10 p-2">
-                    <p.icone size={20} className="text-[var(--emsp-gold)]" aria-hidden="true" />
-                  </div>
-                  <p className="text-sm text-[var(--text-primary)]">{p.texte}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Fonctionnalités */}
-      <section className="px-4 py-12 bg-[var(--bg-page)]">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="font-display text-2xl font-bold text-[var(--text-primary)]">
-              Tout ce qu'il te faut
-            </h2>
-            <p className="mt-1 text-[var(--text-muted)]">
-              Quatre piliers pour ton parcours étudiant
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {fonctionnalites.map((f, i) => (
-              <motion.div
-                key={f.titre}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * i }}
-                whileHover={{ y: -4 }}
-                className="group rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-5 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-panel)]"
-              >
-                <div className="rounded-full bg-[var(--emsp-cream)]/10 p-3 mb-3">
-                  <f.icone size={24} className="text-[var(--emsp-gold)]" aria-hidden="true" />
-                </div>
-                <h3 className="font-semibold text-[var(--text-primary)]">{f.titre}</h3>
-                <p className="mt-1 text-sm text-[var(--text-muted)]">{f.desc}</p>
-                <a
-                  href={f.lien}
-                  className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[var(--accent-green)] hover:underline"
-                >
-                  Découvrir <ArrowRight size={13} aria-hidden="true" className="group-hover:translate-x-0.5 transition-transform" />
-                </a>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pré-inscription email */}
-      <section id="preinscription" className="px-4 py-16 bg-[var(--emsp-green-deep)] relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zM0 36v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 6v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-6V0h-2v4h-4v2h4v4h2v-4h4v-2h-4zM6 36v-4H4v4H0v2h4v4h2v-4h4v-2H6zm0-30V6H4v4H0v2h4v4h2v-4h4v-2H6zm0-30V6H4v4H0v2h4v4h2v-4h4v-2H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}
-        />
-        <div className="relative max-w-2xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col items-center gap-4"
-          >
-            <div className="flex items-center justify-center gap-2">
-              <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-                <Mail size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-                <span className="text-xs font-semibold text-[var(--emsp-gold)]">
-                  Accès anticipé
-                </span>
-              </div>
+            <div className="ctas2">
+              <Link className="btn pri" to="/inscription">Créer mon compte <ArrowRight className="ic s" aria-hidden="true" /></Link>
+              <a className="btn" href="#parrainage">Voir comment ça marche</a>
             </div>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-[var(--emsp-cream)] leading-tight">
-              Veux-tu être prévenu à l'ouverture ?
-            </h2>
-            <p className="max-w-xl mx-auto text-lg text-[var(--emsp-cream)]/90">
-              Laisse ton email @emsp.int — on t'avertit dès que ton compte est prêt.
-              Pas de spam, juste l'essentiel.
-            </p>
-            <form onSubmit={handlePreInscription} className="w-full max-w-md mt-6">
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1">
-                  <Input
-                    type="email"
-                    placeholder="ton.email@emsp.int"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={inscription !== "idle"}
-                    aria-label="Email @emsp.int pour pré-inscription"
-                    className="w-full"
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  size="lg"
-                  loading={inscription === "loading"}
-                  disabled={inscription !== "idle"}
-                  className="w-full sm:w-auto min-w-[160px]"
-                >
-                  {inscription === "success" ? (
-                    <>✓ Inscrit !</>
-                  ) : inscription === "error" ? (
-                    <>Email @emsp.int requis</>
-                  ) : (
-                    <>Je m'inscris</>
-                  )}
-                </Button>
-              </div>
-              {inscription === "success" && (
-                <p className="mt-3 text-sm text-[var(--emsp-cream)]/90">
-                  Merci ! Tu recevras un email quand ton compte sera activé.
-                </p>
-              )}
-              {inscription === "error" && (
-                <p className="mt-3 text-sm text-[var(--emsp-gold)]">
-                  Utilise ton email @emsp.int officiel.
-                </p>
-              )}
-            </form>
-          </motion.div>
+            <p className="hint landing-proof">Une communauté EMSP pour apprendre, transmettre et avancer ensemble.</p>
+          </div>
+          <SchoolIllustration reducedMotion={reducedMotion} />
+        </div>
+
+        <div className="mq" aria-hidden="true">
+          <div className="mq-t">
+            {[0, 1].map((copie) => (
+              <span className="mq-group" key={copie}>
+                {ruban.map((item) => <span className="mq-item" key={`${copie}-${item}`}>{item}<i /></span>)}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[var(--emsp-green-deep)] border-t border-[var(--border-soft)]">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid gap-8 md:grid-cols-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-1.5">
-                <Sparkles size={18} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-                <span className="font-display text-xl font-bold text-[var(--emsp-cream)]">EMSP Connect</span>
-              </div>
-              <p className="text-sm text-[var(--emsp-cream)]/70">
-                Plateforme officielle de parrainage de l'École Multinationale des Postes d'Abidjan.
-              </p>
-            </div>
-            <nav className="flex flex-col gap-2">
-              <h4 className="font-semibold text-[var(--emsp-cream)]">Plateforme</h4>
-              <a href="/annuaire" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Annuaire</a>
-              <a href="/fil" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Fil d'actualité</a>
-              <a href="/evenements" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Événements</a>
-              <a href="/messagerie" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Messagerie</a>
-            </nav>
-            <nav className="flex flex-col gap-2">
-              <h4 className="font-semibold text-[var(--emsp-cream)]">Parrainage</h4>
-              <a href="/mes-demandes" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Mes demandes</a>
-              <a href="/mon-parrainage" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Mon parrainage</a>
-              <a href="/rendez-vous" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Rendez-vous</a>
-            </nav>
-            <nav className="flex flex-col gap-2">
-              <h4 className="font-semibold text-[var(--emsp-cream)]">Légal</h4>
-              <a href="#" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Mentions légales</a>
-              <a href="#" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Données personnelles</a>
-              <a href="#" className="text-sm text-[var(--emsp-cream)]/70 hover:text-[var(--emsp-cream)]">Accessibilité</a>
-            </nav>
-          </div>
-          <div className="mt-8 pt-8 border-t border-[var(--border-soft)] text-center text-sm text-[var(--emsp-cream)]/60">
-            © 2025 EMSP Connect — École Multinationale des Postes, Abidjan
+      <section className="sc2" id="concept">
+        <div className="wrap">
+          <p className="eyebrow">Le concept</p>
+          <h2 className="big disp">Chaque promo a <span className="serif">quelque chose</span> à transmettre.</h2>
+          <p className="lead">Un Aîné connaît les portes qui s’ouvrent, un Cadet connaît les questions qu’on n’ose plus poser. EMSP Connect les met face à face, simplement.</p>
+          <div className="pill3">
+            <article className="pcard3 shine">
+              <span className="bigic concept-mentor"><UsersRound className="ic l" aria-hidden="true" /></span>
+              <h3 className="disp">Le parrainage</h3>
+              <p className="sub">Un Aîné accompagne un Cadet sur la durée, avec des objectifs partagés et des rendez-vous réguliers.</p>
+            </article>
+            <article className="pcard3 shine">
+              <span className="bigic concept-link"><MessageCircle className="ic l" aria-hidden="true" /></span>
+              <h3 className="disp">Le lien</h3>
+              <p className="sub">Messages, rendez-vous et fil de la communauté pour rester proches entre deux rencontres.</p>
+            </article>
+            <article className="pcard3 shine">
+              <span className="bigic concept-opportunity"><BriefcaseBusiness className="ic l" aria-hidden="true" /></span>
+              <h3 className="disp">Les opportunités</h3>
+              <p className="sub">Stages, emplois et missions relayés par la communauté, pour la communauté.</p>
+            </article>
           </div>
         </div>
-      </footer>
+      </section>
+
+      <section className="sc2 steps-section" id="parrainage">
+        <div className="wrap">
+          <div className="board">
+            <p className="chalk">Au programme :</p>
+            <h2 className="disp">Quatre étapes, un parrainage.</h2>
+            <div className="bsteps">
+              <svg className="chalkline" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M70 20 Q200 -6 330 20 T590 20 T850 20" vectorEffect="non-scaling-stroke" />
+              </svg>
+              <article className="bstep"><div className="num">1</div><h3 className="disp">Trouver</h3><p>Parcours l’annuaire et filtre par domaine, compétence ou promotion.</p></article>
+              <article className="bstep"><div className="num">2</div><h3 className="disp">Demander</h3><p>Présente-toi en quelques lignes depuis le profil de la personne.</p></article>
+              <article className="bstep"><div className="num">3</div><h3 className="disp">Échanger</h3><p>Une fois la demande acceptée, discutez et fixez vos rendez-vous.</p></article>
+              <article className="bstep"><div className="num">4</div><h3 className="disp">Avancer</h3><p>Suivez vos objectifs ensemble, puis transmettez à votre tour.</p></article>
+            </div>
+            <p className="chalk board-signoff">… et un jour, c’est toi l’Aîné·e !</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="sc2 paper" id="communaute">
+        <div className="wrap">
+          <p className="eyebrow">La communauté</p>
+          <h2 className="big disp">Des parcours qui <span className="serif">se croisent.</span></h2>
+          <p className="lead story-intro">Des histoires fictives pour illustrer l’esprit du parrainage.</p>
+          <StoryCarousel />
+        </div>
+      </section>
+
+      <section className="sc2" id="fonctionnalites">
+        <div className="wrap">
+          <p className="eyebrow">Fonctionnalités</p>
+          <h2 className="big disp">Tout le campus, <span className="serif">dans ta poche.</span></h2>
+          <div className="bento">
+            <Link className="bt a shine" to="/messagerie">
+              <h3 className="disp">Messagerie</h3>
+              <p>Des conversations privées entre Aînés et Cadets, sans quitter la plateforme.</p>
+              <div className="message-preview" aria-hidden="true">
+                <span className="bub2 l">Vendredi 10 h, ça vous va ?</span>
+                <span className="bub2 r">Parfait, à vendredi !</span>
+                <span className="dots3"><i /><i /><i /></span>
+              </div>
+            </Link>
+            <Link className="bt b shine" to="/rendez-vous">
+              <h3 className="disp">Rendez-vous</h3>
+              <p>Propose, confirme ou reporte tes séances de parrainage.</p>
+              <div className="mcal" aria-hidden="true">
+                <i /><i /><i className="mid" /><i /><i /><i /><i />
+                <i /><i className="hot" /><i /><i /><i className="mid" /><i /><i />
+              </div>
+            </Link>
+            <Link className="bt c shine" to="/annuaire">
+              <h3 className="disp">Annuaire</h3>
+              <p>Filtre par domaine, compétence et promotion.</p>
+              <div className="avatar-stack" aria-hidden="true">
+                <span className="av" style={{ background: "#0B7A3B" }}>NB</span>
+                <span className="av" style={{ background: "#3A4FA3" }}>SM</span>
+                <span className="av" style={{ background: "#7A2E5C" }}>YM</span>
+                <span className="av avatar-more">+</span>
+              </div>
+            </Link>
+            <Link className="bt d shine" to="/fil" aria-label="Découvrir le fil de la communauté">
+              <Heart className="ic l bento-heart" aria-hidden="true" />
+              <b className="disp">Fil</b>
+            </Link>
+            <Link className="bt e shine" to="/offres">
+              <h3 className="disp">Offres et stages</h3>
+              <p>Des opportunités relayées par les Aînés de la communauté.</p>
+              <div className="offer-tags"><span className="badge">Stage</span><span className="badge">Alternance</span><span className="badge">Emploi</span><span className="badge">Mission</span></div>
+            </Link>
+            <article className="bt f shine">
+              <h3 className="disp">Notifications et modération</h3>
+              <p>Reste informé et contribue à garder la communauté bienveillante grâce aux signalements.</p>
+              <Bell className="ic l bento-bell" aria-hidden="true" />
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="sc2 paper" id="evenements">
+        <div className="wrap">
+          <p className="eyebrow">Événements et opportunités</p>
+          <PlatformRail />
+          <div className="platform-tickets">
+            <Link className="ticket" to="/offres"><span className="badge info">Stages</span><span><b>Découvrir les stages</b><span className="hint">Parcours et premières expériences</span></span><ArrowRight className="ic" aria-hidden="true" /></Link>
+            <Link className="ticket" to="/offres"><span className="badge pri">Alternance</span><span><b>Préparer la suite</b><span className="hint">Des opportunités relayées par le réseau</span></span><ArrowRight className="ic" aria-hidden="true" /></Link>
+            <Link className="ticket" to="/offres"><span className="badge ok">Emploi</span><span><b>Faire grandir son parcours</b><span className="hint">Emplois, missions et conseils</span></span><ArrowRight className="ic" aria-hidden="true" /></Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="sc2 final-section">
+        <div className="wrap">
+          <div className="cta3">
+            <h2 className="disp">Prêt·e à rejoindre la <span className="serif cta-highlight">prochaine</span> promo ?</h2>
+            <div className="ctas">
+              <Link className="btn acc" to="/inscription">Créer mon compte <ArrowRight className="ic s" aria-hidden="true" /></Link>
+              <Link className="btn cta-login" to="/connexion">J’ai déjà un compte</Link>
+            </div>
+            <svg className="campus-s" viewBox="0 0 1200 170" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 120 Q300 60 600 110 T1200 90 V170 H0z" fill="#075B2B" />
+              <g fill="#0A4D2A"><rect x="500" y="80" width="200" height="90" /><polygon points="490,80 600,36 710,80" /></g>
+              <g fill="#FFCB05"><circle cx="1060" cy="50" r="34" /></g>
+              <g fill="#0A4D2A"><circle cx="120" cy="108" r="40" /><circle cx="190" cy="124" r="32" /><circle cx="990" cy="116" r="38" /></g>
+            </svg>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -12,6 +12,10 @@ dependencies = [
     "channels-redis>=4.2",
     "daphne>=4",
     "drf-spectacular>=0.27",
+    "dj-database-url>=3.1.2",
+    "psycopg[binary]>=3.3.6",
+    "whitenoise>=6.12.0",
+    "django-cloudinary-storage>=0.3.0",
 ]
 
 [dependency-groups]

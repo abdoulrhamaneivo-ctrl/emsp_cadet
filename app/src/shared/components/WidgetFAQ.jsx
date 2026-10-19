@@ -13,10 +13,7 @@ import Button from "@shared/components/Button";
  * - Opt-in RG12.4 : matchingEnrichi (toggle réutilisé) ou toggle dédié
  * - États : loading, erreur, dégradation silencieuse
  */
-export default function WidgetFAQ({ 
-  onFermer,
-  desactive = false,
-}) {
+export default function WidgetFAQ({ open = false, onClose, onFermer, desactive = false }) {
   const [question, setQuestion] = useState("");
   const [historique, setHistorique] = useState([]); // {question, reponse, sources, score, timestamp}
   const [chargement, setChargement] = useState(false);
@@ -54,7 +51,8 @@ export default function WidgetFAQ({
     }
   }
 
-  if (desactive) return null;
+  const fermer = onClose ?? onFermer;
+  if (!open || desactive) return null;
 
   return (
     <motion.div
@@ -68,7 +66,7 @@ export default function WidgetFAQ({
       {/* Overlay de fermeture */}
       <div
         className="absolute inset-0"
-        onClick={onFermer}
+        onClick={fermer}
         aria-hidden="true"
       />
 
@@ -99,7 +97,7 @@ export default function WidgetFAQ({
           </div>
           <button
             type="button"
-            onClick={onFermer}
+            onClick={fermer}
             className="flex-shrink-0 rounded-full p-1 text-[var(--text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)]"
             aria-label="Fermer la FAQ"
           >

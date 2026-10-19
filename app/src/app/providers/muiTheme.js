@@ -8,9 +8,9 @@ export const muiTheme = createTheme({
   cssVariables: true,
   palette: {
     mode: "light",
-    primary: { main: "#1d4430", contrastText: "#fdfaf2" },
-    secondary: { main: "#e9b517", contrastText: "#16281c" },
-    success: { main: "#1a8a52" },
+    primary: { main: "#0b7a3b", contrastText: "#ffffff" },
+    secondary: { main: "#ffcb05", contrastText: "#2a1b00" },
+    success: { main: "#1b7545" },
     error: { main: "#b42318" },
     warning: { main: "#b54708" },
     info: { main: "#175cd3" },
@@ -18,8 +18,8 @@ export const muiTheme = createTheme({
      * background.default = transparent : le fond animé (gradient vert profond)
      * est géré par styles/globals.css sur <body>, pas par MUI.
      */
-    background: { paper: "#fdfaf2", default: "transparent" },
-    text: { primary: "#16281c", secondary: "#4a5d50" },
+    background: { paper: "#ffffff", default: "#f5f8f1" },
+    text: { primary: "#0e2016", secondary: "#50625e" },
   },
   shape: { borderRadius: 12 },
   typography: { fontFamily: "var(--font-sans), sans-serif" },

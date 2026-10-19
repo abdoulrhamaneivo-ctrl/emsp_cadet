@@ -1,33 +1,37 @@
-/** Footer EMSP — bande institutionnelle + ruban tissé (doc 03 §4). */
-export default function Footer() {
-  const annee = new Date().getFullYear();
+import { Link } from "react-router-dom";
+import { Link2, Mail, UsersRound } from "lucide-react";
+import LogoMark from "@shared/components/LogoMark";
 
+export default function Footer() {
+  const year = new Date().getFullYear();
   return (
-    <footer role="contentinfo" aria-label="Pied de page">
-      <div className="woven-ribbon" />
-      <div className="bg-[var(--emsp-green-deep)] px-5 py-8 lg:px-10">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+    <footer className="foot" aria-label="Pied de page">
+      <div className="wrap">
+        <div className="foot-g">
           <div>
-            <p className="font-bold text-[var(--emsp-cream)]">
-              EMSP<span className="text-[var(--emsp-gold)]">Connect</span>
-            </p>
-            <p className="mt-1 text-sm text-[var(--emsp-cream)]/85">
-              Parrainage Cadets &amp; Aînés — École Multinationale des Postes, Abidjan
-            </p>
+            <Link to="/" className="logo foot-logo">
+              <LogoMark />
+              <span>EMSP Connect</span>
+            </Link>
+            <p className="foot-intro">La communauté qui relie les Cadets et les Aînés de l’École Multinationale des Postes.</p>
           </div>
-          <p className="text-xs text-[var(--emsp-cream)]/90">
-            <span className="sr-only">Copyright </span>
-            <span aria-hidden="true">©</span> {annee} · Base design :{" "}
-            <a
-              href="https://craftedtemplate.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:text-[var(--emsp-gold)]"
-            >
-              cillaux
-            </a>
-          </p>
+          <div>
+            <h3>Découvrir</h3>
+            <Link to="/#fonctionnalites"><Link2 className="ic s" size={15} /> La plateforme</Link>
+            <Link to="/inscription"><UsersRound className="ic s" size={15} /> Rejoindre la communauté</Link>
+          </div>
+          <div>
+            <h3>Votre espace</h3>
+            <Link to="/connexion">Connexion</Link>
+            <Link to="/inscription">Créer un compte</Link>
+          </div>
+          <div>
+            <h3>Contact</h3>
+            <a href="mailto:contact@emsp.int"><Mail className="ic s" size={15} /> contact@emsp.int</a>
+            <span>Abidjan, Côte d’Ivoire</span>
+          </div>
         </div>
+        <div className="foot-bottom">© {year} EMSP Connect · École Multinationale des Postes, Abidjan</div>
       </div>
     </footer>
   );

@@ -16,12 +16,12 @@ import { cx } from "@shared/utils/cx";
  * @param {string} to — si présent, rend un <Link> router stylé bouton
  */
 const stylesBase =
-  "inline-flex select-none items-center justify-center gap-2 font-semibold rounded-[var(--radius-input)] transition-[background-color,border-color,box-shadow] duration-[180ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-green-luminous)] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+  "btn inline-flex select-none items-center justify-center gap-2 font-semibold rounded-full transition-[background-color,border-color,box-shadow] duration-[180ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-green-luminous)] focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
 
 const stylesVariant = {
   primary:
-    "bg-[var(--accent-green)] text-[var(--emsp-cream)] active:shadow-[var(--shadow-pressed)]",
-  secondary: "bg-[var(--emsp-gold)] text-[#16281c] active:shadow-[var(--shadow-pressed)]",
+    "border border-[var(--accent-green)] bg-[var(--accent-green)] text-[var(--emsp-cream)] hover:bg-[var(--emsp-green-deep)] hover:border-[var(--emsp-green-deep)] active:shadow-[var(--shadow-pressed)]",
+  secondary: "border border-[var(--emsp-gold)] bg-[var(--emsp-gold)] text-[#2a1b00] hover:bg-[var(--emsp-gold-bright)] active:shadow-[var(--shadow-pressed)]",
   outline:
     "border-[1.5px] border-[var(--border-structural)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--hover-bg)] active:shadow-[var(--shadow-pressed)]",
   ghost:
@@ -39,6 +39,7 @@ const stylesSize = {
 };
 
 const BoutonLien = motion.create(Link);
+const MotionButton = motion.button;
 
 const Button = forwardRef(function Button(
   { variant = "primary", size = "md", loading = false, disabled = false, icon: Icone, to, className, children, onClick, ...props },
@@ -57,9 +58,9 @@ const Button = forwardRef(function Button(
   const contenu = (
     <>
       {loading ? (
-        <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+        <Loader2 size={16} className="ic animate-spin" aria-hidden="true" />
       ) : (
-        Icone && <Icone size={16} aria-hidden="true" />
+        Icone && <Icone size={16} className="ic s" aria-hidden="true" />
       )}
       {children}
     </>
@@ -74,9 +75,9 @@ const Button = forwardRef(function Button(
   }
 
   return (
-    <button type="button" disabled={desactive} {...commun}>
+    <MotionButton type="button" disabled={desactive} {...commun}>
       {contenu}
-    </button>
+    </MotionButton>
   );
 });
 

@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: emsp-connect-api
+    runtime: python
+    plan: free
+    region: ohio
+    rootDir: backend
+    buildCommand: uv sync --frozen --no-dev && uv run python manage.py collectstatic --noinput
+    startCommand: uv run python manage.py migrate --noinput && uv run daphne -b 0.0.0.0 -p $PORT config.asgi:application
+    healthCheckPath: /health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.14.3"
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: FRONT_ORIGIN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false

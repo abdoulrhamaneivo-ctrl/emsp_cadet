@@ -20,15 +20,12 @@ export default defineConfig({
   server: {
     port: 5200,
     strictPort: true,
-    // Bascule T3b (doc 21 §9) : proxy même origine vers le backend Django.
-    // Actif en dev seulement — sans lui, définir VITE_API_URL/VITE_WS_URL directs.
     proxy: {
       "/api": {
         target: "http://localhost:8000",
         changeOrigin: true,
         secure: false,
         ws: false,
-        // Forward cookies pour le refresh token httpOnly
         configure: (proxy) => {
           proxy.on("proxyReq", (proxyReq, req) => {
             if (req.headers.cookie) {
@@ -36,7 +33,6 @@ export default defineConfig({
             }
           });
           proxy.on("proxyRes", (proxyRes, req, res) => {
-            // Forward le Set-Cookie du backend vers le navigateur
             const setCookie = proxyRes.headers["set-cookie"];
             if (setCookie) {
               res.setHeader("Set-Cookie", setCookie);
@@ -49,6 +45,21 @@ export default defineConfig({
         ws: true,
       },
     },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react": ["react", "react-dom", "react-router-dom"],
+          "vendor-tanstack": ["@tanstack/react-query"],
+          "vendor-lucide": ["lucide-react"],
+          "vendor-framer": ["framer-motion"],
+          "vendor-sonner": ["sonner"],
+          "vendor-zod": ["zod"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
   },
   test: {
     environment: "jsdom",

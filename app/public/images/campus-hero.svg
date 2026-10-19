@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="600" y1="0" x2="600" y2="720" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE56B" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#FBF8EE" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="830" y1="310" x2="820" y2="700" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B9D7A8" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#D8E9C9" stop-opacity=".1"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1200v720H0z"/>
+  <circle cx="944" cy="188" r="86" fill="#FFCB05" fill-opacity=".34"/>
+  <circle cx="944" cy="188" r="122" stroke="#FFCB05" stroke-opacity=".25" stroke-width="2" stroke-dasharray="5 13"/>
+  <path d="M0 474c157-85 302-82 441-10 133 69 220 68 358-10 147-83 266-78 401-13v279H0V474Z" fill="url(#hill)"/>
+  <path d="M0 570c170-55 302-47 450 14 120 50 238 43 359-16 162-79 273-74 391-28v180H0V570Z" fill="#B5D8AB" fill-opacity=".28"/>
+  <g opacity=".55" stroke="#0B7A3B" stroke-width="3">
+    <path d="M642 358h313v260H642z" fill="#FFFDF4" fill-opacity=".72"/>
+    <path d="m616 360 181-105 182 105H616Z" fill="#0B7A3B" fill-opacity=".11"/>
+    <path d="M676 392h54v66h-54zm91 0h54v66h-54zm91 0h54v66h-54zM676 484h54v66h-54zm91 0h54v66h-54zm91 0h54v66h-54z" fill="#FFCB05" fill-opacity=".18"/>
+    <path d="M783 527h35v91h-35z" fill="#0B7A3B" fill-opacity=".1"/>
+  </g>
+  <g fill="#0B7A3B" fill-opacity=".25">
+    <circle cx="561" cy="463" r="42"/><circle cx="561" cy="510" r="28"/>
+    <circle cx="1032" cy="426" r="54"/><circle cx="1032" cy="486" r="35"/>
+    <circle cx="1100" cy="500" r="31"/><circle cx="1100" cy="536" r="22"/>
+  </g>
+  <g stroke="#0B7A3B" stroke-opacity=".24" stroke-width="2">
+    <path d="M70 175h80m-40-40v80M248 301h58m-29-29v58M1083 94h48m-24-24v48"/>
+    <circle cx="425" cy="150" r="6" fill="#0B7A3B"/><circle cx="1120" cy="305" r="7" fill="#0B7A3B"/>
+    <path d="M110 643c31-36 61-36 92 0m54-41c21-25 43-25 64 0"/>
+  </g>
+</svg>

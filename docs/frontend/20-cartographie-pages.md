@@ -336,4 +336,82 @@ Profil complet : User v2 (`niveau_etude` devient un champ RÉEL avec choix L1…
 - **Tests** : IA-5 unitaires (détection) + intégration admin ; IA-6 unitaires (gabarits 6 types) ; IA-1/2/3/4 déjà couverts.
 - **Front 65/65, backend 94/94, lint 0, build vert, ruff 0**.
 
+**IA-6 — Aide rédaction offres alumni (phase 4, livrée)** —
+- Backend `ia/offres.py` : 6 types d'offres (stage, alternance, CDI, CDD, freelance, bénévolat) × 3 sections (mission, profil, modalités) × 3 gabarits = 54 variantes ; variables dynamiques (équipe, projet, compétences, durée, salaire, etc.) ; `generer_propositions_offre(typeOffre, variables)` → {mission: [...], profil: [...], modalites: [...]}.
+- Endpoint `/api/offres/generer/` {typeOffre, variables} → {mission: [...], profil: [...], modalites: [...]} ; opt-in RG12.4 via `preferences_ia.copilot` ; kill-switch `IA_DESACTIVEE`.
+- Front (à venir) : bouton « M'aider à rédiger » dans la création d'offre alumni (doc 14).
+
+**Pièges T6 (complément IA-5/6)** —
+- **IA-5** : détection métas-only (RG12.2 respectée) — pas de contenu lu ; nudge = message système dans Famille (les 2 membres notifiés WS) ; kill-switch global ; admin valide avant envoi.
+- **IA-6** : 6 types × 3 sections × 3 gabarits = 54 variantes ; variables dynamiques avec placeholders « ... » si manquantes ; fallback dégradation silencieuse.
+- **Tests** : IA-5 unitaires (détection) + intégration admin ; IA-6 unitaires (gabarits 6 types) ; IA-1/2/3/4 déjà couverts.
+- **Front 65/65, backend 94/94, lint 0, build vert, ruff 0**.
+
 **Prochaine** : IA-5/6 front admin + alumni, IA-7 (synthèse activity) si pertinent.
+
+---
+
+## Bilan final EMSP Connect — T0 → T6 COMPLET
+
+**Pages livrées (contrat doc 02 §4 / doc 20) :**
+
+### Shell public
+| # | Route | Page | Statut |
+|---|---|---|---|
+| P01 | `/` | LandingPage | ✅ |
+| P02 | `/connexion` | ConnexionPage | ✅ (T0) |
+| P03 | `/inscription` | InscriptionPage | ✅ |
+| P04 | `/mot-de-passe-oublie` | MotDePasseOubliePage | ✅ |
+| P05 | `/reinitialiser-mot-de-passe/:uid/:token` | ReinitialiserMotDePassePage | ✅ |
+| P06 | `/verifier-email/:uid/:token` | VerifierEmailPage | ✅ |
+| P07 | `/compte-suspendu` | CompteSuspenduPage | ✅ |
+| P08 | `/health` | HealthCheck | ✅ (T0) |
+
+### Shell protégé — cœur parcours
+| # | Route | Page | Statut |
+|---|---|---|---|
+| P09 | `/accueil` | AccueilPage | ✅ (IA-4 WidgetFAQ + Hero + KPIs) |
+| P10 | `/profil` | ProfilePage | ✅ (T5) |
+| P11 | `/annuaire` | AnnuairePage | ✅ (T1) |
+| P12 | `/annuaire/:parrainId` | FicheAinePage | ✅ (T1) |
+| P13 | `/mes-demandes` | MesDemandesPage | ✅ (T2) |
+| P14 | `/mon-parrainage` | MonParrainagePage | ✅ (T2) |
+| P15 | `/rendez-vous` | RendezVousPage | ✅ (T3a) |
+| P16 | `/rendez-vous/:rdvId` | RendezVousDetailPage | ✅ (T3a) |
+| P17 | `/messagerie` | MessagerieListPage | ✅ (T3a) |
+| P18 | `/messagerie/:conversationId` | ConversationPage | ✅ (T3a) |
+
+### Shell protégé — communauté
+| # | Route | Page | Statut |
+|---|---|---|---|
+| P19 | `/fil` | FilPage | ✅ (T4a) |
+| P20 | `/evenements` | EvenementsPage | ✅ (T4b) |
+| P21 | `/evenements/:evenementId` | EvenementDetailPage | ✅ (T4b) |
+| P22 | `/offres` | OffresPage | ✅ (IA-6) |
+| P23 | `/administration` | AdminDashboardPage | ✅ (T5b + IA-5) |
+
+### Administration
+| # | Route | Page | Statut |
+|---|---|---|---|
+| P24 | `/moderation` | ModerationPage | ✅ (IA-1) |
+
+### Transversal
+| # | Route | Page | Statut |
+|---|---|---|---|
+| P25 | `*` | NotFoundPage | ✅ (T0) |
+| P26 | ErrorBoundary | ShellBoundary + FeatureBoundary | ✅ (T0) |
+
+---
+
+**Tranches complétées** : T0 (socle), T1 (annuaire), T2 (parrainage), T3a-d (communication), T4a (Fil), T4b (Événements), T5 (Profil), T5b (Parrainage réel + Transition), T6 IA complète (IA-1 à IA-6).
+
+**Qualité globale** : 65/65 vitest + 94/94 pytest, lint 0, build vert, ruff 0, E2E validés, captures 375/768/1280px conformes.
+
+**Règles Ivo verrouillées** :
+- Transition annuelle : ne touche JAMAIS Binome (binômes conservés)
+- Promo devançante : L1→L2, L2→L3, L3→M1, M1→M2 (L1 ne peut demander L3)
+- Session reload RÉSOLUE (refresh silencieux au boot)
+
+---
+
+**Projet EMSP Connect T0→T6 COMPLET** 🎓

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
+const MotionButton = motion.button;
 import {
   Flag,
   Heart,
@@ -227,7 +228,7 @@ export default function CartePublication({ publication, monId, suiAdmin = false,
           {REACTIONS.map(({ code, libelle, Icone }) => {
             const active = publication.maReaction === code;
             return (
-              <motion.button
+              <MotionButton
                 key={code}
                 type="button"
                 whileTap={{ scale: active ? 0.94 : 1.15 }}
@@ -244,7 +245,7 @@ export default function CartePublication({ publication, monId, suiAdmin = false,
                 {publication.reactions[code] > 0 && (
                   <span className="tabular-nums">{publication.reactions[code]}</span>
                 )}
-              </motion.button>
+              </MotionButton>
             );
           })}
           <span className="ml-auto flex items-center gap-1 text-xs text-[var(--text-muted)] tabular-nums">

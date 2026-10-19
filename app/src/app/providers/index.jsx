@@ -2,6 +2,7 @@ import { ThemeProvider } from "./Theme";
 import { AuthProvider } from "./Auth";
 import { QueryProvider } from "./Query";
 import { MuiProvider } from "./Mui";
+import { MotionConfig } from "framer-motion";
 
 /**
  * Ordre contractuel des providers (doc 01 §1.3).
@@ -10,11 +11,13 @@ import { MuiProvider } from "./Mui";
 export function AppProviders({ children }) {
   return (
     <ThemeProvider>
-      <MuiProvider>
-        <QueryProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </QueryProvider>
-      </MuiProvider>
+      <MotionConfig reducedMotion="user">
+        <MuiProvider>
+          <QueryProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </QueryProvider>
+        </MuiProvider>
+      </MotionConfig>
     </ThemeProvider>
   );
 }

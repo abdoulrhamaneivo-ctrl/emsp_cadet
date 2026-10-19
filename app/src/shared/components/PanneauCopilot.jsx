@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+const MotionButton = motion.button;
 import { X, Sparkles, Loader2, ClipboardCheck } from "lucide-react";
 import { cx } from "@shared/utils/cx";
 import ChipIA from "@shared/components/ChipIA";
@@ -114,7 +115,7 @@ export default function PanneauCopilot({
           ) : propositions.length ? (
             <div className="flex flex-col gap-2" role="list" aria-label="Propositions du copilot">
               {propositions.map((p, idx) => (
-                <motion.button
+                <MotionButton
                   key={idx}
                   type="button"
                   initial={{ opacity: 0, x: -10 }}
@@ -140,7 +141,7 @@ export default function PanneauCopilot({
                     </span>
                     <ClipboardCheck size={14} className="shrink-0 text-[var(--emsp-gold)] mt-0.5" aria-hidden="true" />
                   </div>
-                </motion.button>
+                </MotionButton>
               ))}
             </div>
           ) : (
