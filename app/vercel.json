@@ -1,4 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "devCommand": "npm run dev",
@@ -41,11 +42,5 @@
         }
       ]
     }
-  ],
-  "env": {
-    "VITE_API_URL": "",
-    "VITE_ENABLE_MOCKS": "0",
-    "VITE_DEMO_SESSION": "0",
-    "VITE_WS_URL": "wss://emsp-connect-api.onrender.com"
-  }
+  ]
 }

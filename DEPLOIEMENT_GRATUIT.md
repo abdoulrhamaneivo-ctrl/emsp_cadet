@@ -43,12 +43,12 @@ Render migre la base puis démarre Daphne/Channels. L’instance gratuite s’en
 ## 4. Vercel — interface React
 
 1. Le projet Vercel `emsp-connect` est créé et configuré avec **Root Directory** = `app` et le preset Vite.
-2. Vérifie les variables de build :
-   - `VITE_API_URL` : vide ;
+2. Dans **Project Settings → Environment Variables**, définis pour **Production** :
    - `VITE_ENABLE_MOCKS` : `0` ;
    - `VITE_DEMO_SESSION` : `0` ;
    - `VITE_WS_URL` : `wss://emsp-connect-api.onrender.com`.
-3. Déploie le front. `app/vercel.json` transmet `/api/*` à Render et conserve le fallback SPA React. Les WebSockets vont directement vers Render via `VITE_WS_URL`.
+   - Laisse `VITE_API_URL` absent : le client appelle `/api` sur la même origine et Vercel transmet ces requêtes à Render.
+3. Déploie le front. `app/vercel.json` définit les réécritures `/api/*` vers Render et le fallback SPA React. Les variables Vite sont configurées dans les réglages du projet, car elles sont injectées au build. Les WebSockets vont directement vers Render via `VITE_WS_URL`.
 4. Mets l’URL de production Vercel exacte dans `FRONT_ORIGIN` sur Render, puis redéploie l’API.
 
 ## 5. Réglages locaux et vérifications
