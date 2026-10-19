@@ -4,8 +4,8 @@ Le front est servi par Vercel, l’API Django et les WebSockets par Render, Post
 
 ## 1. Neon — base PostgreSQL
 
-1. Dans Neon, sélectionne une branche dédiée au déploiement (garde `production` intacte).
-2. Copie la chaîne de connexion **pooled** PostgreSQL avec TLS, depuis la page de connexion de cette branche.
+1. Le projet Neon `emsp-connect` est créé en Ohio, séparé de `Portail_emsp`, avec une branche vide `main` et la base `emsp_connect`.
+2. Dans Neon, copie la chaîne de connexion **pooled** PostgreSQL avec TLS de cette branche.
 3. Ajoute cette valeur uniquement comme `DATABASE_URL` dans les variables secrètes Render. Ne la mets pas dans Git ni dans le front Vercel.
 
 Le backend exécute les migrations Django au démarrage. Le point `/health/` répond `200` quand la base est joignable.
@@ -28,7 +28,7 @@ Les photos du dossier local `Photos/` ne sont pas automatiquement envoyées. Les
 
 ## 3. Render — API et WebSockets
 
-Le Blueprint [render.yaml](render.yaml) crée `emsp-connect-api` en plan Free, dans la région Ohio pour être proche de la branche Neon `aws-us-east-2`.
+Le Blueprint [render.yaml](render.yaml) crée `emsp-connect-api` en plan Free, dans la région Ohio pour être proche du projet Neon `aws-us-east-2`.
 
 1. Pousse le dépôt dans un fournisseur Git pris en charge par Render, puis connecte ce dépôt au tableau de bord Render.
 2. Choisis **New → Blueprint**, sélectionne le dépôt et confirme `render.yaml`.
@@ -42,7 +42,7 @@ Render migre la base puis démarre Daphne/Channels. L’instance gratuite s’en
 
 ## 4. Vercel — interface React
 
-1. Importe le même dépôt dans Vercel avec **Root Directory** = `app` et le preset Vite.
+1. Le projet Vercel `emsp-connect` est créé et configuré avec **Root Directory** = `app` et le preset Vite.
 2. Vérifie les variables de build :
    - `VITE_API_URL` : vide ;
    - `VITE_ENABLE_MOCKS` : `0` ;
