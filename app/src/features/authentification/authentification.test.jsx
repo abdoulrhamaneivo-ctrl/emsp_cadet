@@ -35,11 +35,23 @@ function remplir(email, motDePasse) {
 }
 
 describe("Connexion (doc 02 §5)", () => {
-  it("RG4 : refuse un e-mail hors domaine @emsp.int avant tout appel réseau", async () => {
+  it("laisse le serveur vérifier une adresse externe pour le compte administrateur", async () => {
+    let emailRecu;
+    server.use(
+      http.post("*/api/auth/connexion/", async ({ request }) => {
+        emailRecu = (await request.json()).email;
+        return HttpResponse.json(
+          { detail: "E-mail ou mot de passe incorrect." },
+          { status: 401 },
+        );
+      }),
+    );
     renderConnexion();
-    remplir("ivo@gmail.com", "peu-importe");
-    expect(await screen.findByText(/Utilise ton adresse @emsp\.int/)).toBeTruthy();
-    // Jamais arrivé à destination.
+    remplir("abdoulivo5@gmail.com", "mot-de-passe-invalide");
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "E-mail ou mot de passe incorrect",
+    );
+    expect(emailRecu).toBe("abdoulivo5@gmail.com");
     expect(screen.queryByText("DESTINATION-ATTEINTE")).toBeNull();
   });
 
@@ -92,10 +104,8 @@ describe("Connexion (doc 02 §5)", () => {
     });
   });
 
-  it("comptes de démo : un clic remplit e-mail et mot de passe", () => {
+  it("ne propose aucun compte de démonstration prérempli", () => {
     renderConnexion();
-    fireEvent.click(screen.getByRole("button", { name: /ivo\.abdoul/ }));
-    expect(screen.getByLabelText(/E-mail institutionnel/).value).toBe("ivo.abdoul@emsp.int");
-    expect(screen.getByLabelText(/Mot de passe/).value).toBe("demo");
+    expect(screen.queryByRole("button", { name: /ivo\.abdoul/ })).toBeNull();
   });
 });

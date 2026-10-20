@@ -17,10 +17,11 @@ explicitement avec `uv run python manage.py createsuperuser`.
 
 ## E-mails Brevo
 
-En production, configurer dans Render `BREVO_SMTP_LOGIN`, `BREVO_SMTP_KEY` (clé SMTP),
-et `BREVO_FROM_EMAIL` (adresse expéditeur vérifiée dans Brevo). Les liens de confirmation
-et de réinitialisation pointent vers `FRONT_ORIGIN`; les demandes de création de compte
-restent bloquées si l'envoi Brevo n'est pas configuré.
+Sur Render Free, configurer dans Render `BREVO_TRANSPORT=api`, `BREVO_API_KEY` (clé API Brevo) et
+`BREVO_FROM_EMAIL` (adresse expéditeur vérifiée dans Brevo). L'envoi passe par l'API HTTPS
+de Brevo, car Render Free bloque les ports SMTP 25, 465 et 587. Sur un hébergement qui
+autorise SMTP, `BREVO_SMTP_LOGIN` et `BREVO_SMTP_KEY` (clé SMTP) restent disponibles en
+repli. Les liens de confirmation et de réinitialisation pointent vers `FRONT_ORIGIN`.
 
 ## Qualité
 

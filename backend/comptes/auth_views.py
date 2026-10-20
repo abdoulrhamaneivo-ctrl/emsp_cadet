@@ -1,6 +1,10 @@
 """Inscription et courriels de compte : confirmation, reset et changement."""
 
+import json
 import logging
+from email.utils import parseaddr
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 from django.conf import settings
 from django.contrib.auth.password_validation import validate_password
@@ -38,12 +42,63 @@ class CourrielIndisponible(APIException):
 def _exiger_configuration_courriel():
     if settings.EMAIL_BACKEND.endswith("console.EmailBackend"):
         return
-    if not (settings.EMAIL_HOST_USER and settings.EMAIL_HOST_PASSWORD and settings.DEFAULT_FROM_EMAIL):
+    if settings.BREVO_TRANSPORT == "api":
+        api_configure = bool(settings.BREVO_API_KEY and settings.DEFAULT_FROM_EMAIL)
+        if not api_configure:
+            raise CourrielIndisponible()
+        return
+    smtp_configure = bool(
+        settings.EMAIL_HOST_USER and settings.EMAIL_HOST_PASSWORD and settings.DEFAULT_FROM_EMAIL
+    )
+    if settings.BREVO_TRANSPORT != "smtp" or not smtp_configure:
         raise CourrielIndisponible()
 
 
 def _envoyer(destinataire, sujet, texte, html):
     _exiger_configuration_courriel()
+    if (
+        settings.BREVO_TRANSPORT == "api"
+        and not settings.EMAIL_BACKEND.endswith("console.EmailBackend")
+    ):
+        api_key = settings.BREVO_API_KEY
+        nom_expediteur, adresse_expediteur = parseaddr(settings.DEFAULT_FROM_EMAIL)
+        if not adresse_expediteur:
+            adresse_expediteur = settings.DEFAULT_FROM_EMAIL
+        payload = json.dumps(
+            {
+                "sender": {
+                    "email": adresse_expediteur,
+                    "name": nom_expediteur or "EMSP Connect",
+                },
+                "to": [{"email": destinataire}],
+                "subject": sujet,
+                "htmlContent": html,
+            }
+        ).encode("utf-8")
+        request = Request(
+            "https://api.brevo.com/v3/smtp/email",
+            data=payload,
+            headers={
+                "accept": "application/json",
+                "api-key": api_key,
+                "content-type": "application/json",
+            },
+            method="POST",
+        )
+        try:
+            with urlopen(request, timeout=10) as response:
+                if not 200 <= response.status < 300:
+                    raise CourrielIndisponible()
+            return
+        except CourrielIndisponible:
+            raise
+        except HTTPError as exc:
+            logger.error("Brevo API a refusé un courriel de compte (HTTP %s)", exc.code)
+            raise CourrielIndisponible() from exc
+        except Exception as exc:
+            logger.exception("Échec de livraison d'un courriel de compte via l'API Brevo")
+            raise CourrielIndisponible() from exc
+
     message = EmailMultiAlternatives(
         subject=sujet,
         body=texte,
@@ -201,7 +256,9 @@ class RenvoyerConfirmationView(APIView):
         user = User.objects.filter(email__iexact=entree.validated_data["email"]).first()
         if user and user.is_active and not user.email_verifie:
             _envoyer_verification(user)
-        return Response({"detail": "Si un compte attend cette confirmation, un e-mail a été envoyé."})
+        return Response(
+            {"detail": "Si un compte attend cette confirmation, un e-mail a été envoyé."}
+        )
 
 
 class DemanderReinitialisationView(APIView):
@@ -221,7 +278,9 @@ class DemanderReinitialisationView(APIView):
         ).first()
         if user:
             _envoyer_reinitialisation(user)
-        return Response({"detail": "Si un compte existe, un lien de réinitialisation a été envoyé."})
+        return Response(
+            {"detail": "Si un compte existe, un lien de réinitialisation a été envoyé."}
+        )
 
 
 class ReinitialiserMotDePasseView(APIView):
