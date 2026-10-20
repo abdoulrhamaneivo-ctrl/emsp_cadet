@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 import ConnexionPage from "./pages/ConnexionPage";
+import ReinitialiserMotDePassePage from "./pages/ReinitialiserMotDePassePage";
 import { AuthProvider } from "@app/providers/Auth";
 import { server } from "@shared/mocks/server";
 import InscriptionPage from "./pages/InscriptionPage";
@@ -36,6 +37,21 @@ function renderInscription() {
       <Routes>
         <Route path="/inscription" element={<InscriptionPage />} />
       </Routes>
+    </MemoryRouter>,
+  );
+}
+
+function renderReinitialisation() {
+  return render(
+    <MemoryRouter initialEntries={["/reinitialiser-mot-de-passe/abc/token"]}>
+      <AuthProvider initialUser={null}>
+        <Routes>
+          <Route
+            path="/reinitialiser-mot-de-passe/:uid/:token"
+            element={<ReinitialiserMotDePassePage />}
+          />
+        </Routes>
+      </AuthProvider>
     </MemoryRouter>,
   );
 }
@@ -170,5 +186,33 @@ describe("Inscription", () => {
 
     expect(screen.getByText("FORMULAIRE-RESET")).toBeInTheDocument();
     expect(screen.queryByText("REDIRECTION-MESSAGERIE")).toBeNull();
+  });
+});
+
+describe("Réinitialisation du mot de passe", () => {
+  it("affiche le formulaire après validation serveur du lien", async () => {
+    server.use(
+      http.post("*/api/auth/verifier-lien-reinitialisation/", () =>
+        HttpResponse.json({ valid: true }),
+      ),
+    );
+
+    renderReinitialisation();
+
+    expect(await screen.findByLabelText(/Nouveau mot de passe/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Mettre à jour le mot de passe" })).toBeInTheDocument();
+  });
+
+  it("n'affiche pas le formulaire si le lien a expiré", async () => {
+    server.use(
+      http.post("*/api/auth/verifier-lien-reinitialisation/", () =>
+        HttpResponse.json({ detail: "Ce lien est invalide ou a expiré." }, { status: 400 }),
+      ),
+    );
+
+    renderReinitialisation();
+
+    expect(await screen.findByRole("heading", { name: "Lien invalide ou expiré" })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/Nouveau mot de passe/)).toBeNull();
   });
 });

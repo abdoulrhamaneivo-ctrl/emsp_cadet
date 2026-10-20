@@ -29,6 +29,8 @@ export const authApi = {
     (await apiClient.post("/api/auth/renvoyer-confirmation/", { email })).data,
   demanderReinitialisation: async (email) =>
     (await apiClient.post("/api/auth/mot-de-passe-oublie/", { email })).data,
+  verifierLienReinitialisation: async ({ uid, token }) =>
+    (await apiClient.post("/api/auth/verifier-lien-reinitialisation/", { uid, token })).data,
   reinitialiserMotDePasse: async ({ uid, token, password }) =>
     (await apiClient.post("/api/auth/reinitialiser-mot-de-passe/", { uid, token, password })).data,
   changerMotDePasse: async ({ currentPassword, newPassword }) =>

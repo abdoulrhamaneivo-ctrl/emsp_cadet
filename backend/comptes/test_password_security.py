@@ -64,6 +64,37 @@ def test_reset_refuse_un_jeton_invalide_sans_modifier_le_mot_de_passe(api, users
 
 
 @pytest.mark.django_db
+def test_verification_prealable_reconnait_un_lien_valide_sans_modifier_le_compte(api, users):
+    user = users.ivo
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    reponse = api.post(
+        "/api/auth/verifier-lien-reinitialisation/",
+        {"uid": uid, "token": token},
+        format="json",
+    )
+
+    assert reponse.status_code == 200
+    assert reponse.json() == {"valid": True}
+    user.refresh_from_db()
+    assert user.check_password("demo")
+    assert user.password_version == 0
+
+
+@pytest.mark.django_db
+def test_verification_prealable_refuse_un_lien_invalide(api, users):
+    reponse = api.post(
+        "/api/auth/verifier-lien-reinitialisation/",
+        {"uid": urlsafe_base64_encode(force_bytes(users.ivo.pk)), "token": "invalide"},
+        format="json",
+    )
+
+    assert reponse.status_code == 400
+    assert reponse.json()["detail"] == "Ce lien est invalide ou a expiré."
+
+
+@pytest.mark.django_db
 @override_settings(
     EMAIL_BACKEND="django.core.mail.backends.smtp.EmailBackend",
     BREVO_TRANSPORT="api",

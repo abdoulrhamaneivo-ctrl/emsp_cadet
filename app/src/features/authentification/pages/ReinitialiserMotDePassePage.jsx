@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { AlertCircle, CheckCircle, Clock3, Eye, EyeOff, KeyRound, Lock, ShieldCheck } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock3, Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { cx } from "@shared/utils/cx";
 import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
@@ -16,10 +16,41 @@ export default function ReinitialiserMotDePassePage() {
   const { logout } = useAuth();
   const { uid, token } = useParams();
   const [form, setForm] = useState({ motDePasse: "", confirmerMdp: "" });
-  const [etape, setEtape] = useState("formulaire");
+  const [etape, setEtape] = useState("verification");
   const [erreur, setErreur] = useState("");
   const [soumission, setSoumission] = useState(false);
   const [voirMdp, setVoirMdp] = useState(false);
+  const [nouvelleVerification, setNouvelleVerification] = useState(0);
+
+  useEffect(() => {
+    if (!uid || !token) {
+      setEtape("invalide");
+      return undefined;
+    }
+
+    let actif = true;
+    setErreur("");
+    setEtape("verification");
+    authApi.verifierLienReinitialisation({ uid, token })
+      .then(() => {
+        if (actif) setEtape("formulaire");
+      })
+      .catch((error) => {
+        if (!actif) return;
+        if (error?.response?.status === 400) {
+          setEtape("invalide");
+        } else {
+          setErreur(
+            error?.response?.status === 429
+              ? "Trop de vérifications rapprochées. Patiente quelques minutes avant de réessayer."
+              : "Nous ne pouvons pas vérifier ce lien pour le moment. Réessaie dans un instant.",
+          );
+          setEtape("verificationErreur");
+        }
+      });
+
+    return () => { actif = false; };
+  }, [uid, token, nouvelleVerification]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -45,13 +76,17 @@ export default function ReinitialiserMotDePassePage() {
       setEtape("succes");
     } catch (error) {
       const detail = error?.response?.data?.detail;
-      setErreur(typeof detail === "string" ? detail : "Le lien n'est plus valide. Demande un nouveau lien de réinitialisation.");
+      if (typeof detail === "string" && error?.response?.status === 400 && detail.includes("invalide")) {
+        setEtape("invalide");
+      } else {
+        setErreur(typeof detail === "string" ? detail : "Le lien n'est plus valide. Demande un nouveau lien de réinitialisation.");
+      }
     } finally {
       setSoumission(false);
     }
   }
 
-  if (!uid || !token) {
+  if (!uid || !token || etape === "invalide") {
     return (
       <AuthExperienceLayout
         eyebrow="LIEN À RENOUVELER"
@@ -86,19 +121,26 @@ export default function ReinitialiserMotDePassePage() {
   }
 
   const termine = etape === "succes";
+  const verification = etape === "verification";
+  const verificationErreur = etape === "verificationErreur";
 
   return (
     <AuthExperienceLayout
-      eyebrow={termine ? "MOT DE PASSE MIS À JOUR" : "NOUVEAU MOT DE PASSE"}
-      storyTitle={termine ? "Tu peux reprendre ton parcours." : "Choisis une clé solide pour ton espace."}
+      eyebrow={termine ? "MOT DE PASSE MIS À JOUR" : verification ? "VÉRIFICATION DU LIEN" : "NOUVEAU MOT DE PASSE"}
+      storyTitle={termine ? "Tu peux reprendre ton parcours." : verification ? "On vérifie ton lien de sécurité." : "Choisis une clé solide pour ton espace."}
       storyText={termine
         ? "La sécurité de ton compte a été actualisée. Connecte-toi et retrouve ta communauté EMSP."
-        : "Le lien t'a conduit ici pour remplacer ton ancien mot de passe. Quelques règles simples protègent ton compte."}
+        : verification
+          ? "On contrôle que le lien est encore valide avant de te laisser modifier ton mot de passe."
+          : "Le lien t'a conduit ici pour remplacer ton ancien mot de passe. Quelques règles simples protègent ton compte."}
       image="/images/emsp/atelier.webp"
       imageAlt="Des étudiants de l'EMSP travaillent ensemble"
       highlights={termine ? [
         { icon: CheckCircle, title: "Changement confirmé", text: "Ton nouveau mot de passe est actif." },
         { icon: ShieldCheck, title: "Sessions protégées", text: "Les anciennes sessions ont été révoquées." },
+      ] : verification ? [
+        { icon: ShieldCheck, title: "Contrôle sécurisé", text: "Le mot de passe ne changera qu'après validation du lien." },
+        { icon: Clock3, title: "Lien temporaire", text: "Les liens de réinitialisation expirent après une heure." },
       ] : [
         { icon: KeyRound, title: "Au moins 8 caractères", text: "Une phrase longue est facile à retenir et difficile à deviner." },
         { icon: ShieldCheck, title: "Ne le réutilise pas", text: "Choisis un mot de passe différent de celui de ta boîte e-mail." },
@@ -115,11 +157,36 @@ export default function ReinitialiserMotDePassePage() {
             {termine ? "C'est fait !" : "Crée ton nouveau mot de passe"}
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
-            {termine ? "Ton mot de passe a été mis à jour." : "Choisis un mot de passe unique que tu pourras retenir."}
+            {termine
+              ? "Ton mot de passe a été mis à jour."
+              : verification
+                ? "Vérification du lien en cours…"
+                : verificationErreur
+                  ? erreur
+                  : "Choisis un mot de passe unique que tu pourras retenir."}
           </p>
         </div>
 
-        {!termine ? (
+        {verification && (
+          <div role="status" className="flex items-center justify-center gap-3 rounded-xl bg-[#f4f7f1] p-4 text-sm text-[var(--text-muted)]">
+            <Loader2 size={19} className="animate-spin text-[var(--accent-green)]" aria-hidden="true" />
+            Vérification sécurisée de ton lien…
+          </div>
+        )}
+
+        {verificationErreur && (
+          <div className="space-y-4">
+            <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-[#e6bd62] bg-[#fff8e7] p-3.5 text-sm leading-relaxed text-[#704b00]">
+              <AlertCircle size={17} className="mt-0.5 shrink-0" aria-hidden="true" />
+              <span>{erreur}</span>
+            </div>
+            <Button className="w-full" size="lg" onClick={() => setNouvelleVerification((n) => n + 1)}>
+              Réessayer la vérification
+            </Button>
+          </div>
+        )}
+
+        {etape === "formulaire" ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             {erreur && (
               <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-[#d98f86] bg-[#fff0ee] p-3.5 text-sm text-[#8b2d25]">
@@ -185,7 +252,7 @@ export default function ReinitialiserMotDePassePage() {
               Mettre à jour le mot de passe
             </Button>
           </form>
-        ) : (
+        ) : termine ? (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="py-2 text-center">
             <motion.div
               initial={{ scale: 0 }}
@@ -203,7 +270,8 @@ export default function ReinitialiserMotDePassePage() {
               Se connecter à EMSP Connect
             </Button>
           </motion.div>
-        )}
+        ) : null}
+        {verification && <p role="status" className="sr-only">Vérification du lien de réinitialisation en cours</p>}
       </Card>
     </AuthExperienceLayout>
   );

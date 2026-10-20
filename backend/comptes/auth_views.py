@@ -360,6 +360,30 @@ class DemanderReinitialisationView(APIView):
         )
 
 
+class VerifierLienReinitialisationView(APIView):
+    """Vérifie un lien avant d'afficher le formulaire de nouveau mot de passe."""
+
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = "auth_password"
+
+    class Entree(serializers.Serializer):
+        uid = serializers.CharField()
+        token = serializers.CharField()
+
+    def post(self, request):
+        entree = self.Entree(data=request.data)
+        entree.is_valid(raise_exception=True)
+        try:
+            user_id = force_str(urlsafe_base64_decode(entree.validated_data["uid"]))
+            user = User.objects.get(pk=user_id, is_active=True)
+        except (User.DoesNotExist, ValueError, TypeError):
+            return Response({"detail": "Ce lien est invalide ou a expiré."}, status=400)
+        if not default_token_generator.check_token(user, entree.validated_data["token"]):
+            return Response({"detail": "Ce lien est invalide ou a expiré."}, status=400)
+        return Response({"valid": True})
+
+
 class ReinitialiserMotDePasseView(APIView):
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]

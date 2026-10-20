@@ -27,6 +27,7 @@ from .auth_views import (
     InscriptionView,
     ReinitialiserMotDePasseView,
     RenvoyerConfirmationView,
+    VerifierLienReinitialisationView,
     VerifierEmailView,
 )
 from .views import ConnexionView, DeconnexionView, RafraichirView, SessionView
@@ -40,6 +41,7 @@ urlpatterns = [
     path("auth/verifier-email/", VerifierEmailView.as_view()),
     path("auth/renvoyer-confirmation/", RenvoyerConfirmationView.as_view()),
     path("auth/mot-de-passe-oublie/", DemanderReinitialisationView.as_view()),
+    path("auth/verifier-lien-reinitialisation/", VerifierLienReinitialisationView.as_view()),
     path("auth/reinitialiser-mot-de-passe/", ReinitialiserMotDePasseView.as_view()),
     path("auth/changer-mot-de-passe/", ChangerMotDePasseView.as_view()),
     path("me/", MoiView.as_view()),
