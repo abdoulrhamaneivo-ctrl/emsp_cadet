@@ -7,6 +7,7 @@ import Button from "@shared/components/Button";
 import { Input } from "@shared/components/Input";
 import { useNavigate, useParams } from "react-router-dom";
 import { authApi } from "@shared/api/auth";
+import { useAuth } from "@app/providers/Auth";
 
 /**
  * Page Réinitialisation mot de passe — P05 (doc 02 §4, doc 16 §4).
@@ -14,6 +15,7 @@ import { authApi } from "@shared/api/auth";
  */
 export default function ReinitialiserMotDePassePage() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const { uid, token } = useParams();
   const [form, setForm] = useState({ motDePasse: "", confirmerMdp: "" });
   const [etape, setEtape] = useState("formulaire"); // formule | succes
@@ -39,10 +41,14 @@ export default function ReinitialiserMotDePassePage() {
     setSoumission(true);
     try {
       await authApi.reinitialiserMotDePasse({ uid, token, password: form.motDePasse });
+      // Le backend révoque tous les refresh tokens après le changement.
+      await authApi.deconnexion().catch(() => {});
+      logout();
       setEtape("succes");
     } catch (erreur) {
-      const detail = erreur?.response?.data?.detail ?? erreur?.response?.data?.password;
-      setErreur(Array.isArray(detail) ? detail[0] : detail ?? "Erreur — lien invalide ou expiré");
+      const donnees = erreur?.response?.data;
+      const messages = [donnees?.detail, ...Object.values(donnees ?? {}).flat(Infinity)];
+      setErreur(messages.find((message) => typeof message === "string") ?? "Erreur — lien invalide ou expiré");
     } finally {
       setSoumission(false);
     }
@@ -92,7 +98,7 @@ export default function ReinitialiserMotDePassePage() {
                 {etape === "formulaire" ? "Nouveau mot de passe" : "C'est fait !"}
               </h1>
               <p className="mt-1 text-sm text-[var(--text-muted)]">
-                {etape === "formulaire" ? "Choisis un mot de passe fort (min. 8 caractères)" : "Ton mot de passe a été mis à jour"}
+                {etape === "formulaire" ? "Choisis un mot de passe difficile à deviner" : "Ton mot de passe a été mis à jour"}
               </p>
             </div>
 
@@ -113,7 +119,7 @@ export default function ReinitialiserMotDePassePage() {
                       <Input
                         type={voirMdp ? "text" : "password"}
                         autoComplete="new-password"
-                        placeholder="Min. 8 caractères"
+                        placeholder="8 caractères minimum"
                         value={form.motDePasse}
                         onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
                         className={cx(
@@ -154,6 +160,9 @@ export default function ReinitialiserMotDePassePage() {
                         required
                       />
                     </div>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      8 caractères minimum. Évite les mots de passe courants et ceux qui reprennent ton nom ou ton e-mail.
+                    </p>
                   </label>
                 </div>
 

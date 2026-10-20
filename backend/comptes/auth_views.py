@@ -132,14 +132,16 @@ def _envoyer_verification(user):
         f"Bonjour {user.prenom},\n\n"
         "Nous avons reçu une demande de création de compte EMSP Connect. "
         f"Confirme ton adresse e-mail en ouvrant ce lien :\n{url}\n\n"
-        "Ce lien expire dans 48 heures. Si tu n'es pas à l'origine de cette demande, "
-        "tu peux ignorer ce message."
+        "Ce lien expire dans 48 heures. Après confirmation, l'administration vérifiera "
+        "ta carte étudiante, ton nom, ton matricule et ta promotion avant d'activer le compte. "
+        "Si tu n'es pas à l'origine de cette demande, ignore ce message."
     )
     prenom_html = escape(user.prenom)
     html = (
         "<div style='font-family:Arial,sans-serif;line-height:1.6;color:#17301f'>"
         f"<h2>Bienvenue sur EMSP Connect, {prenom_html} !</h2>"
-        "<p>Confirme ton adresse e-mail pour activer ton compte.</p>"
+        "<p>Confirme ton adresse e-mail. L'administration vérifiera ensuite ta carte "
+        "étudiante, ton nom, ton matricule et ta promotion avant d'activer le compte.</p>"
         f"<p><a href='{url}' style='display:inline-block;padding:12px 18px;"
         "background:#0b7a3b;color:#fff;text-decoration:none;border-radius:8px'>"
         "Confirmer mon adresse</a></p>"
@@ -198,14 +200,31 @@ class InscriptionView(APIView):
         serializer = InscriptionSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         _exiger_configuration_courriel()
+        stockage_carte = None
+        nom_carte = ""
         try:
             with transaction.atomic():
                 user = serializer.save()
+                carte = user.verification_etudiant.carte_etudiant
+                stockage_carte = carte.storage
+                nom_carte = carte.name
                 _envoyer_verification(user)
         except CourrielIndisponible:
+            # Le fichier Cloudinary/privé n'est pas annulé automatiquement avec
+            # la transaction SQL si Brevo échoue après le téléversement.
+            if stockage_carte and nom_carte:
+                try:
+                    stockage_carte.delete(nom_carte)
+                except Exception:
+                    logger.exception("Impossible de supprimer une carte après échec du courriel")
             raise
         return Response(
-            {"detail": "Compte créé. Consulte ta boîte e-mail pour le confirmer."},
+            {
+                "detail": (
+                    "Dossier créé. Confirme ton e-mail ; l'administration validera ensuite "
+                    "ta carte étudiante avant d'activer ton compte."
+                )
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -238,7 +257,10 @@ class VerifierEmailView(APIView):
         if not user.email_verifie:
             user.email_verifie = True
             user.save(update_fields=["email_verifie"])
-        return Response({"detail": "Adresse e-mail confirmée."})
+        detail = "Adresse e-mail confirmée."
+        if user.statut_compte == User.StatutCompte.EN_ATTENTE:
+            detail += " Ton compte sera activé après vérification de ta carte par l'administration."
+        return Response({"detail": detail})
 
 
 class RenvoyerConfirmationView(APIView):
@@ -254,7 +276,7 @@ class RenvoyerConfirmationView(APIView):
         entree.is_valid(raise_exception=True)
         _exiger_configuration_courriel()
         user = User.objects.filter(email__iexact=entree.validated_data["email"]).first()
-        if user and user.is_active and not user.email_verifie:
+        if user and not user.email_verifie:
             _envoyer_verification(user)
         return Response(
             {"detail": "Si un compte attend cette confirmation, un e-mail a été envoyé."}
@@ -296,7 +318,6 @@ class ReinitialiserMotDePasseView(APIView):
     def post(self, request):
         entree = self.Entree(data=request.data)
         entree.is_valid(raise_exception=True)
-        _exiger_configuration_courriel()
         try:
             user_id = force_str(urlsafe_base64_decode(entree.validated_data["uid"]))
             user = User.objects.get(pk=user_id, is_active=True)
@@ -310,8 +331,10 @@ class ReinitialiserMotDePasseView(APIView):
             raise serializers.ValidationError({"password": exc.messages}) from exc
         with transaction.atomic():
             user.set_password(entree.validated_data["password"])
-            user.save(update_fields=["password"])
-            _envoyer_confirmation_changement(user)
+            user.password_version += 1
+            user.save(update_fields=["password", "password_version"])
+            _revoquer_sessions(user)
+            transaction.on_commit(lambda: _envoyer_confirmation_changement_sans_bloquer(user.pk))
         return Response({"detail": "Mot de passe modifié."})
 
 
@@ -327,7 +350,6 @@ class ChangerMotDePasseView(APIView):
     def post(self, request):
         entree = self.Entree(data=request.data)
         entree.is_valid(raise_exception=True)
-        _exiger_configuration_courriel()
         if not request.user.check_password(entree.validated_data["currentPassword"]):
             raise serializers.ValidationError({"currentPassword": "Mot de passe actuel incorrect."})
         try:
@@ -336,6 +358,29 @@ class ChangerMotDePasseView(APIView):
             raise serializers.ValidationError({"newPassword": exc.messages}) from exc
         with transaction.atomic():
             request.user.set_password(entree.validated_data["newPassword"])
-            request.user.save(update_fields=["password"])
-            _envoyer_confirmation_changement(request.user)
+            request.user.password_version += 1
+            request.user.save(update_fields=["password", "password_version"])
+            _revoquer_sessions(request.user)
+            transaction.on_commit(
+                lambda: _envoyer_confirmation_changement_sans_bloquer(request.user.pk)
+            )
         return Response({"detail": "Mot de passe modifié."})
+
+
+def _revoquer_sessions(user):
+    """Révoque tous les refresh tokens après un changement de mot de passe."""
+    from rest_framework_simplejwt.token_blacklist.models import (
+        BlacklistedToken,
+        OutstandingToken,
+    )
+
+    for jeton in OutstandingToken.objects.filter(user=user).only("id"):
+        BlacklistedToken.objects.get_or_create(token=jeton)
+
+
+def _envoyer_confirmation_changement_sans_bloquer(user_id):
+    """Une panne Brevo ne doit ni annuler le changement ni garder les sessions."""
+    try:
+        _envoyer_confirmation_changement(User.objects.get(pk=user_id))
+    except Exception:
+        logger.exception("Impossible d'envoyer la confirmation du changement de mot de passe")

@@ -3,9 +3,11 @@
 from django.urls import path
 
 from comptes.admin_views import (
+    CarteEtudiantAdminView,
     StatsAdminView,
     TransitionApercuView,
     TransitionExecuterView,
+    VerificationsEtudiantsView,
 )
 
 from .views import (
@@ -27,6 +29,11 @@ urlpatterns = [
     path("parrainages/<int:parrainage_id>/cloture/", ClotureParrainageView.as_view()),
     path("parrainages/<int:parrainage_id>/avis/", AvisParrainageView.as_view()),
     path("admin/stats/", StatsAdminView.as_view()),
+    path("admin/verifications-etudiants/", VerificationsEtudiantsView.as_view()),
+    path(
+        "admin/verifications-etudiants/<int:verification_id>/carte/",
+        CarteEtudiantAdminView.as_view(),
+    ),
     path("admin/transition-apercu/", TransitionApercuView.as_view()),
     path("admin/transition-executer/", TransitionExecuterView.as_view()),
 ]

@@ -19,7 +19,10 @@ export const authApi = {
     return data;
   },
   inscription: async (formulaire) =>
-    (await apiClient.post("/api/auth/inscription/", formulaire)).data,
+    (await apiClient.post("/api/auth/inscription/", formulaire, {
+      // Laisser le navigateur ajouter le boundary multipart au formulaire fichier.
+      headers: { "Content-Type": undefined },
+    })).data,
   verifierEmail: async (uid, token) =>
     (await apiClient.post("/api/auth/verifier-email/", { uid, token })).data,
   renvoyerConfirmation: async (email) =>

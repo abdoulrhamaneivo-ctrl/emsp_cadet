@@ -12,9 +12,10 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.conf import settings
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from comptes.authentication import PasswordChangeJWTAuthentication
 
 
 def _cookies_du_scope(scope):
@@ -51,6 +52,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
     async def receive_json(self, contenu):
+        if not await self._session_valide():
+            await self.close(code=4401)
+            return
         type_evenement = contenu.get("type")
         conversation_id = contenu.get("conversationId")
         if type_evenement == "join" and conversation_id:
@@ -89,7 +93,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
             )
 
     async def disconnect(self, code):
-        for groupe in list(self.groupes_joints):
+        utilisateur = getattr(self, "utilisateur", None)
+        if utilisateur is None:
+            return
+        for groupe in list(getattr(self, "groupes_joints", set())):
             await self.channel_layer.group_discard(groupe, self.channel_name)
             await self.channel_layer.group_send(
                 groupe,
@@ -99,7 +106,7 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
                         {
                             "type": "presence",
                             "conversationId": int(groupe.removeprefix("conv.")),
-                            "utilisateurId": self.utilisateur.pk,
+                            "utilisateurId": utilisateur.pk,
                             "enLigne": False,
                         }
                     ),
@@ -108,6 +115,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
     # Handler des événements publiés par la couche REST (type: "evenement.chat").
     async def evenement_chat(self, message):
+        if not await self._session_valide():
+            await self.close(code=4401)
+            return
         evenement = json.loads(message["texte"])
         # `envoyeParMoi` est du point de vue du DESTINATAIRE (contrat front) :
         # la couche REST diffuse le payload de l'expéditeur, on le réécrit ici.
@@ -138,8 +148,9 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     @database_sync_to_async
     def _utilisateur_du_token(token):
         try:
-            valide = JWTAuthentication().get_validated_token(token)
-            return JWTAuthentication().get_user(valide)
+            authentification = PasswordChangeJWTAuthentication()
+            valide = authentification.get_validated_token(token)
+            return authentification.get_user(valide)
         except (TokenError, InvalidToken, AuthenticationFailed):
             return None
 
@@ -162,6 +173,17 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
 
         return Conversation.objects.filter(
             pk=conversation_id, participants=self.utilisateur
+        ).exists()
+
+    @database_sync_to_async
+    def _session_valide(self):
+        from comptes.models import User
+
+        return User.objects.filter(
+            pk=self.utilisateur.pk,
+            is_active=True,
+            statut_compte=User.StatutCompte.ACTIF,
+            password_version=self.utilisateur.password_version,
         ).exists()
 
     @staticmethod

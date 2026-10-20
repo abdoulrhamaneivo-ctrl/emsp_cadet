@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import Modal from "@shared/components/Modal";
 import Button from "@shared/components/Button";
 import { SkeletonCard } from "@shared/components/Skeleton";
@@ -121,7 +122,9 @@ export default function ProfilePage() {
         newPassword: formMdp.newPassword,
       });
       setFormMdp({ currentPassword: "", newPassword: "", confirmation: "" });
-      setEtatMdp({ message: resultat.detail ?? "Mot de passe modifié. Un e-mail de confirmation a été envoyé.", erreur: "", enCours: false });
+      setEtatMdp({ message: resultat.detail ?? "Mot de passe modifié.", erreur: "", enCours: false });
+      toast.success("Mot de passe modifié. Reconnecte-toi avec le nouveau mot de passe.");
+      logout();
     } catch (erreur) {
       const detail = erreur?.response?.data?.detail ?? erreur?.response?.data?.currentPassword ?? erreur?.response?.data?.newPassword;
       setEtatMdp({ message: "", erreur: Array.isArray(detail) ? detail[0] : detail ?? "Modification impossible. Vérifie les informations et réessaie.", enCours: false });

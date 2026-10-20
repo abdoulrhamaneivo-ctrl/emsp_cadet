@@ -10,8 +10,12 @@ export default function PublicShell() {
   const location = useLocation();
   const destination = location.state?.from ?? "/messagerie";
   const landing = location.pathname === "/";
+  const lienCompte =
+    location.pathname.startsWith("/reinitialiser-mot-de-passe/") ||
+    location.pathname.startsWith("/verifier-email/") ||
+    location.pathname === "/mot-de-passe-oublie";
 
-  if (statut === "authentifie" && user) {
+  if (statut === "authentifie" && user && !lienCompte) {
     return <Navigate to={destination} replace />;
   }
 

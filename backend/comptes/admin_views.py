@@ -5,16 +5,25 @@ La transition monte les niveaux mais ne touche JAMAIS comptes.Binome :
 Atomique : soit tout passe, rien n'est à moitié fait (doc 15 §2 n°3).
 """
 
+import logging
+from pathlib import PurePosixPath
+
 from django.db import transaction
+from django.db.models import Q
+from django.http import HttpResponse
+from django.utils import timezone
+from django.utils.html import escape
+from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from comptes.models import Binome, User
+from comptes.models import Binome, User, VerificationEtudiant
 from comptes.serializers import UtilisateurLegereSerializer
 from config.exceptions import ErreurValidation
-from ia.silence import detecter_binomes_silencieux, creer_nudge_binome
+from ia.silence import creer_nudge_binome, detecter_binomes_silencieux
 
 ORDRE = ["L1", "L2", "L3", "M1", "M2", "alumni"]
+logger = logging.getLogger(__name__)
 
 
 def _garde_admin(request):
@@ -37,8 +46,10 @@ class StatsAdminView(APIView):
                 "demandesEnAttente": Demande.objects.filter(
                     statut=Demande.Statut.EN_ATTENTE
                 ).count(),
-                "etudiants": User.objects.exclude(niveau_etude="alumni").count(),
-                "alumni": User.objects.filter(niveau_etude="alumni").count(),
+                "etudiants": (
+                    User.objects.filter(is_active=True).exclude(niveau_etude="alumni").count()
+                ),
+                "alumni": User.objects.filter(is_active=True, niveau_etude="alumni").count(),
             }
         )
 
@@ -148,14 +159,13 @@ class BinomesSilencieuxView(APIView):
 
     def get(self, request):
         _garde_admin(request)
-        from ia.silence import detecter_binomes_silencieux
 
         silencieux = detecter_binomes_silencieux()
         # Enrichir avec infos utilisateur
         resultats = []
         for s in silencieux:
-            from comptes.serializers import UtilisateurLegereSerializer
             from comptes.models import User
+            from comptes.serializers import UtilisateurLegereSerializer
             aine = User.objects.get(pk=s["aine_id"])
             cadet = User.objects.get(pk=s["cadet_id"])
             resultats.append({
@@ -172,10 +182,197 @@ class BinomesSilencieuxView(APIView):
         binome_id = (request.data or {}).get("binomeId")
         if not binome_id:
             raise ErreurValidation("binomeId requis.")
-        from ia.silence import detecter_binomes_silencieux, creer_nudge_binome
         silencieux = detecter_binomes_silencieux()
         cible = next((s for s in silencieux if s["binome_id"] == binome_id), None)
         if not cible:
             raise ErreurValidation("Binôme non trouvé dans la liste des silencieux.")
         creer_nudge_binome(binome_id, cible["raisons"])
         return Response({"ok": True, "message": "Nudge envoyé aux deux membres."})
+
+
+class VerificationsEtudiantsView(APIView):
+    """Revue réservée au personnel: carte privée, matricule unique, décision."""
+
+    class Decision(serializers.Serializer):
+        verificationId = serializers.IntegerField(min_value=1)
+        decision = serializers.ChoiceField(choices=("approuver", "refuser"))
+        motif = serializers.CharField(max_length=400, required=False, allow_blank=True)
+
+    def get(self, request):
+        _garde_admin(request)
+        verifications = VerificationEtudiant.objects.select_related("utilisateur").filter(
+            utilisateur__statut_compte=User.StatutCompte.EN_ATTENTE
+        )
+        resultats = []
+        for verification in verifications:
+            user = verification.utilisateur
+            homonyme = (
+                User.objects.filter(prenom__iexact=user.prenom, nom__iexact=user.nom)
+                .exclude(pk=user.pk)
+                .filter(
+                    Q(is_active=True, classe__iexact=user.classe)
+                    | Q(verification_etudiant__promotion=verification.promotion)
+                )
+                .exists()
+            )
+            resultats.append(
+                {
+                    "verificationId": verification.pk,
+                    "userId": user.pk,
+                    "prenom": user.prenom,
+                    "nom": user.nom,
+                    "email": user.email,
+                    "emailVerifie": user.email_verifie,
+                    "classe": user.classe,
+                    "filiere": user.filiere,
+                    "matricule": verification.matricule,
+                    "promotion": verification.promotion,
+                    "soumiseLe": verification.creee_le,
+                    "homonymeMemeClasseOuPromotion": homonyme,
+                    "carteUrl": f"/api/admin/verifications-etudiants/{verification.pk}/carte/",
+                }
+            )
+        reponse = Response({"results": resultats, "count": len(resultats)})
+        reponse["Cache-Control"] = "no-store, private"
+        reponse["Referrer-Policy"] = "no-referrer"
+        return reponse
+
+    def post(self, request):
+        admin = _garde_admin(request)
+        entree = self.Decision(data=request.data)
+        entree.is_valid(raise_exception=True)
+        donnees = entree.validated_data
+        with transaction.atomic():
+            verification = (
+                VerificationEtudiant.objects.select_for_update()
+                .select_related("utilisateur")
+                .filter(pk=donnees["verificationId"])
+                .first()
+            )
+            if verification is None:
+                raise ErreurValidation("Dossier de vérification introuvable.")
+            user = User.objects.select_for_update().get(pk=verification.utilisateur_id)
+            if user.statut_compte != User.StatutCompte.EN_ATTENTE:
+                raise ErreurValidation("Ce dossier a déjà été traité.")
+
+            decision = donnees["decision"]
+            if decision == "approuver":
+                if not user.email_verifie:
+                    raise ErreurValidation(
+                        "L'étudiant doit confirmer son adresse e-mail avant validation."
+                    )
+                if not verification.carte_etudiant:
+                    raise ErreurValidation("La carte étudiante est absente du dossier.")
+                user.statut_compte = User.StatutCompte.ACTIF
+                user.is_active = True
+                verification.motif_refus = ""
+            else:
+                user.statut_compte = User.StatutCompte.REFUSE
+                user.is_active = False
+                verification.motif_refus = donnees.get("motif", "").strip()
+
+            user.save(update_fields=["statut_compte", "is_active"])
+            verification.decidee_le = timezone.now()
+            verification.decidee_par = admin
+            nom_carte = verification.carte_etudiant.name
+            verification.save(update_fields=["decidee_le", "decidee_par", "motif_refus"])
+
+            # Le document est supprimé du fournisseur après validation de la
+            # transaction; il n'est jamais conservé comme pièce publique.
+            if nom_carte:
+                transaction.on_commit(
+                    lambda: _supprimer_carte_verification(verification.pk, nom_carte)
+                )
+            if user.email_verifie:
+                transaction.on_commit(
+                    lambda: _notifier_decision_verification(
+                        user.pk, decision, verification.motif_refus
+                    )
+                )
+
+        return Response(
+            {
+                "detail": (
+                    "Compte activé."
+                    if decision == "approuver"
+                    else "Dossier refusé."
+                )
+            }
+        )
+
+
+class CarteEtudiantAdminView(APIView):
+    """Renvoie une copie sans cache uniquement après authentification admin."""
+
+    def get(self, request, verification_id):
+        _garde_admin(request)
+        verification = (
+            VerificationEtudiant.objects.select_related("utilisateur")
+            .filter(
+                pk=verification_id,
+                utilisateur__statut_compte=User.StatutCompte.EN_ATTENTE,
+            )
+            .first()
+        )
+        if verification is None or not verification.carte_etudiant:
+            raise ErreurValidation("Carte étudiante introuvable.")
+
+        extension = PurePosixPath(verification.carte_etudiant.name).suffix.lower()
+        content_type = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png"}.get(
+            extension
+        )
+        if not content_type:
+            raise ErreurValidation("Format de carte non autorisé.")
+        with verification.carte_etudiant.open("rb") as fichier:
+            contenu = fichier.read()
+        reponse = HttpResponse(contenu, content_type=content_type)
+        reponse["Content-Disposition"] = f'inline; filename="carte-etudiante{extension}"'
+        reponse["Cache-Control"] = "no-store, private"
+        reponse["Pragma"] = "no-cache"
+        reponse["X-Content-Type-Options"] = "nosniff"
+        reponse["Referrer-Policy"] = "no-referrer"
+        return reponse
+
+
+def _supprimer_carte_verification(verification_id, nom_carte):
+    try:
+        verification = VerificationEtudiant.objects.get(pk=verification_id)
+        verification.carte_etudiant.storage.delete(nom_carte)
+        VerificationEtudiant.objects.filter(
+            pk=verification_id, carte_etudiant=nom_carte
+        ).update(carte_etudiant="")
+    except Exception:
+        logger.exception("Impossible de supprimer la carte étudiante privée %s", verification_id)
+
+
+def _notifier_decision_verification(user_id, decision, motif):
+    try:
+        user = User.objects.get(pk=user_id)
+        if decision == "approuver":
+            sujet = "Compte activé — EMSP Connect"
+            texte = (
+                "Ton identité étudiante a été validée. Tu peux maintenant te connecter à "
+                "EMSP Connect."
+            )
+            html = (
+                "<p>Ton identité étudiante a été validée. Tu peux maintenant te connecter "
+                "à EMSP Connect.</p>"
+            )
+        else:
+            sujet = "Dossier étudiant non validé — EMSP Connect"
+            texte = (
+                "Ton dossier n'a pas été validé. Contacte l'administration EMSP Connect "
+                "pour toute question."
+            )
+            html = (
+                "<p>Ton dossier n'a pas été validé. Contacte l'administration EMSP Connect "
+                "pour toute question.</p>"
+            )
+            if motif:
+                texte += f"\n\nMotif : {motif}"
+                html += f"<p>Motif : {escape(motif)}</p>"
+        from .auth_views import _envoyer
+
+        _envoyer(user.email, sujet, texte, f"<div>{html}</div>")
+    except Exception:
+        logger.exception("Impossible d'envoyer le résultat de validation du compte %s", user_id)

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterEach, afterAll, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { http, HttpResponse } from "msw";
@@ -6,6 +6,11 @@ import ConnexionPage from "./pages/ConnexionPage";
 import { AuthProvider } from "@app/providers/Auth";
 import { server } from "@shared/mocks/server";
 import InscriptionPage from "./pages/InscriptionPage";
+import PublicShell from "@layout/shells/PublicShell";
+
+vi.mock("@app/providers/Theme", () => ({
+  useTheme: () => ({ theme: "light", toggleTheme: vi.fn() }),
+}));
 
 beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
 afterEach(() => server.resetHandlers());
@@ -131,5 +136,39 @@ describe("Inscription", () => {
 
     expect(await screen.findByRole("heading", { name: "Ton profil" })).toBeInTheDocument();
     expect(screen.queryByText("Adresse e-mail invalide")).toBeNull();
+  });
+
+  it("demande le matricule, la promotion et la carte avant l'envoi du dossier", async () => {
+    renderInscription();
+    fireEvent.change(screen.getByLabelText(/Adresse e-mail/), {
+      target: { value: "personne@gmail.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Continuer" }));
+
+    expect(await screen.findByLabelText(/Matricule étudiant/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Année d'entrée/)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Carte étudiante/)).toHaveAttribute("type", "file");
+    expect(screen.getByText(/Seule l'administration peut la consulter/)).toBeInTheDocument();
+  });
+
+  it("laisse ouvrir le lien de nouveau mot de passe même avec une session active", () => {
+    render(
+      <MemoryRouter initialEntries={["/reinitialiser-mot-de-passe/abc/token"]}>
+        <AuthProvider initialUser={{ id: 1, isAdmin: false }}>
+          <Routes>
+            <Route element={<PublicShell />}>
+              <Route
+                path="/reinitialiser-mot-de-passe/:uid/:token"
+                element={<p>FORMULAIRE-RESET</p>}
+              />
+              <Route path="/messagerie" element={<p>REDIRECTION-MESSAGERIE</p>} />
+            </Route>
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("FORMULAIRE-RESET")).toBeInTheDocument();
+    expect(screen.queryByText("REDIRECTION-MESSAGERIE")).toBeNull();
   });
 });

@@ -115,9 +115,9 @@ class SessionView(APIView):
             )
 
         # Fallback JWT : tenter d'authentifier via le header Authorization
-        from rest_framework_simplejwt.authentication import JWTAuthentication
+        from comptes.authentication import PasswordChangeJWTAuthentication
 
-        jwt_auth = JWTAuthentication()
+        jwt_auth = PasswordChangeJWTAuthentication()
         try:
             auth_result = jwt_auth.authenticate(request)
             if auth_result:

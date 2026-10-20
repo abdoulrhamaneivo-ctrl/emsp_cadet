@@ -3,6 +3,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
+from .storage import CloudinaryAuthenticatedStorage
+
 
 class GestionnaireUtilisateur(BaseUserManager):
     """Manager sans username — l'identifiant est l'adresse e-mail."""
@@ -36,12 +38,24 @@ class User(AbstractUser):
         M2 = "M2", "M2"
         ALUMNI = "alumni", "Alumni"
 
+    class StatutCompte(models.TextChoices):
+        ACTIF = "actif", "Actif"
+        EN_ATTENTE = "en_attente", "En attente de validation"
+        REFUSE = "refuse", "Refusé"
+
     objects = GestionnaireUtilisateur()
 
     email = models.EmailField("email", unique=True)
     # Les comptes existants restent vérifiés. L'inscription publique crée
     # explicitement les nouveaux comptes avec email_verifie=False.
     email_verifie = models.BooleanField("email vérifié", default=True)
+    statut_compte = models.CharField(
+        "statut du compte", max_length=12, choices=StatutCompte.choices,
+        default=StatutCompte.ACTIF,
+    )
+    password_version = models.PositiveIntegerField(
+        "version de sécurité du mot de passe", default=0, editable=False
+    )
     prenom = models.CharField("prénom", max_length=80, blank=True)
     nom = models.CharField("nom", max_length=80, blank=True)
     filiere = models.CharField("filière", max_length=120, blank=True)
@@ -88,6 +102,40 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
+class VerificationEtudiant(models.Model):
+    """Justificatif confidentiel présenté avant l'activation d'un compte étudiant."""
+
+    utilisateur = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="verification_etudiant"
+    )
+    matricule = models.CharField("matricule normalisé", max_length=32, unique=True)
+    promotion = models.CharField("promotion d'entrée", max_length=4)
+    carte_etudiant = models.FileField(
+        "carte étudiante",
+        storage=CloudinaryAuthenticatedStorage(),
+        upload_to="student-cards/",
+        max_length=255,
+    )
+    creee_le = models.DateTimeField("soumise le", auto_now_add=True)
+    decidee_le = models.DateTimeField("décidée le", null=True, blank=True)
+    decidee_par = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="verifications_etudiant_decidees",
+    )
+    motif_refus = models.CharField("motif du refus", max_length=400, blank=True)
+
+    class Meta:
+        ordering = ["creee_le"]
+        verbose_name = "vérification étudiante"
+        verbose_name_plural = "vérifications étudiantes"
+
+    def __str__(self):
+        return f"{self.utilisateur.email} — {self.matricule}"
 
 
 class Binome(models.Model):

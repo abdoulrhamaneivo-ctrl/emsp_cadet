@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parents[2]
+STUDENT_CARD_STORAGE_ROOT = BASE_DIR / "private-media"
 
 # Confidentialité : les valeurs par défaut ne servent qu'au dev local (doc 21 §6).
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-uniquement-pas-secret")
@@ -100,7 +101,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # ── DRF / JWT (doc 21 §6) ─────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "comptes.authentication.PasswordChangeJWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "comptes.permissions.EstActif",
@@ -121,6 +122,10 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_COOKIE_PATH": "/",
     "REFRESH_TOKEN_COOKIE_SAMESITE": "Lax",
 }
+
+# Le formulaire d'inscription accepte une carte de 5 Mo plus l'enveloppe multipart.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 6 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 
 # Refresh token : cookie httpOnly uniquement (jamais exposé au JS, doc 19 §5.1).
 SIMPLE_JWT_REFRESH_COOKIE = "refresh_token"

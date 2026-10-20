@@ -37,6 +37,10 @@
           "value": "DENY"
         },
         {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
         }

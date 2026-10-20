@@ -21,6 +21,9 @@ export default function InscriptionPage() {
     nom: "",
     classe: "",
     filiere: "",
+    matricule: "",
+    promotion: "",
+    carteEtudiant: null,
     motDePasse: "",
     confirmerMdp: "",
     casquette: null, // "cadet" | "aine"
@@ -56,6 +59,20 @@ export default function InscriptionPage() {
     if (!form.nom.trim()) erreurs.nom = "Nom requis";
     if (!form.classe) erreurs.classe = "Choisis ta classe";
     if (!form.filiere) erreurs.filiere = "Choisis ta filière";
+    const matricule = form.matricule.replace(/[^a-z0-9]/gi, "");
+    if (matricule.length < 4 || !/\d/.test(matricule)) {
+      erreurs.matricule = "Saisis le matricule inscrit sur ta carte";
+    }
+    const annee = Number(form.promotion);
+    if (!/^\d{4}$/.test(form.promotion) || annee < 2000 || annee > new Date().getFullYear()) {
+      erreurs.promotion = "Indique ton année d'entrée à l'EMSP";
+    }
+    if (!form.carteEtudiant) erreurs.carteEtudiant = "Ajoute une photo lisible de ta carte étudiante";
+    else if (!/^image\/(jpeg|png)$/.test(form.carteEtudiant.type)) {
+      erreurs.carteEtudiant = "Choisis une image JPEG ou PNG";
+    } else if (form.carteEtudiant.size > 5 * 1024 * 1024) {
+      erreurs.carteEtudiant = "La carte doit faire 5 Mo maximum";
+    }
     if (!form.motDePasse) erreurs.motDePasse = "Mot de passe requis";
     else if (form.motDePasse.length < 8) erreurs.motDePasse = "Au moins 8 caractères";
     if (form.motDePasse !== form.confirmerMdp) erreurs.confirmerMdp = "Les mots de passe ne correspondent pas";
@@ -84,16 +101,19 @@ export default function InscriptionPage() {
 
     setSoumission(true);
     try {
-      await authApi.inscription({
-        email: form.email.trim().toLowerCase(),
-        prenom: form.prenom.trim(),
-        nom: form.nom.trim(),
-        classe: form.classe,
-        filiere: form.filiere,
-        password: form.motDePasse,
-        casquette: form.casquette,
-        acceptConditions: form.acceptConditions,
-      });
+      const dossier = new FormData();
+      dossier.append("email", form.email.trim().toLowerCase());
+      dossier.append("prenom", form.prenom.trim());
+      dossier.append("nom", form.nom.trim());
+      dossier.append("classe", form.classe);
+      dossier.append("filiere", form.filiere);
+      dossier.append("matricule", form.matricule);
+      dossier.append("promotion", form.promotion);
+      dossier.append("carteEtudiant", form.carteEtudiant);
+      dossier.append("password", form.motDePasse);
+      dossier.append("casquette", form.casquette);
+      dossier.append("acceptConditions", String(form.acceptConditions));
+      await authApi.inscription(dossier);
       setEtape(4);
     } catch (erreur) {
       const detail = erreur?.response?.data?.detail ?? erreur?.response?.data;
@@ -127,7 +147,7 @@ export default function InscriptionPage() {
     { num: 1, label: "Email" },
     { num: 2, label: "Profil" },
     { num: 3, label: "Rôle" },
-    { num: 4, label: "Validé" },
+    { num: 4, label: "Vérification" },
   ];
 
   return (
@@ -193,7 +213,7 @@ export default function InscriptionPage() {
                 {etape === 1 ? "Créer ton compte" : etape === 2 ? "Ton profil" : etape === 3 ? "Ton rôle" : "C'est fait !"}
               </h1>
               <p className="mt-1 text-sm text-[var(--text-muted)]">
-                {etape === 1 ? "Utilise une adresse e-mail valide" : etape === 2 ? "Infos visibles par ton futur aîné" : etape === 3 ? "Cadet = cherche un aîné / Aîné = aide un cadet" : "Ton compte est prêt"}
+                {etape === 1 ? "Utilise une adresse e-mail valide" : etape === 2 ? "Infos étudiantes et justificatif confidentiel" : etape === 3 ? "Cadet = cherche un aîné / Aîné = aide un cadet" : "Ton dossier attend sa validation"}
               </p>
             </div>
 
@@ -207,9 +227,9 @@ export default function InscriptionPage() {
                 >
                   <CheckCircle size={48} className="text-[var(--emsp-gold)]" aria-hidden="true" />
                 </motion.div>
-                <h2 className="font-display text-xl font-bold text-[var(--text-primary)]">Compte créé !</h2>
+                <h2 className="font-display text-xl font-bold text-[var(--text-primary)]">Dossier envoyé</h2>
                 <p className="mt-2 text-sm text-[var(--text-muted)]">
-                  Un e-mail de confirmation a été envoyé à <strong>{form.email}</strong>. Clique sur le lien reçu avant de te connecter.
+                  Confirme ton adresse avec le lien envoyé à <strong>{form.email}</strong>. L'administration comparera ensuite ton nom, ta classe, ta promotion et ton matricule à la carte étudiante. Tu pourras te connecter après validation.
                 </p>
                 <button type="button" onClick={renvoyerConfirmation} disabled={renvoiEnCours} className="mt-4 text-sm font-semibold text-[var(--accent-green)] hover:underline disabled:opacity-60">
                   {renvoiEnCours ? "Envoi…" : "Renvoyer l’e-mail de confirmation"}
@@ -343,6 +363,64 @@ export default function InscriptionPage() {
                       </div>
                     </div>
 
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="flex flex-col gap-1">
+                        <span className="text-xs font-semibold text-[var(--text-muted)]">Matricule étudiant *</span>
+                        <input
+                          type="text"
+                          autoComplete="off"
+                          maxLength={40}
+                          placeholder="Ex. EMSP2024001"
+                          value={form.matricule}
+                          onChange={(e) => setForm({ ...form, matricule: e.target.value })}
+                          className={cx(
+                            "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
+                            erreurs.matricule ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                          )}
+                          disabled={soumission}
+                          required
+                        />
+                        {erreurs.matricule && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.matricule}</p>}
+                      </label>
+                      <label className="flex flex-col gap-1">
+                        <span className="text-xs font-semibold text-[var(--text-muted)]">Année d'entrée / promotion *</span>
+                        <input
+                          type="number"
+                          inputMode="numeric"
+                          min="2000"
+                          max={new Date().getFullYear()}
+                          placeholder="2024"
+                          value={form.promotion}
+                          onChange={(e) => setForm({ ...form, promotion: e.target.value })}
+                          className={cx(
+                            "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
+                            erreurs.promotion ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                          )}
+                          disabled={soumission}
+                          required
+                        />
+                        {erreurs.promotion && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.promotion}</p>}
+                      </label>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="flex flex-col gap-2">
+                        <span className="text-xs font-semibold text-[var(--text-muted)]">Carte étudiante (recto lisible) *</span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,.jpg,.jpeg,.png"
+                          onChange={(e) => setForm({ ...form, carteEtudiant: e.target.files?.[0] ?? null })}
+                          className="block w-full rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] file:mr-3 file:rounded-md file:border-0 file:bg-[var(--emsp-cream)]/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-[var(--emsp-gold)]"
+                          disabled={soumission}
+                        />
+                        <span className="text-xs text-[var(--text-muted)]">
+                          Image JPEG ou PNG, 5 Mo maximum. Seule l'administration peut la consulter. Après décision, l'accès est retiré et sa suppression est demandée.
+                        </span>
+                        {form.carteEtudiant && <span className="text-xs text-[var(--text-muted)]">Fichier choisi : {form.carteEtudiant.name}</span>}
+                        {erreurs.carteEtudiant && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.carteEtudiant}</p>}
+                      </label>
+                    </div>
+
                     <div className="space-y-2">
                       <label className="flex flex-col gap-1">
                         <span className="text-xs font-semibold text-[var(--text-muted)]">Mot de passe *</span>
@@ -351,7 +429,7 @@ export default function InscriptionPage() {
                           <input
                             type={voirMdp ? "text" : "password"}
                             autoComplete="new-password"
-                            placeholder="Min. 8 caractères"
+                            placeholder="8 caractères minimum"
                             value={form.motDePasse}
                             onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
                             className={cx(
@@ -371,6 +449,7 @@ export default function InscriptionPage() {
                           </button>
                         </div>
                         {erreurs.motDePasse && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.motDePasse}</p>}
+                        <p className="text-xs text-[var(--text-muted)]">Évite un mot de passe courant ou contenant ton nom ou ton adresse e-mail.</p>
                       </label>
                     </div>
                     <div className="space-y-2">
@@ -458,7 +537,7 @@ export default function InscriptionPage() {
                           required
                         />
                         <div className="text-sm text-[var(--text-muted)]">
-                          J'accepte les <a href="#" className="text-[var(--accent-green)] hover:underline">conditions d'utilisation</a> et la <a href="#" className="text-[var(--accent-green)] hover:underline">politique de confidentialité</a>.
+                          Je confirme que les informations fournies sont exactes et j'autorise l'administration à les vérifier à partir de ma carte étudiante. J'accepte les conditions d'utilisation et la politique de confidentialité.
                           {erreurs.acceptConditions && <p className="text-xs text-[var(--emsp-gold)] mt-1">{erreurs.acceptConditions}</p>}
                         </div>
                       </label>
@@ -468,16 +547,18 @@ export default function InscriptionPage() {
               </form>
             )}
 
-            <div className="mt-6 flex gap-3">
-              {etape > 1 && (
-                <Button type="button" variant="outline" onClick={handleBack} disabled={soumission} className="flex-1">
-                  Retour
+            {etape < 4 && (
+              <div className="mt-6 flex gap-3">
+                {etape > 1 && (
+                  <Button type="button" variant="outline" onClick={handleBack} disabled={soumission} className="flex-1">
+                    Retour
+                  </Button>
+                )}
+                <Button type="submit" form="inscription-form" size="lg" loading={soumission} className="flex-1">
+                  {etape === 1 ? "Continuer" : etape === 2 ? "Continuer" : "Envoyer mon dossier"}
                 </Button>
-              )}
-              <Button type="submit" form="inscription-form" size="lg" loading={soumission} className="flex-1">
-                {etape === 1 ? "Continuer" : etape === 2 ? "Continuer" : "Valider mon inscription"}
-              </Button>
-            </div>
+              </div>
+            )}
           </Card>
 
           <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
