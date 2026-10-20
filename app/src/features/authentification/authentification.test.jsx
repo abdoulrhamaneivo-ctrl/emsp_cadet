@@ -215,4 +215,33 @@ describe("Réinitialisation du mot de passe", () => {
     expect(await screen.findByRole("heading", { name: "Lien invalide ou expiré" })).toBeInTheDocument();
     expect(screen.queryByLabelText(/Nouveau mot de passe/)).toBeNull();
   });
+
+  it("explique le refus du mot de passe sans annoncer à tort un lien expiré", async () => {
+    server.use(
+      http.post("*/api/auth/verifier-lien-reinitialisation/", () =>
+        HttpResponse.json({ valid: true }),
+      ),
+      http.post("*/api/auth/reinitialiser-mot-de-passe/", () =>
+        HttpResponse.json(
+          { password: ["Ce mot de passe est trop similaire aux informations personnelles." ] },
+          { status: 400 },
+        ),
+      ),
+    );
+
+    renderReinitialisation();
+
+    fireEvent.change(await screen.findByLabelText(/Nouveau mot de passe/), {
+      target: { value: "MotDePasseUnique2026!" },
+    });
+    fireEvent.change(screen.getByLabelText(/Confirmer le mot de passe/), {
+      target: { value: "MotDePasseUnique2026!" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Mettre à jour le mot de passe" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "trop proche de tes informations personnelles",
+    );
+    expect(screen.queryByRole("heading", { name: "Lien invalide ou expiré" })).toBeNull();
+  });
 });

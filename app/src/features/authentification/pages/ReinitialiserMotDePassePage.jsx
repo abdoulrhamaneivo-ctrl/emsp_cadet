@@ -75,11 +75,19 @@ export default function ReinitialiserMotDePassePage() {
       logout();
       setEtape("succes");
     } catch (error) {
-      const detail = error?.response?.data?.detail;
-      if (typeof detail === "string" && error?.response?.status === 400 && detail.includes("invalide")) {
+      const data = error?.response?.data;
+      const detail = data?.detail;
+      const erreursMotDePasse = data?.password;
+      if (Array.isArray(erreursMotDePasse) && erreursMotDePasse.length > 0) {
+        setErreur("Ce mot de passe est trop proche de tes informations personnelles ou trop facile à deviner. Choisis-en un autre.");
+      } else if (
+        typeof detail === "string"
+        && error?.response?.status === 400
+        && /invalide|expiré|expire/i.test(detail)
+      ) {
         setEtape("invalide");
       } else {
-        setErreur(typeof detail === "string" ? detail : "Le lien n'est plus valide. Demande un nouveau lien de réinitialisation.");
+        setErreur(typeof detail === "string" ? detail : "Impossible de modifier le mot de passe pour le moment. Réessaie dans un instant.");
       }
     } finally {
       setSoumission(false);
