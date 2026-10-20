@@ -35,6 +35,10 @@ class CloudinaryAuthenticatedStorage(Storage):
 
     def _save(self, name, content):
         if not self._cloudinary_active():
+            if not settings.DEBUG:
+                raise RuntimeError(
+                    "Cloudinary est obligatoire en production pour les cartes étudiantes."
+                )
             return self._local_storage().save(name, content)
 
         from cloudinary import uploader
@@ -61,6 +65,10 @@ class CloudinaryAuthenticatedStorage(Storage):
 
     def _open(self, name, mode="rb"):
         if not self._cloudinary_active():
+            if not settings.DEBUG:
+                raise RuntimeError(
+                    "Cloudinary est obligatoire en production pour les cartes étudiantes."
+                )
             return self._local_storage().open(name, mode)
 
         from cloudinary.utils import private_download_url
@@ -82,6 +90,10 @@ class CloudinaryAuthenticatedStorage(Storage):
         if not name:
             return
         if not self._cloudinary_active():
+            if not settings.DEBUG:
+                raise RuntimeError(
+                    "Cloudinary est obligatoire en production pour les cartes étudiantes."
+                )
             return self._local_storage().delete(name)
 
         from cloudinary import uploader

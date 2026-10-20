@@ -1,7 +1,11 @@
 """Profil courant (doc 11) — PATCH /api/me/, visibilité annuaire, photo,
 suppression de compte self-serve (double confirmation par prénom)."""
 
+import logging
+from pathlib import PurePosixPath
+
 from django.db import transaction
+from PIL import Image, UnidentifiedImageError
 from rest_framework import status
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -12,9 +16,11 @@ from comptes.serializers import (
     ProfilMoiSerializer,
     _niveau_de_classe,
 )
-from config.exceptions import ErreurValidation
+from config.exceptions import ErreurIndisponible, ErreurValidation
 from ia.integration import kill_switch_actif
 from ia.integration_copilot import appeler_copilot
+
+logger = logging.getLogger(__name__)
 
 
 class MoiView(APIView):
@@ -132,12 +138,64 @@ class PhotoMoiView(APIView):
             raise ErreurValidation("Fichier photo manquant.")
         if fichier.size > 5 * 1024 * 1024:
             raise ErreurValidation("Photo : 5 Mo maximum.")
-        if (fichier.content_type or "") not in ("image/jpeg", "image/png", "image/webp"):
-            raise ErreurValidation("Format accepté : JPG, PNG ou WebP.")
-        request.user.photo = fichier
-        request.user.save(update_fields=["photo"])
+
+        # Le type MIME fourni par iOS/Android n'est pas toujours fiable. On
+        # inspecte le contenu réel avant Cloudinary et on normalise l'extension.
+        formats = {
+            "JPEG": ("jpg", "image/jpeg"),
+            "PNG": ("png", "image/png"),
+            "WEBP": ("webp", "image/webp"),
+        }
+        try:
+            fichier.seek(0)
+            with Image.open(fichier) as image:
+                format_image = image.format
+                largeur, hauteur = image.size
+                if largeur > 8000 or hauteur > 8000 or largeur * hauteur > 20_000_000:
+                    raise ErreurValidation("La photo ne peut pas dépasser 20 millions de pixels.")
+                image.verify()
+        except ErreurValidation:
+            raise
+        except (
+            UnidentifiedImageError,
+            OSError,
+            SyntaxError,
+            ValueError,
+            Image.DecompressionBombError,
+        ) as erreur:
+            raise ErreurValidation("Le fichier choisi n'est pas une image valide.") from erreur
+        if format_image not in formats:
+            raise ErreurValidation("Formats acceptés : JPG, PNG ou WebP.")
+
+        extension, content_type = formats[format_image]
+        nom = PurePosixPath(fichier.name or "photo")
+        fichier.name = f"{nom.stem}.{extension}"
+        fichier.content_type = content_type
+        fichier.seek(0)
+
+        ancienne_photo = request.user.photo.name
+        stockage = request.user.photo.storage
+        try:
+            request.user.photo = fichier
+            request.user.save(update_fields=["photo"])
+            photo_url = request.user.photo.url
+        except Exception as erreur:
+            logger.exception("Échec du téléversement Cloudinary pour user_id=%s", request.user.pk)
+            raise ErreurIndisponible(
+                "Le stockage de la photo est temporairement indisponible. Réessaie dans un instant."
+            ) from erreur
+
+        if ancienne_photo and ancienne_photo != request.user.photo.name:
+            try:
+                stockage.delete(ancienne_photo)
+            except Exception:
+                logger.warning(
+                    "Ancienne photo non supprimée de Cloudinary pour user_id=%s",
+                    request.user.pk,
+                    exc_info=True,
+                )
         return Response(
-            {"photoUrl": request.user.photo.url}, status=status.HTTP_201_CREATED
+            {"photoUrl": photo_url}, status=status.HTTP_201_CREATED
         )
 
 

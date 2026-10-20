@@ -186,7 +186,8 @@ describe("Profil (doc 11)", () => {
     const { container } = renderProfil({ id: 1, prenom: "Ivo", nom: "Abdoul", classe: "L2", isAdmin: false });
     await screen.findByLabelText(/Tes attentes/);
 
-    const photo = new File(["png"], "photo.png", { type: "image/png" });
+    // Certains téléphones laissent le MIME vide ; le serveur inspecte l'image.
+    const photo = new File(["png"], "photo.png", { type: "" });
     fireEvent.change(container.querySelector('input[type="file"]'), {
       target: { files: [photo] },
     });

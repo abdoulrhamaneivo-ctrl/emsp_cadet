@@ -69,7 +69,7 @@ export default function InscriptionPage() {
       erreurs.promotion = "Indique ton année d'entrée à l'EMSP";
     }
     if (!form.carteEtudiant) erreurs.carteEtudiant = "Ajoute une photo lisible de ta carte étudiante";
-    else if (!/^image\/(jpeg|png)$/.test(form.carteEtudiant.type)) {
+    else if (form.carteEtudiant.type && !/^image\/(jpeg|png)$/.test(form.carteEtudiant.type)) {
       erreurs.carteEtudiant = "Choisis une image JPEG ou PNG";
     } else if (form.carteEtudiant.size > 5 * 1024 * 1024) {
       erreurs.carteEtudiant = "La carte doit faire 5 Mo maximum";

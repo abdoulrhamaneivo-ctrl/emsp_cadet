@@ -17,3 +17,11 @@ class ErreurConflit(APIException):
     status_code = 409
     default_detail = "Conflit."
     default_code = "conflit"
+
+
+class ErreurIndisponible(APIException):
+    """Dépendance externe temporairement indisponible (Cloudinary, e-mail…)."""
+
+    status_code = 503
+    default_detail = "Service temporairement indisponible."
+    default_code = "indisponible"

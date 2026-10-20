@@ -65,12 +65,7 @@ export function useEnvoyerPhoto() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (fichier) => {
-      const typesAcceptes = new Set(["image/jpeg", "image/png", "image/webp"]);
-      if (!fichier || !typesAcceptes.has(fichier.type)) {
-        throw Object.assign(new Error(), {
-          userMessage: "Format accepté : image JPG, PNG ou WebP.",
-        });
-      }
+      if (!fichier) throw new Error("Sélectionne une photo.");
       if (fichier.size > 5 * 1024 * 1024) {
         throw Object.assign(new Error(), {
           userMessage: "Photo : 5 Mo maximum.",
@@ -88,8 +83,10 @@ export function useEnvoyerPhoto() {
       const message = premierMessage(donnees)
         || e?.userMessage
         || (e?.response?.status >= 500
-          ? "Le serveur n'a pas pu enregistrer cette photo. Réessaie dans un instant."
-          : "Photo refusée. Choisis une image JPG, PNG ou WebP de 5 Mo maximum.");
+          ? "Le stockage photo est indisponible. Réessaie dans un instant."
+          : e?.response?.status
+            ? `Téléversement refusé (HTTP ${e.response.status}). Choisis une image JPG, PNG ou WebP de 5 Mo maximum.`
+            : "Envoi de la photo impossible. Vérifie ta connexion puis réessaie.");
       toast.error(message);
     },
   });

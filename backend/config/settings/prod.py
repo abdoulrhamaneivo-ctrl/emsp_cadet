@@ -8,7 +8,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 from .base import *  # noqa: F401,F403
 
-
 DEBUG = False
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp-relay.brevo.com")
@@ -37,6 +36,21 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "")
 if not DATABASE_URL:
     raise ImproperlyConfigured("DATABASE_URL doit pointer vers PostgreSQL Neon.")
 DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)}
+
+if not (
+    os.environ.get("CLOUDINARY_URL")
+    or all(
+        os.environ.get(cle)
+        for cle in (
+            "CLOUDINARY_CLOUD_NAME",
+            "CLOUDINARY_API_KEY",
+            "CLOUDINARY_API_SECRET",
+        )
+    )
+):
+    raise ImproperlyConfigured(
+        "CLOUDINARY_URL (ou CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET) doit être configuré."
+    )
 
 INSTALLED_APPS = [
     *INSTALLED_APPS,

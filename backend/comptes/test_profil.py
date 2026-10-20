@@ -2,8 +2,11 @@
 suppression de compte. Critères d'acceptation §8."""
 
 
+from io import BytesIO
+
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
 
 pytestmark = pytest.mark.django_db
 
@@ -16,14 +19,11 @@ def _client(user):
     return client
 
 
-def _png(nom="photo.png", taille=200):
-    # PNG minimal valide (1×1) — le type mime est forcé par le nom.
-    octets = bytes.fromhex(
-        "89504e470d0a1a0a0000000d494844520000000100000001080600000"
-        "01f15c4890000000d49444154789c626001000000ffff030000060005"
-        "57bfabd40000000049454e44ae426082"
-    )
-    return SimpleUploadedFile(nom, octets * max(1, taille // len(octets)), "image/png")
+def _png(nom="photo.png"):
+    # Génère une vraie image avec checksums valides pour couvrir le décodage PIL.
+    contenu = BytesIO()
+    Image.new("RGB", (32, 32), color="green").save(contenu, format="PNG")
+    return SimpleUploadedFile(nom, contenu.getvalue(), "image/png")
 
 
 def test_get_me_shape_v2_sans_roles(api, users):
@@ -163,6 +163,16 @@ def test_photo_upload_valide_201(api, users):
     assert reponse.data["photoUrl"]
     users.ivo.refresh_from_db()
     assert users.ivo.photo
+
+
+def test_photo_valide_acceptee_si_le_telephone_envoie_un_mime_generique(api, users):
+    octets_png = _png().read()
+    fichier = SimpleUploadedFile("photo.bin", octets_png, "application/octet-stream")
+    reponse = _client(users.ivo).post("/api/me/photo/", {"photo": fichier}, format="multipart")
+
+    assert reponse.status_code == 201
+    users.ivo.refresh_from_db()
+    assert users.ivo.photo.name.endswith(".png")
 
 
 def test_photo_type_refuse_422(api, users):
