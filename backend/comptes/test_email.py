@@ -33,7 +33,7 @@ def test_envoi_api_brevo_utilise_https_et_envoie_le_contenu_html():
     assert payload["to"] == [{"email": "admin@example.com"}]
     assert payload["subject"] == "Sujet"
     assert payload["htmlContent"] == "<p>HTML</p>"
-    assert "textContent" not in payload
+    assert payload["textContent"] == "Texte"
     urlopen.assert_called_once()
 
 

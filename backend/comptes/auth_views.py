@@ -73,6 +73,7 @@ def _envoyer(destinataire, sujet, texte, html):
                 "to": [{"email": destinataire}],
                 "subject": sujet,
                 "htmlContent": html,
+                "textContent": texte,
             }
         ).encode("utf-8")
         request = Request(
@@ -120,6 +121,47 @@ def _url_front(chemin):
     return f"{settings.FRONT_ORIGIN.rstrip('/')}/{chemin.lstrip('/')}"
 
 
+def _bouton_courriel(label, url):
+    return (
+        "<table role='presentation' cellspacing='0' cellpadding='0' border='0' "
+        "style='margin:24px 0'><tr><td style='border-radius:10px;background:#08713a'>"
+        f"<a href='{escape(url)}' style='display:inline-block;padding:14px 22px;"
+        "border:1px solid #08713a;border-radius:10px;color:#ffffff;"
+        "font-family:Arial,sans-serif;font-size:15px;font-weight:bold;"
+        f"line-height:20px;text-decoration:none'>{escape(label)}</a>"
+        "</td></tr></table>"
+    )
+
+
+def _gabarit_courriel(contenu, preheader):
+    """Cadre HTML simple, lisible sur mobile et compatible avec les clients mail."""
+    return (
+        "<!doctype html><html lang='fr'><head><meta charset='utf-8'>"
+        "<meta name='viewport' content='width=device-width,initial-scale=1'>"
+        "<title>EMSP Connect</title></head>"
+        "<body style='margin:0;padding:24px 12px;background:#f1f5f0;'>"
+        f"<div style='display:none;max-height:0;overflow:hidden;opacity:0;color:transparent'>"
+        f"{escape(preheader)}</div>"
+        "<table role='presentation' width='100%' cellspacing='0' cellpadding='0' "
+        "border='0' style='background:#f1f5f0'><tr><td align='center'>"
+        "<table role='presentation' width='600' cellspacing='0' cellpadding='0' "
+        "border='0' style='width:100%;max-width:600px;border:1px solid #dce5df;"
+        "border-radius:16px;background:#ffffff;overflow:hidden'>"
+        "<tr><td style='padding:22px 28px;background:#075b2b;color:#ffffff;"
+        "font-family:Arial,sans-serif;font-size:17px;font-weight:bold'>"
+        "<span style='color:#ffcb05'>✦</span> EMSP Connect</td></tr>"
+        f"<tr><td style='padding:30px 28px 24px;color:#20372a;"
+        f"font-family:Arial,sans-serif;font-size:15px;line-height:1.7'>{contenu}</td></tr>"
+        "<tr><td style='padding:18px 28px;border-top:1px solid #e5ece7;"
+        "color:#64746a;font-family:Arial,sans-serif;font-size:12px;line-height:1.6'>"
+        "Ce message concerne ton compte EMSP Connect. Si tu n'es pas à l'origine "
+        "de cette demande, tu peux l'ignorer.</td></tr>"
+        "</table><p style='margin:16px 0 0;color:#64746a;font-family:Arial,sans-serif;"
+        "font-size:12px'>École Multinationale des Postes · Abidjan</p>"
+        "</td></tr></table></body></html>"
+    )
+
+
 def _envoyer_verification(user):
     jeton = signing.dumps(
         {"id": user.pk, "email": user.email},
@@ -137,16 +179,22 @@ def _envoyer_verification(user):
         "Si tu n'es pas à l'origine de cette demande, ignore ce message."
     )
     prenom_html = escape(user.prenom)
-    html = (
-        "<div style='font-family:Arial,sans-serif;line-height:1.6;color:#17301f'>"
-        f"<h2>Bienvenue sur EMSP Connect, {prenom_html} !</h2>"
-        "<p>Confirme ton adresse e-mail. L'administration vérifiera ensuite ta carte "
-        "étudiante, ton nom, ton matricule et ta promotion avant d'activer le compte.</p>"
-        f"<p><a href='{url}' style='display:inline-block;padding:12px 18px;"
-        "background:#0b7a3b;color:#fff;text-decoration:none;border-radius:8px'>"
-        "Confirmer mon adresse</a></p>"
-        "<p>Ce lien expire dans 48 heures. Si tu n'as pas demandé de compte, "
-        "ignore ce message.</p></div>"
+    html = _gabarit_courriel(
+        "".join(
+            [
+                f"<p>Bonjour {prenom_html},</p>",
+                "<h1 style='margin:0 0 12px;color:#10251a;font-size:25px;line-height:1.25'>"
+                "Bienvenue sur EMSP Connect</h1>",
+                "<p>Confirme ton adresse e-mail pour poursuivre la création de ton compte. "
+                "L'administration vérifiera ensuite ta carte étudiante, ton nom, ton "
+                "matricule et ta promotion avant d'activer ton accès.</p>",
+                _bouton_courriel("Confirmer mon adresse e-mail", url),
+                "<p><strong>Ce lien est valable 48 heures.</strong></p>",
+                f"<p style='font-size:12px;color:#64746a'>Si le bouton ne fonctionne pas, "
+                f"copie ce lien dans ton navigateur :<br><span style='word-break:break-all'>{escape(url)}</span></p>",
+            ]
+        ),
+        "Confirme ton adresse e-mail pour continuer ton inscription à EMSP Connect.",
     )
     _envoyer(user.email, sujet, texte, html)
 
@@ -157,19 +205,25 @@ def _envoyer_reinitialisation(user):
     url = _url_front(f"reinitialiser-mot-de-passe/{uid}/{jeton}")
     sujet = "Réinitialisation de ton mot de passe — EMSP Connect"
     texte = (
+        f"Bonjour {user.prenom},\n\n"
         "Une demande de réinitialisation de mot de passe a été reçue pour ton compte.\n\n"
         f"Choisis un nouveau mot de passe avec ce lien valable une heure :\n{url}\n\n"
         "Si tu n'es pas à l'origine de cette demande, ignore ce message."
     )
-    html = (
-        "<div style='font-family:Arial,sans-serif;line-height:1.6;color:#17301f'>"
-        "<h2>Réinitialise ton mot de passe</h2>"
-        "<p>Choisis un nouveau mot de passe en suivant le lien ci-dessous. "
-        "Il expire dans une heure.</p>"
-        f"<p><a href='{url}' style='display:inline-block;padding:12px 18px;"
-        "background:#0b7a3b;color:#fff;text-decoration:none;border-radius:8px'>"
-        "Choisir un nouveau mot de passe</a></p>"
-        "<p>Si tu n'as pas demandé cette modification, ignore ce message.</p></div>"
+    html = _gabarit_courriel(
+        "".join(
+            [
+                f"<p>Bonjour {escape(user.prenom)},</p>",
+                "<h1 style='margin:0 0 12px;color:#10251a;font-size:25px;line-height:1.25'>"
+                "Réinitialise ton mot de passe</h1>",
+                "<p>Choisis un nouveau mot de passe pour retrouver l'accès à ton compte EMSP Connect.</p>",
+                _bouton_courriel("Choisir un nouveau mot de passe", url),
+                "<p><strong>Ce lien expire dans une heure.</strong></p>",
+                f"<p style='font-size:12px;color:#64746a'>Si le bouton ne fonctionne pas, "
+                f"copie ce lien dans ton navigateur :<br><span style='word-break:break-all'>{escape(url)}</span></p>",
+            ]
+        ),
+        "Utilise ce lien valable une heure pour choisir un nouveau mot de passe EMSP Connect.",
     )
     _envoyer(user.email, sujet, texte, html)
 
@@ -181,12 +235,13 @@ def _envoyer_confirmation_changement(user):
         "Si tu n'es pas à l'origine de ce changement, contacte immédiatement "
         "l'équipe EMSP Connect."
     )
-    html = (
-        "<div style='font-family:Arial,sans-serif;line-height:1.6;color:#17301f'>"
-        "<h2>Mot de passe modifié</h2>"
+    html = _gabarit_courriel(
+        "<h1 style='margin:0 0 12px;color:#10251a;font-size:25px;line-height:1.25'>"
+        "Mot de passe modifié</h1>"
         "<p>Le mot de passe de ton compte EMSP Connect vient d'être modifié.</p>"
         "<p>Si tu n'es pas à l'origine de ce changement, contacte immédiatement "
-        "l'équipe EMSP Connect.</p></div>"
+        "l'équipe EMSP Connect depuis le site officiel.</p>",
+        "Le mot de passe de ton compte EMSP Connect vient d'être modifié.",
     )
     _envoyer(user.email, sujet, texte, html)
 

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Mail, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Sparkles, GraduationCap, ShieldCheck, UsersRound } from "lucide-react";
 import { cx } from "@shared/utils/cx";
 import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
 import { Input } from "@shared/components/Input";
 import { Link, useNavigate } from "react-router-dom";
 import { authApi } from "@shared/api/auth";
+import AuthExperienceLayout from "../components/AuthExperienceLayout";
 
 /**
  * Page Inscription — P03 (doc 02 §4, doc 16 §4).
@@ -150,35 +151,82 @@ export default function InscriptionPage() {
     { num: 4, label: "Vérification" },
   ];
 
-  return (
-    <div className="min-h-screen flex flex-col bg-[#fafaf8]">
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[var(--emsp-green-deep)]/95 backdrop-blur-sm border-b border-[var(--border-soft)]">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-              <Sparkles size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-              <span className="text-xs font-semibold text-[var(--emsp-gold)]">EMSP Connect</span>
-            </div>
-          </div>
-          <Button variant="ghost-fonce" size="sm" onClick={() => navigate("/connexion")}>
-            <ArrowLeft size={16} className="mr-1" /> Connexion
-          </Button>
-        </div>
-      </header>
+  const histoires = {
+    1: {
+      eyebrow: "BIENVENUE À L'EMSP",
+      title: "Le réseau de ta promo continue ici.",
+      text: "Crée ton espace pour retrouver les autres promotions, échanger et construire un parrainage qui dure.",
+      image: "/images/emsp/cadets-en-cours.webp",
+      alt: "Des étudiants de l'EMSP réunis en cours",
+      highlights: [
+        { icon: Mail, title: "Commence par ton e-mail", text: "On l'utilise pour confirmer ton adresse et te tenir au courant." },
+        { icon: ShieldCheck, title: "Accès après vérification", text: "L'administration valide les dossiers étudiants avant l'accès." },
+      ],
+      caption: "Les liens entre promotions commencent par une rencontre.",
+    },
+    2: {
+      eyebrow: "TON PROFIL ÉTUDIANT",
+      title: "On vérifie que chaque compte représente une vraie personne.",
+      text: "Tes informations de scolarité et ta carte permettent à l'équipe de prévenir les doublons et de confirmer ta promotion.",
+      image: "/images/emsp/mentorat.webp",
+      alt: "Une rencontre entre étudiants et aînés de l'EMSP",
+      highlights: [
+        { icon: ShieldCheck, title: "Justificatif réservé à l'équipe", text: "Ta carte est visible uniquement par l'administration pour la vérification." },
+        { icon: GraduationCap, title: "Promotion et matricule", text: "Renseigne-les comme ils apparaissent sur tes documents scolaires." },
+      ],
+      caption: "Une communauté fiable commence par des profils vérifiés.",
+    },
+    3: {
+      eyebrow: "TON RÔLE DANS LE RÉSEAU",
+      title: "Tu peux apprendre, transmettre, ou faire les deux.",
+      text: "Choisis la casquette qui correspond à ton parcours aujourd'hui. Tu pourras faire évoluer ton profil ensuite.",
+      image: "/images/emsp/rencontre.webp",
+      alt: "Une promotion d'étudiants de l'EMSP réunie lors d'une rencontre",
+      highlights: [
+        { icon: UsersRound, title: "Cadet", text: "Trouve un aîné qui connaît déjà les prochaines étapes." },
+        { icon: GraduationCap, title: "Aîné", text: "Partage ton expérience et accompagne un cadet." },
+      ],
+      caption: "Chaque promotion a quelque chose à transmettre.",
+    },
+    4: {
+      eyebrow: "DERNIÈRE ÉTAPE",
+      title: "Ton dossier est parti. On garde le lien.",
+      text: "Confirme ton adresse e-mail. L'équipe EMSP vérifiera ensuite ta carte et les informations de ton profil.",
+      image: "/images/emsp/evenement.webp",
+      alt: "Une activité de la communauté EMSP",
+      highlights: [
+        { icon: Mail, title: "Confirme ton adresse", text: "Le lien arrive dans ta boîte de réception, parfois dans les courriers indésirables." },
+        { icon: ShieldCheck, title: "Validation par l'école", text: "Tu pourras te connecter après la confirmation et l'examen du dossier." },
+      ],
+      caption: "À bientôt dans la communauté EMSP Connect.",
+    },
+  };
+  const histoire = histoires[etape];
 
-      <main className="flex-1 flex items-center justify-center px-4 pb-16 pt-24">
-        <div className="w-full max-w-md">
+  return (
+    <AuthExperienceLayout
+      eyebrow={histoire.eyebrow}
+      storyTitle={histoire.title}
+      storyText={histoire.text}
+      image={histoire.image}
+      imageAlt={histoire.alt}
+      highlights={histoire.highlights}
+      caption={histoire.caption}
+      actionLabel="Déjà membre ?"
+      actionText="Connexion"
+    >
+        <div className="w-full">
           {/* Indicateur d'étapes */}
-          <div className="relative mb-8">
+          <div className="relative mb-5 px-1">
             <div className="absolute left-[12.5%] right-[12.5%] top-5 h-0.5 bg-[var(--border-soft)]" aria-hidden="true">
               <div
                 className="h-full bg-[var(--emsp-gold)] transition-[width] duration-300"
                 style={{ width: `${((etape - 1) / (etapes.length - 1)) * 100}%` }}
               />
             </div>
-            <div className="relative flex items-start justify-between">
+            <ol aria-label="Progression de l'inscription" className="relative flex items-start justify-between">
               {etapes.map((e, i) => (
-                <div key={e.num} className="flex flex-col items-center">
+                <li key={e.num} aria-current={etape === e.num ? "step" : undefined} className="flex flex-col items-center">
                   <div
                     className={cx(
                       "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all",
@@ -192,23 +240,18 @@ export default function InscriptionPage() {
                     {i + 1 < etape ? <CheckCircle size={16} /> : e.num}
                   </div>
                   <span className="mt-1 text-xs text-[var(--text-muted)] text-center w-20">{e.label}</span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
 
-          <Card className="p-6">
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-                  <Sparkles size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-                  <span className="text-xs font-semibold text-[var(--emsp-gold)]">EMSP Connect</span>
-                </div>
-              </div>
+          <Card className="p-6 sm:p-8">
+            <div className="mb-6">
+              <p className="mb-2 text-xs font-bold uppercase tracking-[.16em] text-[var(--accent-green)]">Étape {etape} sur 4</p>
               <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
                 {etape === 1 ? "Créer ton compte" : etape === 2 ? "Ton profil" : etape === 3 ? "Ton rôle" : "C'est fait !"}
               </h1>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
+              <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
                 {etape === 1 ? "Utilise une adresse e-mail valide" : etape === 2 ? "Infos étudiantes et justificatif confidentiel" : etape === 3 ? "Cadet = cherche un aîné / Aîné = aide un cadet" : "Ton dossier attend sa validation"}
               </p>
             </div>
@@ -238,7 +281,7 @@ export default function InscriptionPage() {
             ) : (
               <form id="inscription-form" onSubmit={handleSubmit} className="space-y-4">
                 {erreurs.global && (
-                  <div className="rounded-[var(--radius-input)] bg-[var(--emsp-gold)]/10 border border-[var(--emsp-gold)]/30 p-3 text-sm text-[var(--emsp-gold)] flex items-center gap-2">
+                  <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-[#d98f86] bg-[#fff0ee] p-3.5 text-sm text-[#8b2d25]">
                     <AlertCircle size={16} aria-hidden="true" />
                     {erreurs.global}
                   </div>
@@ -259,13 +302,13 @@ export default function InscriptionPage() {
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                             className={cx(
                               "w-full rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-10 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                              erreurs.email ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                              erreurs.email ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                             )}
                             disabled={soumission}
                             required
                           />
                         </div>
-                        {erreurs.email && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.email}</p>}
+                        {erreurs.email && <p className="text-xs text-[#8b2d25]">{erreurs.email}</p>}
                       </label>
                     </div>
                   </>
@@ -285,12 +328,12 @@ export default function InscriptionPage() {
                             onChange={(e) => setForm({ ...form, prenom: e.target.value })}
                             className={cx(
                               "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                              erreurs.prenom ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                              erreurs.prenom ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                             )}
                             disabled={soumission}
                             required
                           />
-                          {erreurs.prenom && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.prenom}</p>}
+                          {erreurs.prenom && <p className="text-xs text-[#8b2d25]">{erreurs.prenom}</p>}
                         </label>
                       </div>
                       <div className="space-y-2">
@@ -304,12 +347,12 @@ export default function InscriptionPage() {
                             onChange={(e) => setForm({ ...form, nom: e.target.value })}
                             className={cx(
                               "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                              erreurs.nom ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                              erreurs.nom ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                             )}
                             disabled={soumission}
                             required
                           />
-                          {erreurs.nom && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.nom}</p>}
+                          {erreurs.nom && <p className="text-xs text-[#8b2d25]">{erreurs.nom}</p>}
                         </label>
                       </div>
                     </div>
@@ -323,7 +366,7 @@ export default function InscriptionPage() {
                             onChange={(e) => setForm({ ...form, classe: e.target.value })}
                             className={cx(
                               "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                              erreurs.classe ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                              erreurs.classe ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                             )}
                             disabled={soumission}
                             required
@@ -333,7 +376,7 @@ export default function InscriptionPage() {
                               <option key={c} value={c}>{c}</option>
                             ))}
                           </select>
-                          {erreurs.classe && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.classe}</p>}
+                          {erreurs.classe && <p className="text-xs text-[#8b2d25]">{erreurs.classe}</p>}
                         </label>
                       </div>
                       <div className="space-y-2">
@@ -344,7 +387,7 @@ export default function InscriptionPage() {
                             onChange={(e) => setForm({ ...form, filiere: e.target.value })}
                             className={cx(
                               "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                              erreurs.filiere ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                              erreurs.filiere ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                             )}
                             disabled={soumission}
                             required
@@ -354,7 +397,7 @@ export default function InscriptionPage() {
                               <option key={f} value={f}>{f}</option>
                             ))}
                           </select>
-                          {erreurs.filiere && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.filiere}</p>}
+                          {erreurs.filiere && <p className="text-xs text-[#8b2d25]">{erreurs.filiere}</p>}
                         </label>
                       </div>
                     </div>
@@ -371,12 +414,12 @@ export default function InscriptionPage() {
                           onChange={(e) => setForm({ ...form, matricule: e.target.value })}
                           className={cx(
                             "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                            erreurs.matricule ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                            erreurs.matricule ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                           )}
                           disabled={soumission}
                           required
                         />
-                        {erreurs.matricule && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.matricule}</p>}
+                        {erreurs.matricule && <p className="text-xs text-[#8b2d25]">{erreurs.matricule}</p>}
                       </label>
                       <label className="flex flex-col gap-1">
                         <span className="text-xs font-semibold text-[var(--text-muted)]">Année d'entrée / promotion *</span>
@@ -390,12 +433,12 @@ export default function InscriptionPage() {
                           onChange={(e) => setForm({ ...form, promotion: e.target.value })}
                           className={cx(
                             "rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                            erreurs.promotion ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                            erreurs.promotion ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                           )}
                           disabled={soumission}
                           required
                         />
-                        {erreurs.promotion && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.promotion}</p>}
+                        {erreurs.promotion && <p className="text-xs text-[#8b2d25]">{erreurs.promotion}</p>}
                       </label>
                     </div>
 
@@ -413,7 +456,7 @@ export default function InscriptionPage() {
                           Image JPEG ou PNG, 5 Mo maximum. Seule l'administration peut la consulter. Après décision, l'accès est retiré et sa suppression est demandée.
                         </span>
                         {form.carteEtudiant && <span className="text-xs text-[var(--text-muted)]">Fichier choisi : {form.carteEtudiant.name}</span>}
-                        {erreurs.carteEtudiant && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.carteEtudiant}</p>}
+                        {erreurs.carteEtudiant && <p className="text-xs text-[#8b2d25]">{erreurs.carteEtudiant}</p>}
                       </label>
                     </div>
 
@@ -430,7 +473,7 @@ export default function InscriptionPage() {
                             onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
                             className={cx(
                               "w-full rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-10 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                              erreurs.motDePasse ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                              erreurs.motDePasse ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                             )}
                             disabled={soumission}
                             required
@@ -444,7 +487,7 @@ export default function InscriptionPage() {
                             {voirMdp ? <EyeOff size={18} /> : <Eye size={18} />}
                           </button>
                         </div>
-                        {erreurs.motDePasse && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.motDePasse}</p>}
+                        {erreurs.motDePasse && <p className="text-xs text-[#8b2d25]">{erreurs.motDePasse}</p>}
                         <p className="text-xs text-[var(--text-muted)]">Évite un mot de passe courant ou contenant ton nom ou ton adresse e-mail.</p>
                       </label>
                     </div>
@@ -461,13 +504,13 @@ export default function InscriptionPage() {
                             onChange={(e) => setForm({ ...form, confirmerMdp: e.target.value })}
                             className={cx(
                               "w-full rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-10 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                              erreurs.confirmerMdp ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
+                              erreurs.confirmerMdp ? "border-[#d98f86]" : "border-[var(--border-soft)]"
                             )}
                             disabled={soumission}
                             required
                           />
                         </div>
-                        {erreurs.confirmerMdp && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.confirmerMdp}</p>}
+                        {erreurs.confirmerMdp && <p className="text-xs text-[#8b2d25]">{erreurs.confirmerMdp}</p>}
                       </label>
                     </div>
                   </>
@@ -522,7 +565,7 @@ export default function InscriptionPage() {
                           </div>
                         </button>
                       </div>
-                      {erreurs.casquette && <p className="text-xs text-[var(--emsp-gold)]">{erreurs.casquette}</p>}
+                      {erreurs.casquette && <p className="text-xs text-[#8b2d25]">{erreurs.casquette}</p>}
 
                       <label className="flex items-start gap-3 rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-3 py-3">
                         <input
@@ -534,7 +577,7 @@ export default function InscriptionPage() {
                         />
                         <div className="text-sm text-[var(--text-muted)]">
                           Je confirme que les informations fournies sont exactes et j'autorise l'administration à les vérifier à partir de ma carte étudiante. J'accepte les conditions d'utilisation et la politique de confidentialité.
-                          {erreurs.acceptConditions && <p className="text-xs text-[var(--emsp-gold)] mt-1">{erreurs.acceptConditions}</p>}
+                          {erreurs.acceptConditions && <p className="text-xs text-[#8b2d25] mt-1">{erreurs.acceptConditions}</p>}
                         </div>
                       </label>
                     </div>
@@ -561,7 +604,6 @@ export default function InscriptionPage() {
             Déjà un compte ? <Link to="/connexion" className="text-[var(--accent-green)] hover:underline font-medium">Connexion</Link>
           </p>
         </div>
-      </main>
-    </div>
+    </AuthExperienceLayout>
   );
 }

@@ -355,8 +355,11 @@ def _notifier_decision_verification(user_id, decision, motif):
                 "EMSP Connect."
             )
             html = (
+                f"<p>Bonjour {escape(user.prenom)},</p>"
+                "<h1 style='margin:0 0 12px;color:#10251a;font-size:25px;line-height:1.25'>"
+                "Ton compte est activé</h1>"
                 "<p>Ton identité étudiante a été validée. Tu peux maintenant te connecter "
-                "à EMSP Connect.</p>"
+                "et retrouver le réseau EMSP Connect.</p>"
             )
         else:
             sujet = "Dossier étudiant non validé — EMSP Connect"
@@ -365,14 +368,22 @@ def _notifier_decision_verification(user_id, decision, motif):
                 "pour toute question."
             )
             html = (
+                f"<p>Bonjour {escape(user.prenom)},</p>"
+                "<h1 style='margin:0 0 12px;color:#10251a;font-size:25px;line-height:1.25'>"
+                "Dossier à compléter</h1>"
                 "<p>Ton dossier n'a pas été validé. Contacte l'administration EMSP Connect "
                 "pour toute question.</p>"
             )
             if motif:
                 texte += f"\n\nMotif : {motif}"
                 html += f"<p>Motif : {escape(motif)}</p>"
-        from .auth_views import _envoyer
+        from .auth_views import _envoyer, _gabarit_courriel
 
-        _envoyer(user.email, sujet, texte, f"<div>{html}</div>")
+        _envoyer(
+            user.email,
+            sujet,
+            texte,
+            _gabarit_courriel(html, "Mise à jour de la vérification de ton dossier étudiant EMSP."),
+        )
     except Exception:
         logger.exception("Impossible d'envoyer le résultat de validation du compte %s", user_id)

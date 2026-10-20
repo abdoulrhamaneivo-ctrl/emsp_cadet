@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Sparkles } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock3, Eye, EyeOff, KeyRound, Lock, ShieldCheck } from "lucide-react";
 import { cx } from "@shared/utils/cx";
 import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
@@ -8,17 +8,15 @@ import { Input } from "@shared/components/Input";
 import { useNavigate, useParams } from "react-router-dom";
 import { authApi } from "@shared/api/auth";
 import { useAuth } from "@app/providers/Auth";
+import AuthExperienceLayout from "../components/AuthExperienceLayout";
 
-/**
- * Page Réinitialisation mot de passe — P05 (doc 02 §4, doc 16 §4).
- * Formulaire avec token uid/token dans l'URL.
- */
+/** Formulaire sécurisé de réinitialisation du mot de passe. */
 export default function ReinitialiserMotDePassePage() {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const { uid, token } = useParams();
   const [form, setForm] = useState({ motDePasse: "", confirmerMdp: "" });
-  const [etape, setEtape] = useState("formulaire"); // formule | succes
+  const [etape, setEtape] = useState("formulaire");
   const [erreur, setErreur] = useState("");
   const [soumission, setSoumission] = useState(false);
   const [voirMdp, setVoirMdp] = useState(false);
@@ -27,28 +25,27 @@ export default function ReinitialiserMotDePassePage() {
     e.preventDefault();
     setErreur("");
     if (!form.motDePasse || form.motDePasse.length < 8) {
-      setErreur("Au moins 8 caractères");
+      setErreur("Utilise au moins 8 caractères.");
       return;
     }
     if (form.motDePasse !== form.confirmerMdp) {
-      setErreur("Les mots de passe ne correspondent pas");
+      setErreur("Les deux mots de passe ne correspondent pas.");
       return;
     }
     if (!uid || !token) {
-      setErreur("Lien invalide ou expiré");
+      setErreur("Ce lien est invalide ou expiré. Demande-en un nouveau.");
       return;
     }
+
     setSoumission(true);
     try {
       await authApi.reinitialiserMotDePasse({ uid, token, password: form.motDePasse });
-      // Le backend révoque tous les refresh tokens après le changement.
       await authApi.deconnexion().catch(() => {});
       logout();
       setEtape("succes");
-    } catch (erreur) {
-      const donnees = erreur?.response?.data;
-      const messages = [donnees?.detail, ...Object.values(donnees ?? {}).flat(Infinity)];
-      setErreur(messages.find((message) => typeof message === "string") ?? "Erreur — lien invalide ou expiré");
+    } catch (error) {
+      const detail = error?.response?.data?.detail;
+      setErreur(typeof detail === "string" ? detail : "Le lien n'est plus valide. Demande un nouveau lien de réinitialisation.");
     } finally {
       setSoumission(false);
     }
@@ -56,146 +53,158 @@ export default function ReinitialiserMotDePassePage() {
 
   if (!uid || !token) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <Card className="w-full max-w-md p-6 text-center">
-          <AlertCircle size={48} className="mx-auto mb-4 text-[var(--emsp-gold)]" />
-          <h2 className="font-display text-xl font-bold text-[var(--text-primary)]">Lien invalide</h2>
-          <p className="mt-2 text-sm text-[var(--text-muted)]">
-            Ce lien de réinitialisation est invalide ou a expiré.
+      <AuthExperienceLayout
+        eyebrow="LIEN À RENOUVELER"
+        storyTitle="On reprend la dernière étape ensemble."
+        storyText="Les liens de sécurité sont temporaires. Tu peux demander un nouveau lien et poursuivre sans recommencer ton parcours EMSP Connect."
+        image="/images/emsp/atelier.webp"
+        imageAlt="Une activité de travail en groupe à l'EMSP"
+        highlights={[
+          { icon: Clock3, title: "Liens temporaires", text: "Un nouveau lien reste valide pendant une durée limitée." },
+          { icon: ShieldCheck, title: "Compte protégé", text: "Le mot de passe ne change qu'après validation du lien." },
+        ]}
+        caption="Un lien expiré ne modifie pas ton compte."
+        actionLabel="Besoin d'un nouveau lien ?"
+        actionText="Faire une demande"
+        actionTo="/mot-de-passe-oublie"
+      >
+        <Card className="w-full p-6 text-center sm:p-8">
+          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff2bf] text-[#805900]">
+            <AlertCircle size={25} aria-hidden="true" />
+          </div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[.16em] text-[#8a6200]">Sécurité du compte</p>
+          <h1 className="font-display text-xl font-bold text-[var(--text-primary)]">Lien invalide ou expiré</h1>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
+            Ce lien n'est plus utilisable. Demande-en un nouveau pour définir ton mot de passe.
           </p>
-          <Button className="mt-6 w-full" onClick={() => navigate("/mot-de-passe-oublie")}>
+          <Button className="mt-6 w-full" size="lg" icon={KeyRound} onClick={() => navigate("/mot-de-passe-oublie")}>
             Demander un nouveau lien
           </Button>
         </Card>
-      </div>
+      </AuthExperienceLayout>
     );
   }
 
+  const termine = etape === "succes";
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="fixed top-0 left-0 right-0 z-40 bg-[var(--emsp-green-deep)]/95 backdrop-blur-sm border-b border-[var(--border-soft)]">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-              <Sparkles size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-              <span className="text-xs font-semibold text-[var(--emsp-gold)]">EMSP Connect</span>
-            </div>
+    <AuthExperienceLayout
+      eyebrow={termine ? "MOT DE PASSE MIS À JOUR" : "NOUVEAU MOT DE PASSE"}
+      storyTitle={termine ? "Tu peux reprendre ton parcours." : "Choisis une clé solide pour ton espace."}
+      storyText={termine
+        ? "La sécurité de ton compte a été actualisée. Connecte-toi et retrouve ta communauté EMSP."
+        : "Le lien t'a conduit ici pour remplacer ton ancien mot de passe. Quelques règles simples protègent ton compte."}
+      image="/images/emsp/atelier.webp"
+      imageAlt="Des étudiants de l'EMSP travaillent ensemble"
+      highlights={termine ? [
+        { icon: CheckCircle, title: "Changement confirmé", text: "Ton nouveau mot de passe est actif." },
+        { icon: ShieldCheck, title: "Sessions protégées", text: "Les anciennes sessions ont été révoquées." },
+      ] : [
+        { icon: KeyRound, title: "Au moins 8 caractères", text: "Une phrase longue est facile à retenir et difficile à deviner." },
+        { icon: ShieldCheck, title: "Ne le réutilise pas", text: "Choisis un mot de passe différent de celui de ta boîte e-mail." },
+      ]}
+      caption="Ton compte EMSP Connect reste sous ton contrôle."
+    >
+      <Card className="p-6 sm:p-8">
+        <div className="mb-6 border-b border-[var(--border-soft)] pb-5">
+          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#fff2bf] text-[#805900]">
+            {termine ? <CheckCircle size={23} aria-hidden="true" /> : <KeyRound size={23} aria-hidden="true" />}
           </div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[.16em] text-[var(--accent-green)]">Sécurité du compte</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
+            {termine ? "C'est fait !" : "Crée ton nouveau mot de passe"}
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-[var(--text-muted)]">
+            {termine ? "Ton mot de passe a été mis à jour." : "Choisis un mot de passe unique que tu pourras retenir."}
+          </p>
         </div>
-      </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-20">
-        <div className="w-full max-w-md">
-          <Card className="p-6">
-            <div className="text-center mb-6">
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-                  <Sparkles size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-                  <span className="text-xs font-semibold text-[var(--emsp-gold)]">EMSP Connect</span>
-                </div>
-              </div>
-              <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
-                {etape === "formulaire" ? "Nouveau mot de passe" : "C'est fait !"}
-              </h1>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">
-                {etape === "formulaire" ? "Choisis un mot de passe difficile à deviner" : "Ton mot de passe a été mis à jour"}
-              </p>
-            </div>
-
-            {etape === "formulaire" ? (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {erreur && (
-                  <div className="rounded-[var(--radius-input)] bg-[var(--emsp-gold)]/10 border border-[var(--emsp-gold)]/30 p-3 text-sm text-[var(--emsp-gold)] flex items-center gap-2">
-                    <AlertCircle size={16} aria-hidden="true" />
-                    {erreur}
-                  </div>
-                )}
-
-                <div className="space-y-2">
-                  <label className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold text-[var(--text-muted)]">Nouveau mot de passe *</span>
-                    <div className="relative">
-                      <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
-                      <Input
-                        type={voirMdp ? "text" : "password"}
-                        autoComplete="new-password"
-                        placeholder="8 caractères minimum"
-                        value={form.motDePasse}
-                        onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
-                        className={cx(
-                          "w-full rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-10 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                          erreur ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
-                        )}
-                        disabled={soumission}
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setVoirMdp(!voirMdp)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                        aria-label={voirMdp ? "Masquer" : "Afficher"}
-                      >
-                        {voirMdp ? <EyeOff size={18} /> : <Eye size={18} />}
-                      </button>
-                    </div>
-                  </label>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold text-[var(--text-muted)]">Confirmer le mot de passe *</span>
-                    <div className="relative">
-                      <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
-                      <Input
-                        type={voirMdp ? "text" : "password"}
-                        autoComplete="new-password"
-                        placeholder="Répète le mot de passe"
-                        value={form.confirmerMdp}
-                        onChange={(e) => setForm({ ...form, confirmerMdp: e.target.value })}
-                        className={cx(
-                          "w-full rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-10 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none",
-                          erreur ? "border-[var(--emsp-gold)]" : "border-[var(--border-soft)]"
-                        )}
-                        disabled={soumission}
-                        required
-                      />
-                    </div>
-                    <p className="text-xs text-[var(--text-muted)]">
-                      8 caractères minimum. Évite les mots de passe courants et ceux qui reprennent ton nom ou ton e-mail.
-                    </p>
-                  </label>
-                </div>
-
-                <Button type="submit" size="lg" loading={soumission} className="w-full">
-                  Valider
-                </Button>
-              </form>
-            ) : (
-              <div className="text-center py-8">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                  className="mx-auto mb-4 rounded-full bg-[var(--emsp-cream)]/10 p-3"
-                >
-                  <CheckCircle size={48} className="text-[var(--emsp-gold)]" aria-hidden="true" />
-                </motion.div>
-                <h2 className="font-display text-xl font-bold text-[var(--text-primary)]">Mot de passe mis à jour !</h2>
-                <p className="mt-2 text-sm text-[var(--text-muted)]">
-                  Tu peux maintenant te connecter avec ton nouveau mot de passe.
-                </p>
-                <Button className="mt-6 w-full" size="lg" onClick={() => navigate("/connexion")}>
-                  Aller à la connexion
-                </Button>
+        {!termine ? (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {erreur && (
+              <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-[#d98f86] bg-[#fff0ee] p-3.5 text-sm text-[#8b2d25]">
+                <AlertCircle size={17} className="mt-0.5 shrink-0" aria-hidden="true" />
+                <span>{erreur}</span>
               </div>
             )}
 
-            <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
-              <Link to="/connexion" className="text-[var(--accent-green)] hover:underline font-medium">Connexion</Link>
+            <div className="flex items-center gap-2 rounded-xl bg-[#f4f7f1] px-3.5 py-3 text-xs text-[var(--text-muted)]">
+              <ShieldCheck size={15} className="shrink-0 text-[#0b7a3b]" aria-hidden="true" />
+              Le lien est personnel et expire après une heure.
+            </div>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-semibold text-[var(--text-primary)]">Nouveau mot de passe <span className="text-[#8b2d25]">*</span></span>
+              <div className="relative">
+                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
+                <Input
+                  type={voirMdp ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="8 caractères minimum"
+                  value={form.motDePasse}
+                  onChange={(e) => setForm({ ...form, motDePasse: e.target.value })}
+                  className={cx("w-full rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-10 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none", erreur ? "border-[#d98f86]" : "border-[var(--border-soft)]")}
+                  disabled={soumission}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setVoirMdp(!voirMdp)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                  aria-label={voirMdp ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                >
+                  {voirMdp ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <span className="text-xs text-[var(--text-muted)]">Évite les mots de passe courants ou contenant ton nom ou ton adresse e-mail.</span>
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className="text-sm font-semibold text-[var(--text-primary)]">Confirmer le mot de passe <span className="text-[#8b2d25]">*</span></span>
+              <div className="relative">
+                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
+                <Input
+                  type={voirMdp ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="Répète le mot de passe"
+                  value={form.confirmerMdp}
+                  onChange={(e) => setForm({ ...form, confirmerMdp: e.target.value })}
+                  className={cx("w-full rounded-[var(--radius-input)] border bg-[var(--bg-input)] px-10 py-2.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none", erreur ? "border-[#d98f86]" : "border-[var(--border-soft)]")}
+                  disabled={soumission}
+                  required
+                />
+              </div>
+              {form.confirmerMdp && (
+                <span className={cx("text-xs font-medium", form.confirmerMdp === form.motDePasse ? "text-[#187144]" : "text-[#8b2d25]")}>
+                  {form.confirmerMdp === form.motDePasse ? "Les mots de passe correspondent." : "Les mots de passe ne correspondent pas encore."}
+                </span>
+              )}
+            </label>
+
+            <Button type="submit" size="lg" loading={soumission} icon={ShieldCheck} className="w-full justify-center">
+              Mettre à jour le mot de passe
+            </Button>
+          </form>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="py-2 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+              className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#e7f4e9] text-[#147443]"
+            >
+              <CheckCircle size={34} aria-hidden="true" />
+            </motion.div>
+            <h2 className="font-display text-xl font-bold text-[var(--text-primary)]">Mot de passe mis à jour !</h2>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[var(--text-muted)]">
+              Tu peux maintenant te connecter avec ton nouveau mot de passe.
             </p>
-          </Card>
-        </div>
-      </main>
-    </div>
+            <Button className="mt-6 w-full" size="lg" onClick={() => navigate("/connexion")}>
+              Se connecter à EMSP Connect
+            </Button>
+          </motion.div>
+        )}
+      </Card>
+    </AuthExperienceLayout>
   );
 }

@@ -10,7 +10,11 @@ export default function PublicShell() {
   const location = useLocation();
   const destination = location.state?.from ?? "/messagerie";
   const landing = location.pathname === "/";
-  const inscription = location.pathname === "/inscription";
+  const authExperience =
+    location.pathname === "/inscription" ||
+    location.pathname === "/mot-de-passe-oublie" ||
+    location.pathname.startsWith("/reinitialiser-mot-de-passe/") ||
+    location.pathname.startsWith("/verifier-email/");
   const lienCompte =
     location.pathname.startsWith("/reinitialiser-mot-de-passe/") ||
     location.pathname.startsWith("/verifier-email/") ||
@@ -23,15 +27,19 @@ export default function PublicShell() {
   return (
     <div className="app pub">
       <a href="#main" className="skip-link">Aller au contenu principal</a>
-      {!inscription && <NavBar />}
+      {!authExperience && <NavBar />}
       <main id="main" className="public-main">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={location.pathname} {...pageTransition} className={landing ? "" : "wrap public-page"}>
+          <motion.div
+            key={location.pathname}
+            {...pageTransition}
+            className={authExperience ? "w-full" : landing ? "" : "wrap public-page"}
+          >
             <Outlet />
           </motion.div>
         </AnimatePresence>
       </main>
-      <Footer />
+      {!authExperience && <Footer />}
     </div>
   );
 }
