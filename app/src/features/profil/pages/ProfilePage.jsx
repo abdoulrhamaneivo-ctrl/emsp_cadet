@@ -134,9 +134,9 @@ export default function ProfilePage() {
   return (
     <div className="flex flex-col gap-5 pb-16">
       <header>
-        <p className="text-xs font-semibold text-[var(--emsp-gold)]">Ton espace personnel</p>
-        <h1 className="font-display text-2xl font-bold text-[var(--emsp-cream)]">Mon profil</h1>
-        <p className="mt-0.5 text-sm text-[var(--emsp-cream)]/90">
+        <p className="text-xs font-semibold text-[var(--accent-green)]">Ton espace personnel</p>
+        <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">Mon profil</h1>
+        <p className="mt-0.5 text-sm text-[var(--text-muted)]">
           Ta vitrine et ton interrupteur de visibilité — tout ce que voient les autres.
         </p>
       </header>

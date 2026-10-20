@@ -154,11 +154,11 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col gap-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold text-[var(--emsp-gold)]">Pilotage</p>
-          <h1 className="font-display text-2xl font-bold text-[var(--emsp-cream)]">
+          <p className="text-xs font-semibold text-[var(--accent-green)]">Pilotage</p>
+          <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
             Administration
           </h1>
-          <p className="mt-0.5 text-sm text-[var(--emsp-cream)]/90">
+          <p className="mt-0.5 text-sm text-[var(--text-muted)]">
             Santé du dispositif de parrainage, en un coup d'œil.
           </p>
         </div>

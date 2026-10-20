@@ -34,13 +34,13 @@ export default function FilPage() {
     <div className="flex flex-col gap-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold text-[var(--emsp-gold)]">
+          <p className="text-xs font-semibold text-[var(--accent-green)]">
             L'espace collectif des étudiants
           </p>
-          <h1 className="font-display text-2xl font-bold text-[var(--emsp-cream)]">
+          <h1 className="font-display text-2xl font-bold text-[var(--text-primary)]">
             Fil d'actualité
           </h1>
-          <p className="mt-0.5 text-sm text-[var(--emsp-cream)]/90">
+          <p className="mt-0.5 text-sm text-[var(--text-muted)]">
             Annonces, questions et succès de la communauté EMSP — publie en quelques secondes.
           </p>
         </div>

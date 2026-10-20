@@ -33,11 +33,11 @@ export default function MessagerieListPage() {
     <div className="flex min-h-0 flex-col gap-4 lg:h-[calc(100vh-9rem)] lg:flex-row">
       <section aria-labelledby="titre-messagerie" className="flex min-h-0 flex-col gap-3 lg:w-[360px] lg:shrink-0">
         <div>
-          <p className="text-xs font-semibold text-[var(--emsp-gold)]">Ton espace binôme</p>
-          <h1 id="titre-messagerie" className="font-display text-2xl font-bold text-[var(--emsp-cream)]">
+          <p className="text-xs font-semibold text-[var(--accent-green)]">Ton espace binôme</p>
+          <h1 id="titre-messagerie" className="font-display text-2xl font-bold text-[var(--text-primary)]">
             Messagerie
           </h1>
-          <p className="mt-0.5 text-sm text-[var(--emsp-cream)]/90">
+          <p className="mt-0.5 text-sm text-[var(--text-muted)]">
             {conversations.length} conversation{conversations.length > 1 ? "s" : ""} — privée
             {conversations.length > 1 ? "s" : ""} du binôme et famille.
           </p>
