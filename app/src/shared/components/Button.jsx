@@ -20,7 +20,7 @@ const stylesBase =
 
 const stylesVariant = {
   primary:
-    "border border-[var(--accent-green)] bg-[var(--accent-green)] text-[var(--emsp-cream)] hover:bg-[var(--emsp-green-deep)] hover:border-[var(--emsp-green-deep)] active:shadow-[var(--shadow-pressed)]",
+    "border border-[var(--accent-green)] bg-[var(--accent-green)] text-[var(--text-on-accent)] hover:bg-[var(--accent-green-hover)] hover:border-[var(--accent-green-hover)] active:shadow-[var(--shadow-pressed)]",
   secondary: "border border-[var(--emsp-gold)] bg-[var(--emsp-gold)] text-[#2a1b00] hover:bg-[var(--emsp-gold-bright)] active:shadow-[var(--shadow-pressed)]",
   outline:
     "border-[1.5px] border-[var(--border-structural)] bg-transparent text-[var(--text-primary)] hover:bg-[var(--hover-bg)] active:shadow-[var(--shadow-pressed)]",

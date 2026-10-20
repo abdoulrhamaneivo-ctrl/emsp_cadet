@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterEach, afterAll } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { http, HttpResponse } from "msw";
 import AnnuairePage from "./pages/AnnuairePage";
 import { server } from "@shared/mocks/server";
 
@@ -64,5 +65,16 @@ describe("AnnuairePage (doc 04)", () => {
     await waitFor(() => expect(screen.queryByText(/Grace Adjoua/)).not.toBeInTheDocument());
     expect(screen.getAllByText(/Ibrahim Ouattara/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Page 2" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("affiche un état vide lisible quand aucun Aîné réel n'est disponible", async () => {
+    server.use(
+      http.get("*/api/parrains/", () => HttpResponse.json({ count: 0, results: [] })),
+    );
+
+    renderPage();
+
+    expect(await screen.findByText("Aucun Aîné ne correspond")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Réinitialiser les filtres" })).toBeInTheDocument();
   });
 });

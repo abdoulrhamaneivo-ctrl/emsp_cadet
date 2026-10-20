@@ -203,7 +203,7 @@ export default function EvenementDetailPage() {
                     onClick={ecrire}
                     disabled={!message.trim()}
                     aria-label="Envoyer le message"
-                    className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-input)] bg-[var(--accent-green)] text-[var(--emsp-cream)] disabled:opacity-50"
+                    className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-input)] bg-[var(--accent-green)] text-[var(--text-on-accent)] disabled:opacity-50"
                   >
                     <SendHorizonal size={15} aria-hidden="true" />
                   </button>

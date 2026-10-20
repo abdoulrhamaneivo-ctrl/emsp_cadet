@@ -95,7 +95,7 @@ export default function MesDemandesPage() {
           className={[
             "rounded-full px-4 py-2 text-sm font-semibold transition-shadow duration-200",
             onglet === "envoyees"
-              ? "bg-[var(--accent-green)] text-[var(--emsp-cream)] shadow-[var(--shadow-card)]"
+              ? "bg-[var(--accent-green)] text-[var(--text-on-accent)] shadow-[var(--shadow-card)]"
               : "bg-[var(--bg-panel-alt)] text-[var(--text-muted)] hover:text-[var(--text-primary)]",
           ].join(" ")}
         >
@@ -110,7 +110,7 @@ export default function MesDemandesPage() {
             className={[
               "relative rounded-full px-4 py-2 text-sm font-semibold transition-shadow duration-200",
               onglet === "recues"
-                ? "bg-[var(--accent-green)] text-[var(--emsp-cream)] shadow-[var(--shadow-card)]"
+                ? "bg-[var(--accent-green)] text-[var(--text-on-accent)] shadow-[var(--shadow-card)]"
                 : "bg-[var(--bg-panel-alt)] text-[var(--text-muted)] hover:text-[var(--text-primary)]",
             ].join(" ")}
           >

@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, X, Loader2, Briefcase, User, Settings, Send, Target, Calendar, Users, Heart } from "lucide-react";
+import { Sparkles, X, Briefcase, User, Settings, Send, Target, Calendar, Users, Heart } from "lucide-react";
 import { cx } from "@shared/utils/cx";
 import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
 import PanneauCopilot from "@shared/components/PanneauCopilot";
-import ChipIA from "@shared/components/ChipIA";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@app/providers/Auth";
 import { profilApi } from "@features/profil/api";
+import { offresApi } from "@features/offres/api";
 
 /**
  * Page création offre alumni (doc 14 + IA-6 doc 17 §2) — formulaire complet
@@ -31,9 +33,16 @@ const SECTIONS = [
 ];
 
 export default function CreerOffrePage() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const peutPublier = user?.niveauEtude === "alumni" || user?.isAdmin;
   const [typeOffre, setTypeOffre] = useState("stage");
   const [form, setForm] = useState({
     titre: "",
+    entreprise: "",
+    localisation: "",
+    dateLimite: "",
     typeOffre: "stage",
     equipe: "",
     projet: "",
@@ -43,6 +52,7 @@ export default function CreerOffrePage() {
     competences_requises: "",
     competences: "",
     duree: "",
+    modalites: "",
     mois: "",
     montant: "",
     tuteur: "",
@@ -61,6 +71,7 @@ export default function CreerOffrePage() {
     modalites: { ouvert: false, motsCles: "" },
   });
   const [soumission, setSoumission] = useState(false);
+  const [erreur, setErreur] = useState("");
 
   const { data: prefsIA } = useQuery({
     queryKey: ["preferences-ia"],
@@ -69,19 +80,44 @@ export default function CreerOffrePage() {
 
   const copilotActif = prefsIA?.copilot === true;
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErreur("");
     setSoumission(true);
     try {
-      // TODO: appel API création offre (à créer côté backend)
-      // await offresApi.creer({ ...form, typeOffre });
-      alert("Offre créée ! (API à brancher)");
-      setSoumission(false);
-    } catch (e) {
-      console.error(e);
+      await offresApi.creer({
+        titre: form.titre,
+        typeOffre,
+        entreprise: form.entreprise,
+        localisation: form.localisation,
+        mission: form.taches_principales,
+        profil: form.competences_requises,
+        modalites: form.modalites,
+        salaire: form.salaire || form.montant,
+        telework: form.telework,
+        dateLimite: form.dateLimite || null,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["offres"] });
+      navigate("/offres");
+    } catch (error) {
+      const donnees = error?.response?.data ?? {};
+      const message = donnees.detail ?? Object.values(donnees).flat().find((valeur) => typeof valeur === "string");
+      setErreur(typeof message === "string" ? message : "L'offre n'a pas pu être publiée. Vérifie les champs et réessaie.");
+    } finally {
       setSoumission(false);
     }
   };
+
+  if (!peutPublier) {
+    return (
+      <Card className="mx-auto mt-8 max-w-xl p-6 text-center sm:p-8">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--bg-panel-alt)] text-[var(--accent-green)]"><Briefcase size={23} aria-hidden="true" /></div>
+        <h1 className="font-display text-xl font-bold text-[var(--text-primary)]">Publication réservée aux alumni</h1>
+        <p className="mt-2 text-sm text-[var(--text-muted)]">Les offres sont publiées par les alumni et l'administration EMSP.</p>
+        <Button className="mt-5" variant="outline" to="/offres">Retour aux offres</Button>
+      </Card>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -145,8 +181,8 @@ export default function CreerOffrePage() {
                   )}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 rounded-full bg-[var(--emsp-cream)]/10 p-2">
-                      <t.icone size={20} className="text-[var(--emsp-gold)]" aria-hidden="true" />
+                    <div className="flex-shrink-0 rounded-full bg-[var(--bg-panel-alt)] p-2">
+                      <t.icone size={20} className="text-[var(--accent-green)]" aria-hidden="true" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-semibold text-[var(--text-primary)]">{t.libelle}</h3>
@@ -186,6 +222,21 @@ export default function CreerOffrePage() {
                 required
               />
             </label>
+
+            <div className="mb-5 grid gap-3 sm:grid-cols-2">
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-[var(--text-muted)]">Entreprise / organisation *</span>
+                <input type="text" maxLength={120} required value={form.entreprise} onChange={(e) => setForm({ ...form, entreprise: e.target.value })} placeholder="Nom de la structure" className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-green)] focus:outline-none" />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-[var(--text-muted)]">Lieu de travail *</span>
+                <input type="text" maxLength={160} required value={form.localisation} onChange={(e) => setForm({ ...form, localisation: e.target.value })} placeholder="Ville, quartier ou télétravail" className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-green)] focus:outline-none" />
+              </label>
+              <label className="flex flex-col gap-1 sm:col-span-2">
+                <span className="text-xs font-semibold text-[var(--text-muted)]">Date limite de candidature <span className="font-normal">(facultatif)</span></span>
+                <input type="date" value={form.dateLimite} min={new Date().toISOString().slice(0, 10)} onChange={(e) => setForm({ ...form, dateLimite: e.target.value })} className="w-full rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--accent-green)] focus:outline-none sm:max-w-xs" />
+              </label>
+            </div>
 
             {/* Type d'offre (hidden, géré par les cartes) */}
             <input type="hidden" name="typeOffre" value={typeOffre} />
@@ -395,7 +446,7 @@ export default function CreerOffrePage() {
                     <button
                       type="button"
                       onClick={() => setCopilots((c) => ({ ...c, [s.id]: { ouvert: true, motsCles: "" } }))}
-                      className="flex items-center gap-1.5 rounded-full border border-[var(--emsp-cream)]/30 px-3 py-1.5 text-xs font-semibold text-[var(--emsp-gold)] hover:bg-[var(--emsp-cream)]/10"
+                      className="flex items-center gap-1.5 rounded-full border border-[var(--border-structural)] px-3 py-1.5 text-xs font-semibold text-[var(--accent-green)] hover:bg-[var(--hover-bg)]"
                     >
                       <Sparkles size={13} aria-hidden="true" />
                       <span>M'aider à rédiger</span>
@@ -462,8 +513,8 @@ export default function CreerOffrePage() {
                           rows={4}
                           maxLength={2000}
                           className="resize-none rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none"
-                          value={form.duree}
-                          onChange={(e) => setForm({ ...form, duree: e.target.value })}
+                          value={form.modalites}
+                          onChange={(e) => setForm({ ...form, modalites: e.target.value })}
                           placeholder="Durée, rémunération, télétravail, avantages, dates, processus de recrutement..."
                           required
                         />
@@ -471,8 +522,8 @@ export default function CreerOffrePage() {
                       {/* Copilot IA-6 - Modalités */}
                       <PanneauCopilot
                         section="modalites"
-                        motsCles={copilots.modalites?.motsCles || form.duree}
-                        surInsertion={(texte) => setForm((f) => ({ ...f, duree: texte }))}
+                        motsCles={copilots.modalites?.motsCles || form.modalites}
+                        surInsertion={(texte) => setForm((f) => ({ ...f, modalites: texte }))}
                         surFermeture={() => setCopilots((c) => ({ ...c, modalites: { ouvert: false, motsCles: "" } }))}
                         desactive={!copilotActif}
                       />
@@ -484,12 +535,13 @@ export default function CreerOffrePage() {
           </Card>
 
           {/* Bouton soumission */}
+          {erreur && <p role="alert" className="rounded-xl border border-[var(--danger)]/40 bg-[var(--danger)]/10 p-3 text-sm text-[var(--danger)]">{erreur}</p>}
           <div className="flex justify-center">
             <Button
               type="submit"
               size="lg"
               loading={soumission}
-              startIcon={Send}
+              icon={Send}
               className="min-w-[280px]"
             >
               Publier l'offre

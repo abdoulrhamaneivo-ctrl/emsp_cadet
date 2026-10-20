@@ -30,6 +30,8 @@ const AdminDashboardPage = lazy(() => import("@features/admin/pages/AdminDashboa
 const ModerationPage = lazy(() => import("@features/admin/pages/ModerationPage"));
 const AccueilPage = lazy(() => import("@features/accueil/pages/AccueilPage"));
 const OffresPage = lazy(() => import("@features/offres/pages/OffresPage"));
+const OffreDetailPage = lazy(() => import("@features/offres/pages/OffreDetailPage"));
+const CreerOffrePage = lazy(() => import("@features/alumni/pages/CreerOffrePage"));
 
 // Composant de chargement partagé pour Suspense
 function PageFallback() {
@@ -79,6 +81,8 @@ function AppRoutes() {
         <Route path="/evenements" element={<Suspense fallback={<PageFallback />}><EvenementsPage /></Suspense>} />
         <Route path="/evenements/:evenementId" element={<Suspense fallback={<PageFallback />}><EvenementDetailPage /></Suspense>} />
         <Route path="/offres" element={<Suspense fallback={<PageFallback />}><OffresPage /></Suspense>} />
+        <Route path="/offres/creer" element={<Suspense fallback={<PageFallback />}><CreerOffrePage /></Suspense>} />
+        <Route path="/offres/:offreId" element={<Suspense fallback={<PageFallback />}><OffreDetailPage /></Suspense>} />
         <Route path="/administration" element={<Suspense fallback={<PageFallback />}><AdminDashboardPage /></Suspense>} />
         <Route path="/moderation" element={<Suspense fallback={<PageFallback />}><ModerationPage /></Suspense>} />
       </Route>

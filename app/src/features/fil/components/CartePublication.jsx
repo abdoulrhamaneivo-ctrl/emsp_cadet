@@ -207,7 +207,7 @@ export default function CartePublication({ publication, monId, suiAdmin = false,
                 type="button"
                 onClick={() => modifier.mutate()}
                 disabled={contenuEdite.trim().length < 10 || modifier.isPending}
-                className="rounded-[var(--radius-input)] bg-[var(--accent-green)] px-3 py-1.5 text-xs font-semibold text-[var(--emsp-cream)] disabled:opacity-50"
+                className="rounded-[var(--radius-input)] bg-[var(--accent-green)] px-3 py-1.5 text-xs font-semibold text-[var(--text-on-accent)] disabled:opacity-50"
               >
                 Enregistrer
               </button>

@@ -37,6 +37,7 @@ LOCAL_APPS = [
     "fil",
     "evenements",
     "parrainage",
+    "offres",
     "ia",
 ]
 

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SearchX, UserCheck, AlertTriangle, ArrowRight } from "lucide-react";
 import Button from "@shared/components/Button";
+import Card from "@shared/components/Card";
 import EmptyState from "@shared/components/EmptyState";
 import Pagination from "@shared/components/Pagination";
 import { SkeletonCard } from "@shared/components/Skeleton";

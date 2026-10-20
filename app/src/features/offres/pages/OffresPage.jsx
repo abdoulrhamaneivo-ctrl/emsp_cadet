@@ -1,371 +1,220 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowRight, Briefcase, Users, Settings, Calendar, Heart, Search, Filter, Sparkles, ChevronDown, MapPin, Euro, Clock } from "lucide-react";
+import { Briefcase, Calendar, Filter, Heart, MapPin, Search, Settings, Sparkles, Users } from "lucide-react";
+import { useAuth } from "@app/providers/Auth";
 import { cx } from "@shared/utils/cx";
 import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
 import { Input } from "@shared/components/Input";
-import Chip from "@shared/components/Chip";
-import { Link, useNavigate } from "react-router-dom";
+import EmptyState from "@shared/components/EmptyState";
+import { offresApi } from "../api";
 
-/**
- * Page Offres alumni — P22 (doc 14 §6 + IA-6).
- * Liste des offres avec filtres + bouton création (si alumni).
- */
 const TYPES_OFFRES = [
-  { valeur: "stage", libelle: "Stage", icone: Briefcase, couleur: "bg-blue-500/20 text-blue-400" },
-  { valeur: "alternance", libelle: "Alternance", icone: Users, couleur: "bg-purple-500/20 text-purple-400" },
-  { valeur: "cdi", libelle: "CDI", icone: Briefcase, couleur: "bg-green-500/20 text-green-400" },
-  { valeur: "cdd", libelle: "CDD", icone: Calendar, couleur: "bg-amber-500/20 text-amber-400" },
-  { valeur: "freelance", libelle: "Freelance", icone: Settings, couleur: "bg-pink-500/20 text-pink-400" },
-  { valeur: "benevolat", libelle: "Bénévolat", icone: Heart, couleur: "bg-red-500/20 text-red-400" },
+  { valeur: "stage", libelle: "Stage", icone: Briefcase, couleur: "bg-[var(--offer-stage-bg)] text-[var(--offer-stage-text)]" },
+  { valeur: "alternance", libelle: "Alternance", icone: Users, couleur: "bg-[var(--offer-alternance-bg)] text-[var(--offer-alternance-text)]" },
+  { valeur: "cdi", libelle: "CDI", icone: Briefcase, couleur: "bg-[var(--offer-cdi-bg)] text-[var(--offer-cdi-text)]" },
+  { valeur: "cdd", libelle: "CDD", icone: Calendar, couleur: "bg-[var(--offer-cdd-bg)] text-[var(--offer-cdd-text)]" },
+  { valeur: "freelance", libelle: "Freelance", icone: Settings, couleur: "bg-[var(--offer-freelance-bg)] text-[var(--offer-freelance-text)]" },
+  { valeur: "benevolat", libelle: "Bénévolat", icone: Heart, couleur: "bg-[var(--offer-benevolat-bg)] text-[var(--offer-benevolat-text)]" },
 ];
+const OFFRES_VIDES = [];
 
-const OFFRES_DEMO = [
-  {
-    id: 1,
-    titre: "Développeur Full Stack Junior — Stage 6 mois",
-    type: "stage",
-    entreprise: "TechCorp Abidjan",
-    localisation: "Abidjan, Cocody",
-    typeContrat: "stage",
-    datePublication: "2025-01-15",
-    dateLimite: "2025-03-15",
-    salaire: "800 €/mois",
-    telework: "Hybride (2j/sem)",
-  },
-  {
-    id: 2,
-    titre: "Data Scientist — Alternance 2 ans",
-    type: "alternance",
-    entreprise: "DataFlow CI",
-    localisation: "Abidjan, Plateau",
-    typeContrat: "alternance",
-    datePublication: "2025-01-10",
-    dateLimite: "2025-02-28",
-    salaire: "SMIC % selon âge",
-    telework: "1j/sem",
-  },
-  {
-    id: 3,
-    titre: "Lead DevOps — CDI",
-    type: "cdi",
-    entreprise: "CloudScale",
-    localisation: "Abidjan, Marcory + Télétravail",
-    typeContrat: "cdi",
-    datePublication: "2025-01-05",
-    dateLimite: "2025-03-01",
-    salaire: "55k €/an",
-    telework: "100% remote possible",
-  },
-  {
-    id: 4,
-    titre: "React Native Developer — CDD 12 mois",
-    type: "cdd",
-    entreprise: "MobileFirst",
-    localisation: "Yamoussoukro",
-    typeContrat: "cdd",
-    datePublication: "2025-01-12",
-    dateLimite: "2025-02-15",
-    salaire: "45k €/an",
-    telework: "Non",
-  },
-  {
-    id: 5,
-    titre: "Consultant Cybersécurité — Freelance 3 mois",
-    type: "freelance",
-    entreprise: "SecureNet",
-    localisation: "Abidjan + Remote",
-    typeContrat: "freelance",
-    datePublication: "2025-01-08",
-    dateLimite: "2025-02-20",
-    salaire: "500 €/jour",
-    telework: "100% remote",
-  },
-  {
-    id: 6,
-    titre: "Coordinateur Bénévole — Éducation",
-    type: "benevolat",
-    entreprise: "ONG EducaCI",
-    localisation: "Abidjan, Yopougon",
-    typeContrat: "benevolat",
-    datePublication: "2025-01-01",
-    dateLimite: "2025-06-30",
-    salaire: "Bénévolat (frais remboursés)",
-    telework: "Sur site",
-  },
-];
+function dateLisible(valeur) {
+  if (!valeur) return "Date à convenir";
+  const date = new Date(valeur);
+  return Number.isNaN(date.getTime())
+    ? "Date à convenir"
+    : date.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
+}
 
 export default function OffresPage() {
-  const navigate = useNavigate();
-  const [filtres, setFiltres] = useState({
-    recherche: "",
-    type: "",
-    localisation: "",
-    telework: "",
-  });
-  const [offresFiltrees, setOffresFiltrees] = useState(OFFRES_DEMO);
-  const [tri, setTri] = useState("date"); // date | salaire | titre
+  const { user } = useAuth();
+  const [filtres, setFiltres] = useState({ recherche: "", type: "", localisation: "", telework: "" });
+  const [tri, setTri] = useState("date");
   const [voirFiltres, setVoirFiltres] = useState(false);
+  const peutPublier = user?.niveauEtude === "alumni" || user?.isAdmin;
+  const { data, isPending, isError, refetch, isFetching } = useQuery({
+    queryKey: ["offres"],
+    queryFn: () => offresApi.lister(),
+  });
 
-  useEffect(() => {
-    let resultat = [...OFFRES_DEMO];
-    if (filtres.recherche) {
-      const q = filtres.recherche.toLowerCase();
-      resultat = resultat.filter(
-        (o) =>
-          o.titre.toLowerCase().includes(q) ||
-          o.entreprise.toLowerCase().includes(q) ||
-          o.localisation.toLowerCase().includes(q)
-      );
-    }
-    if (filtres.type) resultat = resultat.filter((o) => o.typeContrat === filtres.type);
-    if (filtres.localisation) {
-      const q = filtres.localisation.toLowerCase();
-      resultat = resultat.filter((o) => o.localisation.toLowerCase().includes(q));
-    }
-    if (filtres.telework) {
-      if (filtres.telework === "oui") resultat = resultat.filter((o) => o.telework.toLowerCase().includes("remote") || o.telework.toLowerCase().includes("hybride"));
-      else if (filtres.telework === "non") resultat = resultat.filter((o) => !o.telework.toLowerCase().includes("remote") && !o.telework.toLowerCase().includes("hybride"));
-    }
-    // Tri
-    if (tri === "date") resultat.sort((a, b) => new Date(b.datePublication) - new Date(a.datePublication));
-    else if (tri === "salaire") resultat.sort((a, b) => b.salaire.localeCompare(a.salaire));
-    else if (tri === "titre") resultat.sort((a, b) => a.titre.localeCompare(b.titre));
-    setOffresFiltrees(resultat);
-  }, [filtres, tri]);
+  const offres = Array.isArray(data?.results) ? data.results : OFFRES_VIDES;
+  const offresFiltrees = useMemo(() => {
+    const recherche = filtres.recherche.trim().toLocaleLowerCase("fr");
+    const localisation = filtres.localisation.trim().toLocaleLowerCase("fr");
+    const resultats = offres.filter((offre) => {
+      const correspondRecherche = !recherche || [offre.titre, offre.entreprise, offre.localisation]
+        .some((champ) => (champ || "").toLocaleLowerCase("fr").includes(recherche));
+      const correspondType = !filtres.type || offre.typeContrat === filtres.type;
+      const correspondLieu = !localisation || (offre.localisation || "").toLocaleLowerCase("fr").includes(localisation);
+      const teletravail = (offre.telework || "").toLocaleLowerCase("fr");
+      const possibleTeletravail = /remote|hybride|télétravail/.test(teletravail);
+      const correspondTeletravail = !filtres.telework || (filtres.telework === "oui" ? possibleTeletravail : !possibleTeletravail);
+      return correspondRecherche && correspondType && correspondLieu && correspondTeletravail;
+    });
+    return resultats.sort((a, b) => tri === "titre"
+      ? a.titre.localeCompare(b.titre, "fr")
+      : new Date(b.datePublication) - new Date(a.datePublication));
+  }, [offres, filtres, tri]);
 
-  function handleFiltreChange(champ, valeur) {
-    setFiltres((f) => ({ ...f, [champ]: valeur }));
-  }
-
-  function resetFiltres() {
-    setFiltres({ recherche: "", type: "", localisation: "", telework: "" });
-  }
-
-  const aFiltresActifs = filtres.recherche || filtres.type || filtres.localisation || filtres.telework;
+  const aFiltresActifs = Object.values(filtres).some(Boolean);
+  const resetFiltres = () => setFiltres({ recherche: "", type: "", localisation: "", telework: "" });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--bg-page)]">
-      {/* Header avec filtres */}
-      <header className="sticky top-16 z-30 bg-[var(--bg-page)]/95 backdrop-blur-sm border-b border-[var(--border-soft)]">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 rounded-full bg-[var(--emsp-cream)]/10 px-3 py-1">
-                <Sparkles size={14} aria-hidden="true" className="text-[var(--emsp-gold)]" />
-                <span className="text-xs font-semibold text-[var(--emsp-gold)]">EMSP Connect — Alumni</span>
+    <div className="flex min-h-full flex-col">
+      <header className="relative z-10 border-b border-[var(--border-soft)] bg-[var(--bg-page)]">
+        <div className="mx-auto max-w-7xl px-4 py-4">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-1.5 rounded-full bg-[var(--bg-panel-alt)] px-3 py-1">
+                <Sparkles size={14} aria-hidden="true" className="text-[var(--accent-green)]" />
+                <span className="text-xs font-semibold text-[var(--accent-green)]">EMSP Connect — Alumni</span>
               </div>
-              <h1 className="font-display text-xl font-bold text-[var(--text-primary)]">Offres d'emploi & stages</h1>
+              <h1 className="font-display text-xl font-bold text-[var(--text-primary)]">Offres d'emploi &amp; stages</h1>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-3 w-full lg:w-auto">
-              {/* Barre recherche */}
-              <div className="relative flex-1 max-w-md">
+            <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto] lg:w-auto">
+              <div className="relative min-w-0 sm:w-64">
                 <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
                 <Input
                   type="search"
-                  placeholder="Rechercher un poste, une entreprise, un lieu..."
+                  placeholder="Poste, entreprise, lieu…"
+                  aria-label="Rechercher une offre"
                   value={filtres.recherche}
-                  onChange={(e) => handleFiltreChange("recherche", e.target.value)}
+                  onChange={(e) => setFiltres((actuels) => ({ ...actuels, recherche: e.target.value }))}
                   className="w-full pl-10"
                 />
               </div>
-
-              {/* Filtres avancés */}
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setVoirFiltres(!voirFiltres)}
-                className={cx("flex items-center gap-2", aFiltresActifs && "border-[var(--emsp-gold)] text-[var(--emsp-gold)]")}
+                onClick={() => setVoirFiltres((ouvert) => !ouvert)}
+                aria-expanded={voirFiltres}
+                className={cx("flex items-center gap-2", aFiltresActifs && "border-[var(--accent-green)] text-[var(--accent-green)]")}
               >
-                <Filter size={16} />
+                <Filter size={16} aria-hidden="true" />
                 <span>Filtres</span>
-                {aFiltresActifs && <Chip tone="gold" className="ml-1">{Object.values(filtres).filter(Boolean).length}</Chip>}
               </Button>
-
-              {/* Bouton création offre */}
-              <Button
-                size="sm"
-                onClick={() => navigate("/offres/creer")}
-                className="flex items-center gap-2"
-              >
-                <Sparkles size={16} aria-hidden="true" />
-                <span>Créer une offre</span>
-              </Button>
+              {peutPublier && (
+                <Button size="sm" to="/offres/creer" icon={Sparkles}>
+                  Créer une offre
+                </Button>
+              )}
             </div>
           </div>
 
-          {/* Filtres avancés expansibles */}
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
+            initial={false}
             animate={{ height: voirFiltres ? "auto" : 0, opacity: voirFiltres ? 1 : 0 }}
             transition={{ duration: 0.2 }}
-            className="overflow-hidden mt-4 lg:hidden"
+            className="overflow-hidden"
+            aria-hidden={!voirFiltres}
+            inert={!voirFiltres}
           >
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 p-4 bg-[var(--bg-panel)] rounded-[var(--radius-card)] border border-[var(--border-soft)]">
-              <div className="space-y-2">
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-[var(--text-muted)]">Type d'offre</span>
-                  <select
-                    value={filtres.type}
-                    onChange={(e) => handleFiltreChange("type", e.target.value)}
-                    className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none"
-                  >
-                    <option value="">Tous les types</option>
-                    {TYPES_OFFRES.map((t) => (
-                      <option key={t.valeur} value={t.valeur}>{t.libelle}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <div className="space-y-2">
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-[var(--text-muted)]">Localisation</span>
-                  <Input
-                    type="text"
-                    placeholder="Ville, quartier..."
-                    value={filtres.localisation}
-                    onChange={(e) => handleFiltreChange("localisation", e.target.value)}
-                  />
-                </label>
-              </div>
-              <div className="space-y-2">
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold text-[var(--text-muted)]">Télétravail</span>
-                  <select
-                    value={filtres.telework}
-                    onChange={(e) => handleFiltreChange("telework", e.target.value)}
-                    className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none"
-                  >
-                    <option value="">Tous</option>
-                    <option value="oui">Oui (remote/hybride)</option>
-                    <option value="non">Non (sur site uniquement)</option>
-                  </select>
-                </label>
-              </div>
+            <div className="mt-4 grid gap-3 rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-4 sm:grid-cols-2 lg:grid-cols-4">
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-[var(--text-muted)]">Type d'offre</span>
+                <select value={filtres.type} onChange={(e) => setFiltres((f) => ({ ...f, type: e.target.value }))} className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)]">
+                  <option value="">Tous les types</option>
+                  {TYPES_OFFRES.map((type) => <option key={type.valeur} value={type.valeur}>{type.libelle}</option>)}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-[var(--text-muted)]">Localisation</span>
+                <Input value={filtres.localisation} onChange={(e) => setFiltres((f) => ({ ...f, localisation: e.target.value }))} placeholder="Ville, quartier…" />
+              </label>
+              <label className="flex flex-col gap-1">
+                <span className="text-xs font-semibold text-[var(--text-muted)]">Télétravail</span>
+                <select value={filtres.telework} onChange={(e) => setFiltres((f) => ({ ...f, telework: e.target.value }))} className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)]">
+                  <option value="">Tous</option>
+                  <option value="oui">Télétravail ou hybride</option>
+                  <option value="non">Sur site</option>
+                </select>
+              </label>
               <div className="flex items-end">
-                <Button variant="outline" size="sm" onClick={resetFiltres} className="w-full">
-                  Réinitialiser
-                </Button>
+                <Button variant="outline" size="sm" onClick={resetFiltres} className="w-full">Réinitialiser</Button>
               </div>
             </div>
           </motion.div>
         </div>
       </header>
 
-      {/* Barre tri + compteur (desktop) */}
-      <div className="hidden lg:block sticky top-64 z-20 bg-[var(--bg-page)]/95 backdrop-blur-sm border-b border-[var(--border-soft)]">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <p className="text-sm text-[var(--text-muted)]">
-            {offresFiltrees.length} offre{offresFiltrees.length > 1 ? "s" : ""} trouvée{offresFiltrees.length > 1 ? "s" : ""}
-          </p>
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
-              <span>Trier par :</span>
-              <select
-                value={tri}
-                onChange={(e) => setTri(e.target.value)}
-                className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-1.5 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none"
-              >
-                <option value="date">Date (récentes d'abord)</option>
-                <option value="salaire">Salaire (décroissant)</option>
-                <option value="titre">Titre (A-Z)</option>
-              </select>
-            </label>
-          </div>
-        </div>
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3">
+        <p className="text-sm text-[var(--text-muted)]" aria-live="polite">
+          {isPending ? "Chargement des offres…" : `${offresFiltrees.length} offre${offresFiltrees.length > 1 ? "s" : ""} trouvée${offresFiltrees.length > 1 ? "s" : ""}`}
+        </p>
+        <label className="flex items-center gap-2 text-sm text-[var(--text-muted)]">
+          <span>Trier :</span>
+          <select value={tri} onChange={(e) => setTri(e.target.value)} className="max-w-[13rem] rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-2.5 py-1.5 text-sm text-[var(--text-primary)]">
+            <option value="date">Plus récentes</option>
+            <option value="titre">Titre (A–Z)</option>
+          </select>
+        </label>
       </div>
 
-      {/* Liste des offres */}
-      <main className="flex-1 px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          {offresFiltrees.length === 0 ? (
-            <div className="text-center py-16">
-              <Briefcase size={64} className="mx-auto mb-4 text-[var(--text-muted)]/30" aria-hidden="true" />
-              <h2 className="font-display text-xl font-bold text-[var(--text-primary)]">Aucune offre ne correspond</h2>
-              <p className="mt-2 text-[var(--text-muted)]">Essaie d'élargir tes critères de recherche</p>
-              <Button variant="outline" className="mt-4" onClick={resetFiltres}>
-                Réinitialiser les filtres
-              </Button>
-            </div>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {offresFiltrees.map((offre) => {
-                const typeInfo = TYPES_OFFRES.find((t) => t.valeur === offre.typeContrat);
-                return (
-                  <motion.article
-                    key={offre.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="group"
-                  >
-                    <Card className="p-5 h-full flex flex-col shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-panel)] transition-shadow border-[var(--border-soft)]">
-                      {/* Header offre */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-2">
-                          <div className={cx("rounded-full p-2", typeInfo?.couleur)}>
-                            {typeInfo && <typeInfo.icone size={16} aria-hidden="true" />}
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold text-[var(--emsp-gold)] uppercase tracking-wide">{typeInfo?.libelle}</p>
-                            <p className="text-xs text-[var(--text-muted)]">{offre.entreprise}</p>
-                          </div>
-                        </div>
-                        <span className="flex-shrink-0 text-xs text-[var(--text-muted)]">
-                          {new Date(offre.datePublication).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-8">
+        {isError ? (
+          <Card className="p-6 text-center" role="alert">
+            <p className="font-semibold text-[var(--text-primary)]">Les offres ne sont pas disponibles pour le moment.</p>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">Vérifie ta connexion et réessaie.</p>
+            <Button className="mt-4" variant="outline" onClick={() => refetch()} loading={isFetching}>Réessayer</Button>
+          </Card>
+        ) : isPending ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Chargement des offres">
+            {Array.from({ length: 6 }, (_, index) => <div key={index} className="h-64 animate-pulse rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)]" />)}
+          </div>
+        ) : offresFiltrees.length === 0 ? (
+          <Card>
+            <EmptyState
+              icon={Briefcase}
+              title={offres.length === 0 ? "Aucune offre publiée pour le moment" : "Aucune offre ne correspond"}
+              description={offres.length === 0
+                ? "Les offres publiées par les alumni apparaîtront ici. Tu peux revenir consulter cette page plus tard."
+                : "Essaie d'élargir ta recherche ou de réinitialiser les filtres."}
+              actionLabel={aFiltresActifs ? "Réinitialiser les filtres" : undefined}
+              onAction={aFiltresActifs ? resetFiltres : undefined}
+            >
+              {offres.length === 0 && peutPublier && <Button to="/offres/creer" icon={Sparkles}>Publier la première offre</Button>}
+            </EmptyState>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {offresFiltrees.map((offre) => {
+              const typeInfo = TYPES_OFFRES.find((type) => type.valeur === offre.typeContrat);
+              const IconeType = typeInfo?.icone ?? Briefcase;
+              return (
+                <motion.article key={offre.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="h-full">
+                  <Card className="flex h-full flex-col p-5 transition-shadow hover:shadow-[var(--shadow-card-hover)]">
+                    <div className="mb-3 flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <span className={cx("rounded-full p-2", typeInfo?.couleur ?? "bg-[var(--bg-panel-alt)] text-[var(--accent-green)]")}>
+                          <IconeType size={17} aria-hidden="true" />
                         </span>
-                      </div>
-
-                      {/* Titre */}
-                      <h3 className="font-semibold text-[var(--text-primary)] mb-2 line-clamp-2 group-hover:text-[var(--accent-green)] transition-colors">
-                        {offre.titre}
-                      </h3>
-
-                      {/* Métadonnées */}
-                      <div className="flex flex-col gap-2 mb-4 text-sm text-[var(--text-muted)]">
-                        <div className="flex items-center gap-1.5">
-                          <MapPin size={14} aria-hidden="true" />
-                          <span>{offre.localisation}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Euro size={14} aria-hidden="true" />
-                          <span>{offre.salaire}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock size={14} aria-hidden="true" />
-                          <span>{offre.telework}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Calendar size={14} aria-hidden="true" />
-                          <span>Jusqu'au {new Date(offre.dateLimite).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</span>
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--accent-green)]">{typeInfo?.libelle ?? offre.typeContrat}</p>
+                          <p className="truncate text-xs text-[var(--text-muted)]">{offre.entreprise}</p>
                         </div>
                       </div>
-
-                      {/* Footer actions */}
-                      <div className="mt-auto flex gap-2 pt-3 border-t border-[var(--border-soft)]">
-                        <Link to={`/offres/${offre.id}`}>
-                          <Button variant="outline" size="sm" className="flex-1">
-                            Voir détails
-                          </Button>
-                        </Link>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => navigate(`/offres/${offre.id}/postuler`)}
-                          className="flex-1"
-                        >
-                          Postuler
-                        </Button>
-                      </div>
-                    </Card>
-                  </motion.article>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                      <time className="shrink-0 text-xs text-[var(--text-muted)]" dateTime={offre.datePublication}>{dateLisible(offre.datePublication)}</time>
+                    </div>
+                    <h2 className="mb-2 line-clamp-2 font-semibold text-[var(--text-primary)]">{offre.titre}</h2>
+                    <div className="mb-4 flex flex-col gap-2 text-sm text-[var(--text-muted)]">
+                      <p className="flex items-center gap-1.5"><MapPin size={14} aria-hidden="true" /><span>{offre.localisation}</span></p>
+                      {offre.salaire && <p>{offre.salaire}</p>}
+                      {offre.telework && <p>{offre.telework}</p>}
+                      <p className="flex items-center gap-1.5"><Calendar size={14} aria-hidden="true" /><span>Fin des candidatures : {dateLisible(offre.dateLimite)}</span></p>
+                    </div>
+                    <div className="mt-auto flex gap-2 border-t border-[var(--border-soft)] pt-3">
+                      <Button variant="outline" size="sm" to={`/offres/${offre.id}`} className="flex-1">Voir l'offre</Button>
+                      <Button size="sm" to={`/offres/${offre.id}`} className="flex-1">Postuler</Button>
+                    </div>
+                  </Card>
+                </motion.article>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );

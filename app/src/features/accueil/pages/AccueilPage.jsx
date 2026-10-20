@@ -20,6 +20,8 @@ import { useConversations } from "@features/messagerie/hooks/useConversations";
 import WidgetFAQ from "@shared/components/WidgetFAQ";
 import Carousel from "@shared/components/Carousel";
 
+const LISTE_VIDE = [];
+
 const raccourcis = [
   {
     titre: "Trouver un Aîné",
@@ -111,7 +113,7 @@ export default function AccueilPage() {
     isError: demandesEnErreur,
   } = useDemandes("recues");
 
-  const evenements = evenementsData?.results ?? [];
+  const evenements = evenementsData?.results ?? LISTE_VIDE;
   const conversations = conversationsData?.results ?? [];
   const demandesEnAttente = (demandesData?.results ?? []).filter(
     (demande) => demande.statut === "en_attente",

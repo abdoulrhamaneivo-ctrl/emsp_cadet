@@ -65,7 +65,7 @@ export default function Pagination({ page, pageCount, onChange, totalElements = 
             className={cx(
               "flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-green-luminous)] focus-visible:ring-offset-2",
               p === page
-                ? "bg-[var(--accent-green)] text-[var(--emsp-cream)]"
+                ? "bg-[var(--accent-green)] text-[var(--text-on-accent)]"
                 : "border-[1.5px] border-transparent text-[var(--text-primary)] hover:bg-[var(--hover-bg)]",
             )}
           >

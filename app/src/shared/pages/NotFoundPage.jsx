@@ -15,7 +15,7 @@ export default function NotFoundPage() {
       </p>
       <Link
         to="/accueil"
-        className="mt-6 inline-flex items-center gap-2 rounded-[var(--radius-chip)] bg-[var(--accent-green)] px-4 py-2.5 text-sm font-semibold text-[var(--emsp-cream)] hover:bg-[var(--emsp-green-bright)]"
+        className="mt-6 inline-flex items-center gap-2 rounded-[var(--radius-chip)] bg-[var(--accent-green)] px-4 py-2.5 text-sm font-semibold text-[var(--text-on-accent)] hover:bg-[var(--accent-green-hover)]"
       >
         <Compass size={16} aria-hidden="true" /> Retour à l'accueil
       </Link>

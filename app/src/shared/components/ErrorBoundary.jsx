@@ -29,7 +29,7 @@ export default class ErrorBoundary extends Component {
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="mt-5 inline-flex items-center rounded-[var(--radius-chip)] bg-[var(--accent-green)] px-4 py-2 text-sm font-semibold text-[var(--emsp-cream)] hover:bg-[var(--emsp-green-bright)]"
+            className="mt-5 inline-flex items-center rounded-[var(--radius-chip)] bg-[var(--accent-green)] px-4 py-2 text-sm font-semibold text-[var(--text-on-accent)] hover:bg-[var(--accent-green-hover)]"
           >
             Recharger la page
           </button>

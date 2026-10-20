@@ -22,7 +22,21 @@
   --bg-input: #ffffff;
   --hover-bg: #e2f5e8;
   --accent-green: #075b2b;
+  --accent-green-hover: #0b7a3b;
+  --text-on-accent: #ffffff;
   --accent-gold: #0b7a3b;
+  --offer-stage-bg: #eaf2ff;
+  --offer-stage-text: #174ea6;
+  --offer-alternance-bg: #f3eafe;
+  --offer-alternance-text: #6b21a8;
+  --offer-cdi-bg: #e6f6ec;
+  --offer-cdi-text: #166534;
+  --offer-cdd-bg: #fff3d6;
+  --offer-cdd-text: #854d0e;
+  --offer-freelance-bg: #fdeaf3;
+  --offer-freelance-text: #9d174d;
+  --offer-benevolat-bg: #feeceb;
+  --offer-benevolat-text: #9f2d24;
   /* Danger : encre mode-aware (texte/bordure) + fond fixe (bannières plein
      rouge texte blanc — lisible dans les DEUX modes). */
   --danger: #b3261e;
@@ -64,7 +78,21 @@ html.dark {
   --bg-input: #22352a;
   --hover-bg: #263c2e;
   --accent-green: #5fc984;
+  --accent-green-hover: #9ce2b2;
+  --text-on-accent: #0e1711;
   --accent-gold: #ffcb05;
+  --offer-stage-bg: #1d3453;
+  --offer-stage-text: #b8d2ff;
+  --offer-alternance-bg: #3b2450;
+  --offer-alternance-text: #e3c5ff;
+  --offer-cdi-bg: #1d3a29;
+  --offer-cdi-text: #a9e8bb;
+  --offer-cdd-bg: #45351c;
+  --offer-cdd-text: #ffdc91;
+  --offer-freelance-bg: #452437;
+  --offer-freelance-text: #ffbfd9;
+  --offer-benevolat-bg: #482522;
+  --offer-benevolat-text: #ffb8b0;
   --danger: #f2b8b5;
 
   --shadow-panel:

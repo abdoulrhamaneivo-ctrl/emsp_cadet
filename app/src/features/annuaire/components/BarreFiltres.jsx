@@ -80,7 +80,7 @@ export default function BarreFiltres({ filtres, onChanger, onReinitialiser }) {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
-        <label className="flex cursor-pointer select-none items-center gap-2.5 text-sm text-[var(--emsp-cream)]">
+        <label className="flex cursor-pointer select-none items-center gap-2.5 text-sm text-[var(--text-primary)]">
           <Switch
             checked={filtres.inclureComplets}
             onChange={(suivant) => onChanger({ inclureComplets: suivant })}

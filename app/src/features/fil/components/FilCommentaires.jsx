@@ -151,7 +151,7 @@ export default function FilCommentaires({ publication, monId, suiAdmin = false }
                   onClick={envoyer}
                   disabled={commenter.isPending || !texte.trim()}
                   aria-label="Envoyer le commentaire"
-                  className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-input)] bg-[var(--accent-green)] text-[var(--emsp-cream)] disabled:opacity-50"
+                  className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-input)] bg-[var(--accent-green)] text-[var(--text-on-accent)] disabled:opacity-50"
                 >
                   <SendHorizonal size={15} aria-hidden="true" />
                 </button>
