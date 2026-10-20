@@ -151,7 +151,7 @@ export default function InscriptionPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-[#fafaf8]">
       <header className="fixed top-0 left-0 right-0 z-40 bg-[var(--emsp-green-deep)]/95 backdrop-blur-sm border-b border-[var(--border-soft)]">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -160,17 +160,23 @@ export default function InscriptionPage() {
               <span className="text-xs font-semibold text-[var(--emsp-gold)]">EMSP Connect</span>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => navigate("/connexion")}>
+          <Button variant="ghost-fonce" size="sm" onClick={() => navigate("/connexion")}>
             <ArrowLeft size={16} className="mr-1" /> Connexion
           </Button>
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-4 py-20">
+      <main className="flex-1 flex items-center justify-center px-4 pb-16 pt-24">
         <div className="w-full max-w-md">
           {/* Indicateur d'étapes */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
+          <div className="relative mb-8">
+            <div className="absolute left-[12.5%] right-[12.5%] top-5 h-0.5 bg-[var(--border-soft)]" aria-hidden="true">
+              <div
+                className="h-full bg-[var(--emsp-gold)] transition-[width] duration-300"
+                style={{ width: `${((etape - 1) / (etapes.length - 1)) * 100}%` }}
+              />
+            </div>
+            <div className="relative flex items-start justify-between">
               {etapes.map((e, i) => (
                 <div key={e.num} className="flex flex-col items-center">
                   <div
@@ -186,16 +192,6 @@ export default function InscriptionPage() {
                     {i + 1 < etape ? <CheckCircle size={16} /> : e.num}
                   </div>
                   <span className="mt-1 text-xs text-[var(--text-muted)] text-center w-20">{e.label}</span>
-                  {i < etapes.length - 1 && (
-                    <div
-                      className={cx(
-                        "absolute top-5 left-1/2 w-full h-1 -ml-1/2",
-                        i + 1 < etape
-                          ? "bg-[var(--emsp-gold)]"
-                          : "bg-[var(--border-soft)]"
-                      )}
-                    />
-                  )}
                 </div>
               ))}
             </div>
