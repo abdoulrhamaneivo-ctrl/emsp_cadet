@@ -75,10 +75,20 @@ export default function CreerOffrePage() {
 
   const { data: prefsIA } = useQuery({
     queryKey: ["preferences-ia"],
-    queryFn: () => profilApi.preferencesIA().then((r) => r.data ?? {}),
+    queryFn: profilApi.preferencesIA,
   });
 
   const copilotActif = prefsIA?.copilot === true;
+  const genererAideRedaction = (motsCles) => offresApi.genererIA(typeOffre, {
+    ...form,
+    projet: form.projet || motsCles,
+    taches_principales: form.taches_principales || motsCles,
+    domaine: form.domaine || motsCles,
+    formation: form.formation || motsCles,
+    competences_requises: form.competences_requises || motsCles,
+    competences: form.competences || motsCles,
+    modalites: form.modalites || motsCles,
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -470,13 +480,16 @@ export default function CreerOffrePage() {
                         />
                       </label>
                       {/* Copilot IA-6 - Mission */}
-                      <PanneauCopilot
-                        section="mission"
-                        motsCles={copilots.mission?.motsCles || form.taches_principales}
-                        surInsertion={(texte) => setForm((f) => ({ ...f, taches_principales: texte }))}
-                        surFermeture={() => setCopilots((c) => ({ ...c, mission: { ouvert: false, motsCles: "" } }))}
-                        desactive={!copilotActif}
-                      />
+                      {copilots.mission?.ouvert && (
+                        <PanneauCopilot
+                          ouvert
+                          section="mission"
+                          motsClesInitials={form.taches_principales}
+                          genererPropositions={genererAideRedaction}
+                          surInsertion={(texte) => setForm((f) => ({ ...f, taches_principales: texte }))}
+                          surFermeture={() => setCopilots((c) => ({ ...c, mission: { ouvert: false, motsCles: "" } }))}
+                        />
+                      )}
                     </>
                   )}
 
@@ -495,13 +508,16 @@ export default function CreerOffrePage() {
                         />
                       </label>
                       {/* Copilot IA-6 - Profil */}
-                      <PanneauCopilot
-                        section="profil"
-                        motsCles={copilots.profil?.motsCles || form.competences_requises}
-                        surInsertion={(texte) => setForm((f) => ({ ...f, competences_requises: texte }))}
-                        surFermeture={() => setCopilots((c) => ({ ...c, profil: { ouvert: false, motsCles: "" } }))}
-                        desactive={!copilotActif}
-                      />
+                      {copilots.profil?.ouvert && (
+                        <PanneauCopilot
+                          ouvert
+                          section="profil"
+                          motsClesInitials={form.competences_requises}
+                          genererPropositions={genererAideRedaction}
+                          surInsertion={(texte) => setForm((f) => ({ ...f, competences_requises: texte }))}
+                          surFermeture={() => setCopilots((c) => ({ ...c, profil: { ouvert: false, motsCles: "" } }))}
+                        />
+                      )}
                     </>
                   )}
 
@@ -520,13 +536,16 @@ export default function CreerOffrePage() {
                         />
                       </label>
                       {/* Copilot IA-6 - Modalités */}
-                      <PanneauCopilot
-                        section="modalites"
-                        motsCles={copilots.modalites?.motsCles || form.modalites}
-                        surInsertion={(texte) => setForm((f) => ({ ...f, modalites: texte }))}
-                        surFermeture={() => setCopilots((c) => ({ ...c, modalites: { ouvert: false, motsCles: "" } }))}
-                        desactive={!copilotActif}
-                      />
+                      {copilots.modalites?.ouvert && (
+                        <PanneauCopilot
+                          ouvert
+                          section="modalites"
+                          motsClesInitials={form.modalites}
+                          genererPropositions={genererAideRedaction}
+                          surInsertion={(texte) => setForm((f) => ({ ...f, modalites: texte }))}
+                          surFermeture={() => setCopilots((c) => ({ ...c, modalites: { ouvert: false, motsCles: "" } }))}
+                        />
+                      )}
                     </>
                   )}
                 </div>

@@ -4,10 +4,10 @@ Endpoint POST /api/offres/generer/ {typeOffre, variables} → {mission: [...], p
 Opt-in RG12.4 via preferences_ia (réutilise copilot ou toggle dédié).
 """
 
-from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from config.exceptions import ErreurValidation
 from ia.offres import generer_propositions_offre
 from ia.integration import kill_switch_actif
 
@@ -21,17 +21,22 @@ class GenererOffreView(APIView):
 
     def post(self, request):
         if kill_switch_actif():
-            return Response({"mission": [], "profil": [], "modalites": []})
+            raise ErreurValidation("L'assistant de rédaction est temporairement désactivé.")
+
+        if not (request.user.preferences_ia or {}).get("copilot"):
+            raise ErreurValidation("Active l'assistant de rédaction dans tes préférences IA.")
 
         type_offre = (request.data or {}).get("typeOffre")
         variables = (request.data or {}).get("variables") or {}
 
         if type_offre not in ("stage", "alternance", "cdi", "cdd", "freelance", "benevolat"):
-            from config.exceptions import ErreurValidation
             raise ErreurValidation("Type d'offre invalide.")
+        if not isinstance(variables, dict):
+            raise ErreurValidation("Les informations de l'offre sont invalides.")
 
-        try:
-            from ia.offres import generer_propositions_offre
-            return Response(generer_propositions_offre(type_offre, variables))
-        except Exception:  # noqa: BLE001 — dégradation silencieuse
-            return Response({"mission": [], "profil": [], "modalites": []})
+        contexte = {
+            str(cle): str(valeur)[:500]
+            for cle, valeur in variables.items()
+            if isinstance(cle, str) and isinstance(valeur, (str, int, float))
+        }
+        return Response(generer_propositions_offre(type_offre, contexte))

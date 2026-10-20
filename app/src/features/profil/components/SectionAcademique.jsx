@@ -5,6 +5,7 @@
 import { useState } from "react";
 import PanneauCopilot from "@shared/components/PanneauCopilot";
 import { Sparkles } from "lucide-react";
+import { profilApi } from "@features/profil/api";
 
 const NIVEAUX = [
   { valeur: "L1", libelle: "L1 — première année" },
@@ -16,7 +17,7 @@ const NIVEAUX = [
 ];
 
 export default function SectionAcademique({ moi, surChamp }) {
-  const [copilotAttentes, setCopilotAttentes] = useState({ ouvert: false, motsCles: "" });
+  const [copilotOuvert, setCopilotOuvert] = useState(false);
   return (
     <section
       aria-labelledby="titre-academique"
@@ -65,11 +66,12 @@ export default function SectionAcademique({ moi, surChamp }) {
           Tu changeras de niveau en début d'année suivante.
         </span>
       </label>
-      <label className="mt-3 flex flex-col gap-1">
-        <span className="text-xs font-semibold text-[var(--text-muted)]">
+      <div className="mt-3 flex flex-col gap-1">
+        <label htmlFor="profil-attentes" className="text-xs font-semibold text-[var(--text-muted)]">
           Tes attentes (visibles par tes futurs Aînés)
-        </span>
+        </label>
         <textarea
+          id="profil-attentes"
           rows={3}
           maxLength={1000}
           className="resize-none rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--emsp-gold)] focus:outline-none"
@@ -82,7 +84,7 @@ export default function SectionAcademique({ moi, surChamp }) {
           <div className="mt-2 flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setCopilotAttentes({ ouvert: true, motsCles: "" })}
+              onClick={() => setCopilotOuvert(true)}
               className="flex items-center gap-1.5 rounded-full border border-[var(--emsp-cream)]/30 px-3 py-1.5 text-xs font-semibold text-[var(--emsp-gold)] hover:bg-[var(--emsp-cream)]/10"
             >
               <Sparkles size={13} aria-hidden="true" />
@@ -91,13 +93,13 @@ export default function SectionAcademique({ moi, surChamp }) {
           </div>
         )}
         <PanneauCopilot
-          section="attentes"
-          motsCles={copilotAttentes.motsCles}
+          ouvert={copilotOuvert}
+          section="propositions"
+          genererPropositions={(motsCles) => profilApi.copilot("attentes", motsCles)}
           surInsertion={(texte) => surChamp("attentes", texte)}
-          surFermeture={() => setCopilotAttentes({ ouvert: false, motsCles: "" })}
-          desactive={false}
+          surFermeture={() => setCopilotOuvert(false)}
         />
-      </label>
+      </div>
     </section>
   );
 }

@@ -71,8 +71,7 @@ export default function ReinitialiserMotDePassePage() {
     setSoumission(true);
     try {
       await authApi.reinitialiserMotDePasse({ uid, token, password: form.motDePasse });
-      await authApi.deconnexion().catch(() => {});
-      logout();
+      await logout();
       setEtape("succes");
     } catch (error) {
       const data = error?.response?.data;

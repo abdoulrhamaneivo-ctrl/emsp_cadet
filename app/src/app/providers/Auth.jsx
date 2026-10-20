@@ -1,8 +1,26 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { authApi } from "@shared/api/auth";
 import { apiClient, definirJeton } from "@shared/api/client";
 
 const AuthContext = createContext(null);
+const CLE_DECONNEXION = "emsp-connect:deconnecte";
+
+function lireMarqueurDeconnexion() {
+  try {
+    return Boolean(window.localStorage.getItem(CLE_DECONNEXION));
+  } catch {
+    return false;
+  }
+}
+
+function ecrireMarqueurDeconnexion(valeur) {
+  try {
+    if (valeur) window.localStorage.setItem(CLE_DECONNEXION, String(Date.now()));
+    else window.localStorage.removeItem(CLE_DECONNEXION);
+  } catch {
+    // L'état local et la révocation serveur restent prioritaires si le stockage est bloqué.
+  }
+}
 
 /**
  * État d'authentification global.
@@ -15,34 +33,43 @@ export function AuthProvider({ children, initialUser }) {
   const [statut, setStatut] = useState(
     initialUser !== undefined ? "authentifie" : "chargement",
   ); // chargement | authentifie | invite
+  const revisionSession = useRef(0);
+  const resolutionEnCours = useRef(null);
 
   useEffect(() => {
     if (initialUser !== undefined) return; // injection de test (même null = figé)
     let actif = true;
+    const revision = ++revisionSession.current;
     // Résolution de session AU RECHARGEMENT (t5b) : l'access en mémoire est
     // mort, mais le refresh httpOnly cookie est toujours là. On tente d'abord
     // un refresh silencieux — s'il réussit, la session part avec un jeton
     // frais ; s'il échoue (401, pas de cookie), on part réellement invité.
-    apiClient
-      .post("/api/auth/refresh/")
-      .then((r) => {
-        if (r?.data?.access) definirJeton(r.data.access);
+    const resolution = (async () => {
+      // Après une déconnexion explicite, le cookie ne doit jamais restaurer la
+      // session au rechargement, même si l'appel réseau de révocation a échoué.
+      if (lireMarqueurDeconnexion()) return null;
+      try {
+        const reponse = await apiClient.post("/api/auth/refresh/");
+        if (reponse?.data?.access) definirJeton(reponse.data.access);
+      } catch {
+        // Pas de cookie valide : la requête session ci-dessous confirme l'état invité.
+      }
+      return authApi.session();
+    })();
+    resolutionEnCours.current = resolution;
+    resolution
+      .then((u) => {
+        if (!actif || revisionSession.current !== revision) return;
+        setUser(u);
+        setStatut(u ? "authentifie" : "invite");
       })
-      .catch(() => {}) // pas de cookie → session() renverra un invité propre
+      .catch(() => {
+        if (!actif || revisionSession.current !== revision) return;
+        setUser(null);
+        setStatut("invite");
+      })
       .finally(() => {
-        if (!actif) return;
-        authApi
-          .session()
-          .then((u) => {
-            if (!actif) return;
-            setUser(u);
-            setStatut(u ? "authentifie" : "invite");
-          })
-          .catch(() => {
-            if (!actif) return;
-            setUser(null);
-            setStatut("invite");
-          });
+        if (resolutionEnCours.current === resolution) resolutionEnCours.current = null;
       });
     return () => {
       actif = false;
@@ -51,13 +78,43 @@ export function AuthProvider({ children, initialUser }) {
   }, []);
 
   const login = (u) => {
+    revisionSession.current += 1;
+    ecrireMarqueurDeconnexion(false);
     setUser(u);
     setStatut("authentifie");
   };
-  const logout = () => {
+  const logout = async () => {
+    revisionSession.current += 1;
+    ecrireMarqueurDeconnexion(true);
+    definirJeton(null);
     setUser(null);
     setStatut("invite");
+    // Termine d'abord tout refresh déjà lancé puis révoque le cookie côté API.
+    // Le marqueur local protège entre-temps contre une reconnexion silencieuse.
+    try {
+      await resolutionEnCours.current;
+    } catch {
+      // Une session qui se résout mal ne doit pas empêcher la déconnexion.
+    }
+    try {
+      await authApi.deconnexion();
+      return true;
+    } catch {
+      return false;
+    }
   };
+
+  useEffect(() => {
+    const synchroniserDeconnexion = (event) => {
+      if (event.key !== CLE_DECONNEXION || !event.newValue) return;
+      revisionSession.current += 1;
+      definirJeton(null);
+      setUser(null);
+      setStatut("invite");
+    };
+    window.addEventListener("storage", synchroniserDeconnexion);
+    return () => window.removeEventListener("storage", synchroniserDeconnexion);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, statut, login, logout }}>

@@ -137,6 +137,65 @@ describe("Profil (doc 11)", () => {
     );
   });
 
+  it("permet de demander puis choisir une proposition du copilot", async () => {
+    const preferencesIA = { matchingEnrichi: false, copilot: false };
+    let patchRecu;
+    let motsClesRecus;
+    mockMoi({ preferencesIA });
+    server.use(
+      http.patch("*/api/me/", async ({ request }) => {
+        patchRecu = await request.json();
+        return HttpResponse.json({ ...moiBase, ...patchRecu });
+      }),
+      http.post("*/api/me/copilot/", async ({ request }) => {
+        motsClesRecus = await request.json();
+        return HttpResponse.json({ propositions: ["Je souhaite progresser en réseaux et cybersécurité."] });
+      }),
+    );
+    renderProfil({ id: 1, prenom: "Ivo", nom: "Abdoul", classe: "L2", isAdmin: false });
+
+    fireEvent.click(await screen.findByRole("switch", { name: "Copilot de profil" }));
+    fireEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
+    await waitFor(() => expect(patchRecu?.preferencesIA?.copilot).toBe(true));
+
+    fireEvent.click((await screen.findAllByRole("button", { name: /M'aider à rédiger/ }))[0]);
+    fireEvent.change(screen.getByLabelText("Mots-clés pour l'assistant"), {
+      target: { value: "réseaux cybersécurité" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Générer des idées" }));
+    await waitFor(() => expect(motsClesRecus).toEqual({ section: "attentes", motsCles: "réseaux cybersécurité" }));
+
+    const proposition = await screen.findByRole("button", {
+      name: /Je souhaite progresser en réseaux et cybersécurité/,
+    });
+    fireEvent.click(proposition);
+    expect(screen.getByLabelText(/Tes attentes/).value).toBe(
+      "Je souhaite progresser en réseaux et cybersécurité.",
+    );
+  });
+
+  it("envoie la photo en multipart avec une frontière générée par le navigateur", async () => {
+    let typeContenu;
+    mockMoi();
+    server.use(
+      http.post("*/api/me/photo/", ({ request }) => {
+        typeContenu = request.headers.get("content-type");
+        return HttpResponse.json({ photoUrl: "/media/photo-test.png" }, { status: 201 });
+      }),
+    );
+    const { container } = renderProfil({ id: 1, prenom: "Ivo", nom: "Abdoul", classe: "L2", isAdmin: false });
+    await screen.findByLabelText(/Tes attentes/);
+
+    const photo = new File(["png"], "photo.png", { type: "image/png" });
+    fireEvent.change(container.querySelector('input[type="file"]'), {
+      target: { files: [photo] },
+    });
+
+    await waitFor(() => expect(typeContenu).toBeTruthy());
+    expect(typeContenu).toMatch(/^multipart\/form-data; boundary=/i);
+    expect(await screen.findByText("Photo mise à jour.")).toBeInTheDocument();
+  });
+
   it("RG4 : l'email est affiché verrouillé et ne part JAMAIS dans le PATCH", async () => {
     let recu = null;
     mockMoi();

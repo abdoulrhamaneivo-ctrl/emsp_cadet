@@ -121,6 +121,40 @@ def test_visibilite_l1_pas_de_motif_candidature(api, users):
     assert "candidature" not in motifs  # L1 = parcours, pas un manquement
 
 
+def test_copilot_refuse_sans_consentement(api, users):
+    reponse = _client(users.ivo).post(
+        "/api/me/copilot/",
+        {"section": "attentes", "motsCles": "réseaux cybersécurité"},
+        format="json",
+    )
+    assert reponse.status_code == 422
+    assert "désactivé" in reponse.data["detail"].lower()
+
+
+def test_copilot_genere_trois_propositions_apres_consentement(api, users):
+    users.ivo.preferences_ia = {"copilot": True}
+    users.ivo.save(update_fields=["preferences_ia"])
+    reponse = _client(users.ivo).post(
+        "/api/me/copilot/",
+        {"section": "attentes", "motsCles": "réseaux cybersécurité"},
+        format="json",
+    )
+    assert reponse.status_code == 200
+    assert len(reponse.data["propositions"]) == 3
+    assert all("réseaux" in texte for texte in reponse.data["propositions"])
+
+
+def test_copilot_refuse_mots_cles_vides(api, users):
+    users.ivo.preferences_ia = {"copilot": True}
+    users.ivo.save(update_fields=["preferences_ia"])
+    reponse = _client(users.ivo).post(
+        "/api/me/copilot/",
+        {"section": "attentes", "motsCles": " "},
+        format="json",
+    )
+    assert reponse.status_code == 422
+
+
 def test_photo_upload_valide_201(api, users):
     reponse = _client(users.ivo).post(
         "/api/me/photo/", {"photo": _png()}, format="multipart"

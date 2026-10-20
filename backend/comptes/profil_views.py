@@ -13,6 +13,7 @@ from comptes.serializers import (
     _niveau_de_classe,
 )
 from config.exceptions import ErreurValidation
+from ia.integration import kill_switch_actif
 from ia.integration_copilot import appeler_copilot
 
 
@@ -100,6 +101,8 @@ class CopilotView(APIView):
     """
 
     def post(self, request):
+        if kill_switch_actif():
+            raise ErreurValidation("L'assistant de rédaction est temporairement désactivé.")
         prefs = request.user.preferences_ia or {}
         if not prefs.get("copilot"):
             raise ErreurValidation("Copilot désactivé — active-le dans tes préférences IA.")
@@ -107,7 +110,11 @@ class CopilotView(APIView):
         mots_cles = (request.data or {}).get("motsCles", "")
         if section not in ("attentes", "ambitions", "projets", "pointsForts", "pointsFaibles"):
             raise ErreurValidation("Section invalide.")
-        return Response(appeler_copilot(request, section, mots_cles))
+        if not isinstance(mots_cles, str) or not mots_cles.strip():
+            raise ErreurValidation("Saisis quelques mots-clés pour préparer les propositions.")
+        if len(mots_cles) > 300:
+            raise ErreurValidation("Les mots-clés ne doivent pas dépasser 300 caractères.")
+        return Response(appeler_copilot(request, section, mots_cles.strip()))
 
 
 class PhotoMoiView(APIView):

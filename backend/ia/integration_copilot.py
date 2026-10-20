@@ -1,10 +1,13 @@
 """IA-3 — Copilot profil (doc 17 §2)."""
 
+import logging
+
 from django.conf import settings
-from django.utils.text import Truncator
 
 from .models import AppelIA
 from .copilot import generer_propositions
+
+logger = logging.getLogger(__name__)
 
 
 def appeler_copilot(request, section, mots_cles):
@@ -16,10 +19,8 @@ def appeler_copilot(request, section, mots_cles):
     if getattr(settings, "IA_DESACTIVEE", False):
         return {"propositions": []}
 
+    propositions = generer_propositions(section, mots_cles or "")
     try:
-        from ia.copilot import generer_propositions
-
-        propositions = generer_propositions(section, mots_cles or "")
         AppelIA.objects.create(
             feature=AppelIA.Feature.MODERATION,  # on réutilise le même type, feature distincte idéale pour V2
             score=0,  # pas de score pour copilot
@@ -28,6 +29,6 @@ def appeler_copilot(request, section, mots_cles):
             cible_type=None,
             cible_id=request.user.pk,
         )
-        return {"propositions": propositions}
-    except Exception:  # noqa: BLE001 — dégradation silencieuse
-        return {"propositions": []}
+    except Exception:  # noqa: BLE001 — le journal ne doit pas bloquer la suggestion
+        logger.exception("Échec de journalisation du copilot profil")
+    return {"propositions": propositions}

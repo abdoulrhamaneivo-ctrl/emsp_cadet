@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { http, HttpResponse } from "msw";
 import ConnexionPage from "./pages/ConnexionPage";
 import ReinitialiserMotDePassePage from "./pages/ReinitialiserMotDePassePage";
-import { AuthProvider } from "@app/providers/Auth";
+import { AuthProvider, useAuth } from "@app/providers/Auth";
 import { server } from "@shared/mocks/server";
 import InscriptionPage from "./pages/InscriptionPage";
 import PublicShell from "@layout/shells/PublicShell";
@@ -15,8 +15,21 @@ vi.mock("@app/providers/Theme", () => ({
 }));
 
 beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  window.localStorage.removeItem("emsp-connect:deconnecte");
+});
 afterAll(() => server.close());
+
+function SessionProbe() {
+  const { user, logout } = useAuth();
+  return (
+    <>
+      <p>{user ? "Session ouverte" : "Session fermée"}</p>
+      <button type="button" onClick={logout}>Déconnexion test</button>
+    </>
+  );
+}
 
 /** Page rendue en invité figé (initialUser={null}) + destination de sondage. */
 function renderConnexion() {
@@ -68,6 +81,40 @@ function remplir(email, motDePasse) {
 }
 
 describe("Connexion (doc 02 §5)", () => {
+  it("révoque le refresh à la déconnexion et ne restaure pas la session après rechargement", async () => {
+    let appelsDeconnexion = 0;
+    let appelsRefresh = 0;
+    server.use(
+      http.post("*/api/auth/deconnexion/", () => {
+        appelsDeconnexion += 1;
+        return HttpResponse.json({ ok: true });
+      }),
+      http.post("*/api/auth/refresh/", () => {
+        appelsRefresh += 1;
+        return HttpResponse.json({ access: "ancien-access" });
+      }),
+    );
+
+    const premierRendu = render(
+      <AuthProvider initialUser={{ id: 1, prenom: "Ivo", nom: "Abdoul" }}>
+        <SessionProbe />
+      </AuthProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Déconnexion test" }));
+    expect(await screen.findByText("Session fermée")).toBeInTheDocument();
+    await waitFor(() => expect(appelsDeconnexion).toBe(1));
+    expect(window.localStorage.getItem("emsp-connect:deconnecte")).toBeTruthy();
+    premierRendu.unmount();
+
+    render(
+      <AuthProvider>
+        <SessionProbe />
+      </AuthProvider>,
+    );
+    expect(await screen.findByText("Session fermée")).toBeInTheDocument();
+    expect(appelsRefresh).toBe(0);
+  });
+
   it("termine le chargement en invité quand le refresh et la session répondent 401", async () => {
     let refreshCalls = 0;
     let sessionCalls = 0;

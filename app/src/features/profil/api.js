@@ -30,7 +30,8 @@ export const profilApi = {
     const corps = new FormData();
     corps.append("photo", fichier);
     const { data } = await apiClient.post("/api/me/photo/", corps, {
-      headers: { "Content-Type": "multipart/form-data" },
+      // Laisser le navigateur ajouter la frontière multipart exacte.
+      headers: { "Content-Type": undefined },
     });
     return data; // { photoUrl }
   },

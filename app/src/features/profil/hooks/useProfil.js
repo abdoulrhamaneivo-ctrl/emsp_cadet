@@ -2,6 +2,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { profilApi } from "../api";
 
+function premierMessage(erreur) {
+  if (typeof erreur === "string") return erreur;
+  if (Array.isArray(erreur)) return erreur.map(premierMessage).find(Boolean) ?? "";
+  if (!erreur || typeof erreur !== "object") return "";
+  for (const cle of ["detail", "photo", "non_field_errors"]) {
+    const message = premierMessage(erreur[cle]);
+    if (message) return message;
+  }
+  return Object.values(erreur).map(premierMessage).find(Boolean) ?? "";
+}
+
 export function useMoi() {
   return useQuery({ queryKey: ["me"], queryFn: profilApi.moi });
 }
@@ -13,7 +24,7 @@ export function useVisibilite() {
 export function usePreferencesIA() {
   return useQuery({
     queryKey: ["preferences-ia"],
-    queryFn: () => profilApi.preferencesIA().then((r) => r.data ?? {}),
+    queryFn: profilApi.preferencesIA,
   });
 }
 
@@ -53,15 +64,33 @@ export function useModifierProfil() {
 export function useEnvoyerPhoto() {
   const client = useQueryClient();
   return useMutation({
-    mutationFn: profilApi.photo,
+    mutationFn: (fichier) => {
+      const typesAcceptes = new Set(["image/jpeg", "image/png", "image/webp"]);
+      if (!fichier || !typesAcceptes.has(fichier.type)) {
+        throw Object.assign(new Error(), {
+          userMessage: "Format accepté : image JPG, PNG ou WebP.",
+        });
+      }
+      if (fichier.size > 5 * 1024 * 1024) {
+        throw Object.assign(new Error(), {
+          userMessage: "Photo : 5 Mo maximum.",
+        });
+      }
+      return profilApi.photo(fichier);
+    },
     onSuccess: (donnees) => {
       client.setQueryData(["me"], (ancien) => ({ ...ancien, photoUrl: donnees.photoUrl }));
       client.invalidateQueries({ queryKey: ["visibilite-annuaire"] });
       toast.success("Photo mise à jour.");
     },
     onError: (e) => {
-      const detail = e?.response?.data?.detail;
-      toast.error(typeof detail === "string" ? detail : "Photo refusée.");
+      const donnees = e?.response?.data ?? {};
+      const message = premierMessage(donnees)
+        || e?.userMessage
+        || (e?.response?.status >= 500
+          ? "Le serveur n'a pas pu enregistrer cette photo. Réessaie dans un instant."
+          : "Photo refusée. Choisis une image JPG, PNG ou WebP de 5 Mo maximum.");
+      toast.error(message);
     },
   });
 }

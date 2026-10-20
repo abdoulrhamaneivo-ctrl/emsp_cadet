@@ -1,164 +1,151 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-const MotionButton = motion.button;
-import { X, Sparkles, Loader2, ClipboardCheck } from "lucide-react";
+import { X, Sparkles, Loader2, ClipboardCheck, WandSparkles } from "lucide-react";
 import { cx } from "@shared/utils/cx";
 import ChipIA from "@shared/components/ChipIA";
-import Button from "@shared/components/Button";
 
 /**
- * PanneauCopilot — IA-3 (doc 17 §2) : 3 propositions cliquables basées sur
- * 2-3 mots-clés. Insertion = action explicite utilisateur (RG12.1/3).
- * ChipIA sur chaque proposition (RG12.3). Fermeture auto après insertion.
+ * Assistant de rédaction : l'utilisateur fournit son contexte, demande des
+ * propositions puis choisit explicitement celle qu'il veut insérer.
  */
 export default function PanneauCopilot({
-  section,           // "attentes" | "ambitions" | "projets" | "pointsForts" | "pointsFaibles"
-  motsCles,          // string (2-3 mots saisis par l'utilisateur)
-  surInsertion,      // (texte) => void — insère la proposition dans le textarea
-  surFermeture,      // () => void
-  desactive = false,
+  section,
+  ouvert = false,
+  motsClesInitials = "",
+  genererPropositions,
+  surInsertion,
+  surFermeture,
 }) {
+  const [motsCles, setMotsCles] = useState(String(motsClesInitials ?? "").slice(0, 300));
   const [propositions, setPropositions] = useState([]);
   const [chargement, setChargement] = useState(false);
-  const [erreur, setErreur] = useState(null);
-  const conteneurRef = useRef(null);
+  const [erreur, setErreur] = useState("");
 
-  // Fermeture si clic hors du panneau
-  useEffect(() => {
-    function handleClickOutside(e) {
-      if (conteneurRef.current && !conteneurRef.current.contains(e.target)) {
-        surFermeture();
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [surFermeture]);
+  if (!ouvert) return null;
 
-  const generer = useCallback(async () => {
-    if (!motsCles?.trim() || chargement) return;
+  const generer = async (event) => {
+    event.preventDefault();
+    const contexte = motsCles.trim();
+    if (!contexte || chargement) return;
+
     setChargement(true);
-    setErreur(null);
+    setErreur("");
+    setPropositions([]);
     try {
-      const api = window.profilApi;
-      if (!api?.copilot) {
-        setErreur("Service copilot indisponible.");
-        setChargement(false);
-        return;
-      }
-      const { data } = await api.copilot(section, motsCles);
-      if (data?.propositions?.length) {
-        setPropositions(data.propositions);
-      } else {
-        setErreur("Aucune proposition générée — essaie d'autres mots-clés.");
+      const resultat = await genererPropositions(contexte);
+      const liste = Array.isArray(resultat)
+        ? resultat
+        : resultat?.propositions ?? resultat?.[section] ?? [];
+      if (liste.length) setPropositions(liste);
+      else {
+        setErreur(
+          typeof resultat?.detail === "string"
+            ? resultat.detail
+            : "Aucune proposition disponible. Essaie d'autres mots-clés.",
+        );
       }
     } catch (e) {
-      setErreur("Service indisponible — réessaie plus tard.");
+      const detail = e?.response?.data?.detail;
+      setErreur(
+        typeof detail === "string"
+          ? detail
+          : "L'assistant n'est pas disponible pour le moment. Réessaie dans un instant.",
+      );
     } finally {
       setChargement(false);
     }
-  }, [section, motsCles, chargement]);
-
-  // Auto-génération au montage si motsCles fourni
-  useEffect(() => {
-    let mounted = true;
-    if (motsCles?.trim() && !propositions.length && mounted) {
-      generer();
-    }
-    return () => { mounted = false; };
-  }, [motsCles, section, propositions.length, generer]);
-
-  if (!motsCles?.trim() && !propositions.length) return null;
+  };
 
   return (
     <AnimatePresence>
-      <motion.div
-        ref={conteneurRef}
+      <motion.section
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: 0.15 }}
-        className={cx(
-          "absolute z-20 w-full max-w-xs mt-1.5 rounded-[var(--radius-card)]",
-          "border border-[var(--emsp-cream)]/20 bg-[var(--bg-panel)] shadow-[var(--shadow-panel)] overflow-hidden"
-        )}
+        transition={{ duration: 0.16 }}
+        aria-label="Assistant de rédaction"
+        className="mt-3 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-structural)] bg-[var(--bg-panel)] shadow-[var(--shadow-card)]"
       >
-        {/* En-tête */}
-        <div className="flex items-center justify-between gap-2 p-3 border-b border-[var(--emsp-cream)]/15">
+        <header className="flex items-center justify-between gap-3 border-b border-[var(--border-soft)] px-4 py-3">
           <div className="flex items-center gap-2">
-            <ChipIA />
-            <span className="text-sm font-semibold text-[var(--text-primary)]">
-              Copilot — 3 propositions
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--emsp-gold)]/15 text-[var(--accent-green)]">
+              <WandSparkles size={16} aria-hidden="true" />
             </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-[var(--text-primary)]">Assistant de rédaction</span>
+                <ChipIA />
+              </div>
+              <p className="text-xs text-[var(--text-muted)]">Donne-lui quelques mots pour personnaliser les idées.</p>
+            </div>
           </div>
           <button
             type="button"
             onClick={surFermeture}
-            disabled={desactive}
-            className="flex-shrink-0 rounded-full p-1 text-[var(--text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)]"
-            aria-label="Fermer le copilot"
+            className="rounded-full p-1.5 text-[var(--text-muted)] hover:bg-[var(--hover-bg)] hover:text-[var(--text-primary)]"
+            aria-label="Fermer l'assistant de rédaction"
           >
             <X size={16} aria-hidden="true" />
           </button>
-        </div>
+        </header>
 
-        {/* Contenu */}
-        <div className="p-3">
-          {erreur && (
-            <p className="mb-3 text-sm text-[#b42318]" role="alert">{erreur}</p>
-          )}
+        <div className="p-4">
+          <form onSubmit={generer} className="flex flex-col gap-2 sm:flex-row">
+            <label className="min-w-0 flex-1">
+              <span className="sr-only">Mots-clés pour l'assistant</span>
+              <input
+                autoFocus
+                value={motsCles}
+                onChange={(event) => setMotsCles(event.target.value)}
+                maxLength={300}
+                placeholder="Ex. réseaux, cybersécurité, travail en équipe"
+                className="w-full rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2.5 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:border-[var(--accent-green)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-green)]/20"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={!motsCles.trim() || chargement}
+              className={cx(
+                "inline-flex min-h-10 items-center justify-center gap-2 rounded-[var(--radius-input)] px-4 py-2 text-sm font-semibold transition-colors",
+                "bg-[var(--accent-green)] text-white hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50",
+              )}
+            >
+              {chargement ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Sparkles size={15} aria-hidden="true" />}
+              {chargement ? "Préparation…" : "Générer des idées"}
+            </button>
+          </form>
 
-          {chargement ? (
-            <div className="flex items-center justify-center gap-2 py-4">
-              <Loader2 size={16} className="animate-spin text-[var(--emsp-gold)]" aria-hidden="true" />
-              <span className="text-sm text-[var(--text-muted)]">L'assistant prépare...</span>
-            </div>
-          ) : propositions.length ? (
-            <div className="flex flex-col gap-2" role="list" aria-label="Propositions du copilot">
-              {propositions.map((p, idx) => (
-                <MotionButton
-                  key={idx}
-                  type="button"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    surInsertion(p);
-                    surFermeture();
-                  }}
-                  className={cx(
-                    "w-full text-left p-3 rounded-[var(--radius-card)]",
-                    "border border-[var(--emsp-cream)]/20 bg-[var(--bg-input)]",
-                    "hover:bg-[var(--emsp-cream)]/10 transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--emsp-gold)]"
-                  )}
-                  role="listitem"
-                >
-                  <div className="flex items-start gap-2">
+          {erreur && <p className="mt-3 text-sm text-[#b42318]" role="alert">{erreur}</p>}
+
+          {propositions.length > 0 && (
+            <ul className="mt-3 flex flex-col gap-2" aria-label="Propositions de rédaction">
+              {propositions.map((proposition, index) => (
+                <li key={`${index}-${proposition}`}>
+                  <motion.button
+                    type="button"
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.04 }}
+                    onClick={() => {
+                      surInsertion(proposition);
+                      surFermeture();
+                    }}
+                    className="flex w-full items-start gap-2 rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-panel-alt)] p-3 text-left text-sm leading-relaxed text-[var(--text-primary)] transition-colors hover:border-[var(--accent-green)] hover:bg-[var(--hover-bg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-green)]"
+                  >
                     <ChipIA />
-                    <span className="flex-1 text-sm leading-relaxed text-[var(--text-primary)]">
-                      {p}
-                    </span>
-                    <ClipboardCheck size={14} className="shrink-0 text-[var(--emsp-gold)] mt-0.5" aria-hidden="true" />
-                  </div>
-                </MotionButton>
+                    <span className="min-w-0 flex-1">{proposition}</span>
+                    <ClipboardCheck size={15} className="mt-0.5 shrink-0 text-[var(--accent-green)]" aria-hidden="true" />
+                  </motion.button>
+                </li>
               ))}
-            </div>
-          ) : (
-            <p className="text-sm text-[var(--text-muted)]">
-              Saisis 2-3 mots-clés puis appuie sur Entrée pour générer.
-            </p>
+            </ul>
           )}
-        </div>
-
-        {/* Pied : info RG12.3 */}
-        <div className="px-3 pb-3 border-t border-[var(--emsp-cream)]/15">
-          <p className="flex items-center gap-1.5 text-[10px] font-medium text-[var(--emsp-gold)]">
-            <Sparkles size={10} aria-hidden="true" />
-            Généré par IA — tu choisis d'insérer
+          <p className="mt-3 flex items-center gap-1.5 text-[11px] text-[var(--text-muted)]">
+            <Sparkles size={12} className="text-[var(--emsp-gold)]" aria-hidden="true" />
+            Les suggestions ne sont insérées que lorsque tu en choisis une.
           </p>
         </div>
-      </motion.div>
+      </motion.section>
     </AnimatePresence>
   );
 }
