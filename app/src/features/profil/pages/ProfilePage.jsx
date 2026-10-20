@@ -24,6 +24,7 @@ import SectionVitrineAine from "../components/SectionVitrineAine";
 import PipelineCompletude from "../components/PipelineCompletude";
 import SectionIntention from "../components/SectionIntention";
 import ZoneDanger from "../components/ZoneDanger";
+import { authApi } from "@shared/api/auth";
 
 /**
  * /profil (doc 11 §4) — vitrine ET centre de contrôle des casquettes.
@@ -37,6 +38,8 @@ export default function ProfilePage() {
   const { data: preferencesIA } = usePreferencesIA();
   const [form, setForm] = useState(null); // null = reflète le serveur
   const [basculeDemandee, setBasculeDemandee] = useState(null); // true|false|null
+  const [formMdp, setFormMdp] = useState({ currentPassword: "", newPassword: "", confirmation: "" });
+  const [etatMdp, setEtatMdp] = useState({ message: "", erreur: "", enCours: false });
   const modifier = useModifierProfil();
   const basculer = useBasculeCandidature();
   const photo = useEnvoyerPhoto();
@@ -99,6 +102,30 @@ export default function ProfilePage() {
 
   const confirmerBascule = () => {
     basculer.mutate(basculeDemandee, { onSettled: () => setBasculeDemandee(null) });
+  };
+
+  const changerMotDePasse = async (event) => {
+    event.preventDefault();
+    setEtatMdp({ message: "", erreur: "", enCours: true });
+    if (formMdp.newPassword.length < 8) {
+      setEtatMdp({ message: "", erreur: "Le nouveau mot de passe doit contenir au moins 8 caractères.", enCours: false });
+      return;
+    }
+    if (formMdp.newPassword !== formMdp.confirmation) {
+      setEtatMdp({ message: "", erreur: "Les deux nouveaux mots de passe ne correspondent pas.", enCours: false });
+      return;
+    }
+    try {
+      const resultat = await authApi.changerMotDePasse({
+        currentPassword: formMdp.currentPassword,
+        newPassword: formMdp.newPassword,
+      });
+      setFormMdp({ currentPassword: "", newPassword: "", confirmation: "" });
+      setEtatMdp({ message: resultat.detail ?? "Mot de passe modifié. Un e-mail de confirmation a été envoyé.", erreur: "", enCours: false });
+    } catch (erreur) {
+      const detail = erreur?.response?.data?.detail ?? erreur?.response?.data?.currentPassword ?? erreur?.response?.data?.newPassword;
+      setEtatMdp({ message: "", erreur: Array.isArray(detail) ? detail[0] : detail ?? "Modification impossible. Vérifie les informations et réessaie.", enCours: false });
+    }
   };
 
   return (
@@ -164,6 +191,30 @@ export default function ProfilePage() {
             desactive={false}
           />
         </div>
+      </section>
+
+      <section aria-labelledby="titre-securite" className="rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel)] p-5 shadow-[var(--shadow-card)]">
+        <h2 id="titre-securite" className="mb-2 font-display text-base font-bold text-[var(--text-primary)]">Sécurité du compte</h2>
+        <p className="mb-4 text-sm text-[var(--text-muted)]">Après modification, un e-mail de confirmation sera envoyé à {moi.email}.</p>
+        <form onSubmit={changerMotDePasse} className="grid gap-3 sm:grid-cols-2">
+          <label className="flex flex-col gap-1 text-xs font-semibold text-[var(--text-muted)] sm:col-span-2">
+            Mot de passe actuel
+            <input type="password" autoComplete="current-password" required value={formMdp.currentPassword} onChange={(e) => setFormMdp({ ...formMdp, currentPassword: e.target.value })} className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2.5 text-sm font-normal text-[var(--text-primary)]" />
+          </label>
+          <label className="flex flex-col gap-1 text-xs font-semibold text-[var(--text-muted)]">
+            Nouveau mot de passe
+            <input type="password" autoComplete="new-password" minLength={8} required value={formMdp.newPassword} onChange={(e) => setFormMdp({ ...formMdp, newPassword: e.target.value })} className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2.5 text-sm font-normal text-[var(--text-primary)]" />
+          </label>
+          <label className="flex flex-col gap-1 text-xs font-semibold text-[var(--text-muted)]">
+            Confirmer le nouveau mot de passe
+            <input type="password" autoComplete="new-password" minLength={8} required value={formMdp.confirmation} onChange={(e) => setFormMdp({ ...formMdp, confirmation: e.target.value })} className="rounded-[var(--radius-input)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2.5 text-sm font-normal text-[var(--text-primary)]" />
+          </label>
+          <div className="sm:col-span-2">
+            {etatMdp.erreur && <p role="alert" className="mb-3 text-sm text-[var(--danger)]">{etatMdp.erreur}</p>}
+            {etatMdp.message && <p role="status" className="mb-3 text-sm text-[var(--accent-green)]">{etatMdp.message}</p>}
+            <Button type="submit" loading={etatMdp.enCours}>Modifier le mot de passe</Button>
+          </div>
+        </form>
       </section>
 
       <ZoneDanger

@@ -1,14 +1,10 @@
 import { z } from "zod";
 
-/** Règles connexion — doc 02 §5 (RG4 : domaine @emsp.int exclusivement). */
+/** Un compte administrateur peut aussi utiliser une adresse de gestion externe. */
 export const schemaConnexion = z.object({
   email: z
     .string()
     .min(1, "L'e-mail est requis.")
-    .email("Adresse e-mail invalide.")
-    .refine(
-      (valeur) => valeur.toLowerCase().endsWith("@emsp.int"),
-      "Utilise ton adresse @emsp.int — les comptes externes ne sont pas admis.",
-    ),
+    .email("Adresse e-mail invalide."),
   motDePasse: z.string().min(1, "Le mot de passe est requis."),
 });

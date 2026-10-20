@@ -107,6 +107,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "TOKEN_OBTAIN_SERIALIZER": "comptes.serializers.JetonConnexionSerializer",
+    "DEFAULT_THROTTLE_RATES": {"auth_email": "8/hour", "auth_password": "12/hour"},
 }
 
 SIMPLE_JWT = {
@@ -126,6 +127,20 @@ SIMPLE_JWT_REFRESH_COOKIE = "refresh_token"
 
 CORS_ALLOWED_ORIGINS = [os.environ.get("FRONT_ORIGIN", "http://localhost:5200")]
 CORS_ALLOW_CREDENTIALS = True
+FRONT_ORIGIN = os.environ.get("FRONT_ORIGIN", "http://localhost:5200").rstrip("/")
+
+# Les messages partent par la console en développement et via le relais SMTP
+# Brevo en production. Aucun identifiant n'est enregistré dans le dépôt.
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp-relay.brevo.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "true").lower() in {"1", "true", "yes"}
+EMAIL_HOST_USER = os.environ.get("BREVO_SMTP_LOGIN", "")
+EMAIL_HOST_PASSWORD = os.environ.get("BREVO_SMTP_KEY", "")
+DEFAULT_FROM_EMAIL = os.environ.get("BREVO_FROM_EMAIL", "")
+PASSWORD_RESET_TIMEOUT = 60 * 60
 
 # ── Channels ──────────────────────────────────────────────────────────────────
 # Dev : InMemoryChannelLayer (mono-process). Prod : channels-redis via env.

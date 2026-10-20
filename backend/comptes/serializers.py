@@ -1,6 +1,9 @@
 """Comptes — serializers (shape utilisateur + User v2 doc 11)."""
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from .models import Binome, User
@@ -206,6 +209,66 @@ class JetonConnexionSerializer(TokenObtainPairSerializer):
     default_error_messages = {
         "no_active_account": "E-mail ou mot de passe incorrect.",
     }
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not self.user.email_verifie:
+            raise AuthenticationFailed(
+                "Confirme ton adresse e-mail avant de te connecter.", code="email_non_verifie"
+            )
+        return data
+
+
+class InscriptionSerializer(serializers.Serializer):
+    """Création d'un compte étudiant; le rôle admin reste réservé au backend."""
+
+    email = serializers.EmailField()
+    prenom = serializers.CharField(max_length=80, trim_whitespace=True)
+    nom = serializers.CharField(max_length=80, trim_whitespace=True)
+    classe = serializers.CharField(max_length=40)
+    filiere = serializers.CharField(max_length=120)
+    password = serializers.CharField(write_only=True, min_length=8)
+    casquette = serializers.ChoiceField(choices=("cadet", "aine"))
+    acceptConditions = serializers.BooleanField()
+
+    def validate_email(self, value):
+        value = value.strip().lower()
+        if not value.endswith("@emsp.int"):
+            raise serializers.ValidationError("Utilise ton adresse e-mail @emsp.int.")
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("Un compte utilise déjà cette adresse.")
+        return value
+
+    def validate(self, attrs):
+        if not attrs["acceptConditions"]:
+            raise serializers.ValidationError(
+                {"acceptConditions": "Tu dois accepter les conditions d'utilisation."}
+            )
+        niveau = attrs["classe"].strip().split()[0].upper()
+        if attrs["casquette"] == "aine" and niveau not in {"L2", "L3", "M1", "M2"}:
+            raise serializers.ValidationError(
+                {"casquette": "Le rôle Aîné est réservé aux étudiants à partir de L2."}
+            )
+        try:
+            validate_password(attrs["password"])
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError({"password": exc.messages}) from exc
+        return attrs
+
+    def create(self, validated_data):
+        casquette = validated_data.pop("casquette")
+        validated_data.pop("acceptConditions")
+        password = validated_data.pop("password")
+        niveau = validated_data["classe"].strip().split()[0].upper()
+        if niveau not in User.Niveau.values:
+            niveau = User.Niveau.L1
+        return User.objects.create_user(
+            **validated_data,
+            password=password,
+            niveau_etude=niveau,
+            candidature_aine_ouverte=casquette == "aine",
+            email_verifie=False,
+        )
 
 
 class BinomeSerializer(serializers.ModelSerializer):

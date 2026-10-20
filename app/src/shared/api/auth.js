@@ -20,6 +20,16 @@ export const authApi = {
   },
   inscription: async (formulaire) =>
     (await apiClient.post("/api/auth/inscription/", formulaire)).data,
+  verifierEmail: async (uid, token) =>
+    (await apiClient.post("/api/auth/verifier-email/", { uid, token })).data,
+  renvoyerConfirmation: async (email) =>
+    (await apiClient.post("/api/auth/renvoyer-confirmation/", { email })).data,
+  demanderReinitialisation: async (email) =>
+    (await apiClient.post("/api/auth/mot-de-passe-oublie/", { email })).data,
+  reinitialiserMotDePasse: async ({ uid, token, password }) =>
+    (await apiClient.post("/api/auth/reinitialiser-mot-de-passe/", { uid, token, password })).data,
+  changerMotDePasse: async ({ currentPassword, newPassword }) =>
+    (await apiClient.post("/api/auth/changer-mot-de-passe/", { currentPassword, newPassword })).data,
   deconnexion: async () => {
     definirJeton(null);
     return apiClient.post("/api/auth/deconnexion/");

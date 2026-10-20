@@ -6,6 +6,7 @@ import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
 import { Input } from "@shared/components/Input";
 import { Link, useNavigate } from "react-router-dom";
+import { authApi } from "@shared/api/auth";
 
 /**
  * Page Inscription — P03 (doc 02 §4, doc 16 §4).
@@ -28,6 +29,8 @@ export default function InscriptionPage() {
   const [erreurs, setErreurs] = useState({});
   const [soumission, setSoumission] = useState(false);
   const [voirMdp, setVoirMdp] = useState(false);
+  const [renvoiEnCours, setRenvoiEnCours] = useState(false);
+  const [messageRenvoi, setMessageRenvoi] = useState("");
 
   const CLASSES = [
     "L1", "L2", "L3", "M1", "M2"
@@ -79,13 +82,38 @@ export default function InscriptionPage() {
 
     setSoumission(true);
     try {
-      // TODO: appel API inscription
-      await new Promise((r) => setTimeout(r, 1000));
+      await authApi.inscription({
+        email: form.email.trim(),
+        prenom: form.prenom.trim(),
+        nom: form.nom.trim(),
+        classe: form.classe,
+        filiere: form.filiere,
+        password: form.motDePasse,
+        casquette: form.casquette,
+        acceptConditions: form.acceptConditions,
+      });
       setEtape(4);
-    } catch {
-      setErreurs({ global: "Erreur serveur — réessaie plus tard" });
+    } catch (erreur) {
+      const detail = erreur?.response?.data?.detail ?? erreur?.response?.data;
+      const premier = detail && typeof detail === "object"
+        ? Object.values(detail).flat()[0]
+        : detail;
+      setErreurs({ global: typeof premier === "string" ? premier : "Inscription impossible — vérifie les informations et réessaie." });
     } finally {
       setSoumission(false);
+    }
+  }
+
+  async function renvoyerConfirmation() {
+    setRenvoiEnCours(true);
+    setMessageRenvoi("");
+    try {
+      const resultat = await authApi.renvoyerConfirmation(form.email.trim());
+      setMessageRenvoi(resultat.detail);
+    } catch (erreur) {
+      setMessageRenvoi(erreur?.response?.data?.detail ?? "Envoi impossible pour le moment. Réessaie plus tard.");
+    } finally {
+      setRenvoiEnCours(false);
     }
   }
 
@@ -179,8 +207,12 @@ export default function InscriptionPage() {
                 </motion.div>
                 <h2 className="font-display text-xl font-bold text-[var(--text-primary)]">Compte créé !</h2>
                 <p className="mt-2 text-sm text-[var(--text-muted)]">
-                  Un email de vérification a été envoyé à <strong>{form.email}</strong>.
+                  Un e-mail de confirmation a été envoyé à <strong>{form.email}</strong>. Clique sur le lien reçu avant de te connecter.
                 </p>
+                <button type="button" onClick={renvoyerConfirmation} disabled={renvoiEnCours} className="mt-4 text-sm font-semibold text-[var(--accent-green)] hover:underline disabled:opacity-60">
+                  {renvoiEnCours ? "Envoi…" : "Renvoyer l’e-mail de confirmation"}
+                </button>
+                {messageRenvoi && <p role="status" className="mt-2 text-xs text-[var(--text-muted)]">{messageRenvoi}</p>}
                 <Button className="mt-6 w-full" size="lg" onClick={() => navigate("/connexion")}>
                   Aller à la connexion
                 </Button>

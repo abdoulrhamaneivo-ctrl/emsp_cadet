@@ -5,7 +5,8 @@ import { cx } from "@shared/utils/cx";
 import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
 import { Input } from "@shared/components/Input";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { authApi } from "@shared/api/auth";
 
 /**
  * Page Réinitialisation mot de passe — P05 (doc 02 §4, doc 16 §4).
@@ -13,9 +14,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
  */
 export default function ReinitialiserMotDePassePage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const uid = searchParams.get("uid");
-  const token = searchParams.get("token");
+  const { uid, token } = useParams();
   const [form, setForm] = useState({ motDePasse: "", confirmerMdp: "" });
   const [etape, setEtape] = useState("formulaire"); // formule | succes
   const [erreur, setErreur] = useState("");
@@ -39,11 +38,11 @@ export default function ReinitialiserMotDePassePage() {
     }
     setSoumission(true);
     try {
-      // TODO: appel API reset password avec uid + token
-      await new Promise((r) => setTimeout(r, 1000));
+      await authApi.reinitialiserMotDePasse({ uid, token, password: form.motDePasse });
       setEtape("succes");
-    } catch {
-      setErreur("Erreur — lien invalide ou expiré");
+    } catch (erreur) {
+      const detail = erreur?.response?.data?.detail ?? erreur?.response?.data?.password;
+      setErreur(Array.isArray(detail) ? detail[0] : detail ?? "Erreur — lien invalide ou expiré");
     } finally {
       setSoumission(false);
     }

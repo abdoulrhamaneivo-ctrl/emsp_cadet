@@ -21,6 +21,14 @@ from ia.faq_view import FAQView
 from ia.offres_view import GenererOffreView
 from ia.silence import detecter_binomes_silencieux  # noqa: F401 - used in admin_views
 from .admin_views import BinomesSilencieuxView
+from .auth_views import (
+    ChangerMotDePasseView,
+    DemanderReinitialisationView,
+    InscriptionView,
+    ReinitialiserMotDePasseView,
+    RenvoyerConfirmationView,
+    VerifierEmailView,
+)
 from .views import ConnexionView, DeconnexionView, RafraichirView, SessionView
 
 urlpatterns = [
@@ -28,6 +36,12 @@ urlpatterns = [
     path("auth/refresh/", RafraichirView.as_view()),
     path("auth/deconnexion/", DeconnexionView.as_view()),
     path("auth/session/", SessionView.as_view()),
+    path("auth/inscription/", InscriptionView.as_view()),
+    path("auth/verifier-email/", VerifierEmailView.as_view()),
+    path("auth/renvoyer-confirmation/", RenvoyerConfirmationView.as_view()),
+    path("auth/mot-de-passe-oublie/", DemanderReinitialisationView.as_view()),
+    path("auth/reinitialiser-mot-de-passe/", ReinitialiserMotDePasseView.as_view()),
+    path("auth/changer-mot-de-passe/", ChangerMotDePasseView.as_view()),
     path("me/", MoiView.as_view()),
     path("me/visibilite-annuaire/", VisibiliteAnnuaireView.as_view()),
     path("me/preferences-ia/", PreferencesIAView.as_view()),

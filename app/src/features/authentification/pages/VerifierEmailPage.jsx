@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Mail, CheckCircle, AlertCircle, Loader2, Sparkles } from "lucide-react";
 import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { authApi } from "@shared/api/auth";
 
 /**
  * Page Vérification email — P06 (doc 02 §4, doc 16 §4).
@@ -11,9 +12,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
  */
 export default function VerifierEmailPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const uid = searchParams.get("uid");
-  const token = searchParams.get("token");
+  const { uid, token } = useParams();
   const [etat, setEtat] = useState("verification"); // verification | succes | erreur
   const [message, setMessage] = useState("");
 
@@ -23,17 +22,15 @@ export default function VerifierEmailPage() {
       setMessage("Lien invalide ou manquant");
       return;
     }
-    // TODO: appel API vérification email avec uid + token
     const verifier = async () => {
       setEtat("verification");
       try {
-        await new Promise((r) => setTimeout(r, 1500));
-        // Simuler succès
+        const resultat = await authApi.verifierEmail(uid, token);
         setEtat("succes");
-        setMessage("Ton email a été vérifié avec succès !");
-      } catch {
+        setMessage(resultat.detail ?? "Ton adresse e-mail a été confirmée.");
+      } catch (erreur) {
         setEtat("erreur");
-        setMessage("Lien invalide ou expiré");
+        setMessage(erreur?.response?.data?.detail ?? "Lien invalide ou expiré");
       }
     };
     verifier();

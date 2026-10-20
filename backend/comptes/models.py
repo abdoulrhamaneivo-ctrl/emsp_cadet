@@ -39,6 +39,9 @@ class User(AbstractUser):
     objects = GestionnaireUtilisateur()
 
     email = models.EmailField("email", unique=True)
+    # Les comptes existants restent vérifiés. L'inscription publique crée
+    # explicitement les nouveaux comptes avec email_verifie=False.
+    email_verifie = models.BooleanField("email vérifié", default=True)
     prenom = models.CharField("prénom", max_length=80, blank=True)
     nom = models.CharField("nom", max_length=80, blank=True)
     filiere = models.CharField("filière", max_length=120, blank=True)

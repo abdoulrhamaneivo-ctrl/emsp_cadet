@@ -6,6 +6,7 @@ import Card from "@shared/components/Card";
 import Button from "@shared/components/Button";
 import { Input } from "@shared/components/Input";
 import { Link, useNavigate } from "react-router-dom";
+import { authApi } from "@shared/api/auth";
 
 /**
  * Page Mot de passe oublié — P04 (doc 02 §4, doc 16 §4).
@@ -21,17 +22,16 @@ export default function MotDePasseOubliePage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setErreur("");
-    if (!email || !email.endsWith("@emsp.int")) {
-      setErreur("Utilise ton email @emsp.int");
+    if (!email) {
+      setErreur("Saisis l'adresse e-mail associée à ton compte.");
       return;
     }
     setEnvoi(true);
     try {
-      // TODO: appel API demande reset
-      await new Promise((r) => setTimeout(r, 800));
+      await authApi.demanderReinitialisation(email.trim());
       setEtape("envoye");
-    } catch {
-      setErreur("Erreur serveur — réessaie plus tard");
+    } catch (erreur) {
+      setErreur(erreur?.response?.data?.detail ?? "Envoi impossible pour le moment — réessaie plus tard.");
     } finally {
       setEnvoi(false);
     }
@@ -68,7 +68,7 @@ export default function MotDePasseOubliePage() {
               </h1>
               <p className="mt-1 text-sm text-[var(--text-muted)]">
                 {etape === "demande"
-                  ? "Entre ton email @emsp.int pour recevoir un lien de réinitialisation"
+                  ? "Entre l'adresse e-mail associée à ton compte pour recevoir un lien de réinitialisation"
                   : "Un lien a été envoyé à ton adresse email"}
               </p>
             </div>
@@ -84,7 +84,7 @@ export default function MotDePasseOubliePage() {
 
                 <div className="space-y-2">
                   <label className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold text-[var(--text-muted)]">Email @emsp.int *</span>
+                    <span className="text-xs font-semibold text-[var(--text-muted)]">Adresse e-mail *</span>
                     <div className="relative">
                       <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
                       <Input

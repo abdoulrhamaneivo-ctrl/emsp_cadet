@@ -9,12 +9,18 @@ verbatim du front T3a (mocks MSW `app/src/shared/mocks/handlers-t3.js`).
 cd backend
 uv sync                          # installe .venv (Python 3.13)
 uv run python manage.py migrate
-uv run python manage.py seed_demo   # démo : Ivo/Awa, conv 101 + famille, RDV demain 14h
 uv run python manage.py runserver 8000
 ```
 
-Comptes de démo : `ivo.abdoul@emsp.int`, `awa.kouassi@emsp.int`, `yann.gbagbo@emsp.int`,
-`salim.cisse@emsp.int` — mot de passe `demo` (JAMAIS en prod).
+La base démarre sans compte ni contenu de démonstration. Crée les comptes administrateurs
+explicitement avec `uv run python manage.py createsuperuser`.
+
+## E-mails Brevo
+
+En production, configurer dans Render `BREVO_SMTP_LOGIN`, `BREVO_SMTP_KEY` (clé SMTP),
+et `BREVO_FROM_EMAIL` (adresse expéditeur vérifiée dans Brevo). Les liens de confirmation
+et de réinitialisation pointent vers `FRONT_ORIGIN`; les demandes de création de compte
+restent bloquées si l'envoi Brevo n'est pas configuré.
 
 ## Qualité
 

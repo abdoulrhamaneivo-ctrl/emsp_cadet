@@ -66,20 +66,23 @@ html.dark .app .paper {
 
 html.dark .app #communaute {
   background-image:
-    linear-gradient(rgba(14, 23, 17, .82), rgba(14, 23, 17, .88)),
-    url("/images/community-background.svg");
+    linear-gradient(115deg, rgba(14, 23, 17, .72), rgba(14, 23, 17, .79)),
+    url("/images/emsp/rencontre.webp");
   background-size: cover, cover;
   background-position: center;
 }
 
 html.dark .app #evenements {
   background-image:
-    linear-gradient(rgba(14, 23, 17, .82), rgba(14, 23, 17, .88)),
-    url("/images/campus-horizon.svg");
-  background-size: cover, min(1600px, 100vw) auto;
-  background-position: center, center bottom;
+    linear-gradient(110deg, rgba(14, 23, 17, .72), rgba(14, 23, 17, .8)),
+    url("/images/emsp/evenement.webp");
+  background-size: cover, cover;
+  background-position: center;
 }
 
+html.dark .app .hero2 {
+  background-image:linear-gradient(110deg,rgba(14,23,17,.77),rgba(14,23,17,.68)),url("/images/emsp/promo-campus.webp");
+}
 html.dark .app .hero2::before { opacity: .18; }
 
 html.dark .app :is(

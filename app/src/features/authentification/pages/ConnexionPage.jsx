@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { AtSign, CalendarCheck, Eye, EyeOff, GraduationCap, KeyRound, LogIn, MessageSquareText, MousePointerClick, TriangleAlert } from "lucide-react";
+import { AtSign, CalendarCheck, Eye, EyeOff, GraduationCap, KeyRound, LogIn, MessageSquareText, TriangleAlert } from "lucide-react";
 import { authApi } from "@shared/api/auth";
 import { useAuth } from "@app/providers/Auth";
 import Button from "@shared/components/Button";
 import { FormField, Input } from "@shared/components/Input";
 import { schemaConnexion } from "../schemas";
+import { Link } from "react-router-dom";
 
 const ressorts = { type: "spring", stiffness: 260, damping: 30, mass: 0.9 };
 
@@ -26,12 +27,6 @@ const points = [
     titre: "Jamais une séance manquée",
     texte: "Rendez-vous confirmés et rappel 48 h avant, sans y penser.",
   },
-];
-
-/** Comptes seedés par `uv run manage.py seed_demo` (doc 21 §8) — un clic remplit le formulaire. */
-const comptesDemo = [
-  { email: "ivo.abdoul@emsp.int", role: "Cadet & Aîné — L2 Digitalisation" },
-  { email: "awa.kouassi@emsp.int", role: "Aînée — L3 Réseaux" },
 ];
 
 export default function ConnexionPage() {
@@ -54,12 +49,6 @@ export default function ConnexionPage() {
   const poser = (champ) => (evenement) => {
     setChamps((c) => ({ ...c, [champ]: evenement.target.value }));
     setErreurs((e) => ({ ...e, [champ]: undefined }));
-    setErreurServeur(null);
-  };
-
-  const remplirDemo = (email) => {
-    setChamps({ email, motDePasse: "demo" });
-    setErreurs({});
     setErreurServeur(null);
   };
 
@@ -142,7 +131,7 @@ export default function ConnexionPage() {
         </div>
 
         <p className="relative mt-10 border-t border-white/15 pt-5 text-xs font-semibold text-[var(--emsp-cream)]/85">
-          Plateforme interne — réservée aux comptes @emsp.int.
+          Accès réservé aux comptes EMSP Connect autorisés.
         </p>
       </motion.section>
 
@@ -166,7 +155,7 @@ export default function ConnexionPage() {
             Entre dans ton espace.
           </h2>
           <p className="mt-2 text-sm text-[var(--text-muted)]">
-            Une seule adresse : ton e-mail institutionnel @emsp.int.
+            Utilise l'adresse e-mail associée à ton compte EMSP Connect.
           </p>
 
           {erreurServeur && (
@@ -219,37 +208,15 @@ export default function ConnexionPage() {
               />
             </FormField>
 
+            <Link to="/mot-de-passe-oublie" className="-mt-2 self-end text-sm font-semibold text-[var(--accent-green)] hover:underline">
+              Mot de passe oublié ?
+            </Link>
+
             <Button type="submit" size="lg" loading={enCours} icon={LogIn} className="mt-1 w-full justify-center">
               Se connecter
             </Button>
           </form>
 
-          <div className="mt-8 rounded-[var(--radius-card)] border border-[var(--border-soft)] bg-[var(--bg-panel-alt)] p-4">
-            <p className="text-xs font-bold text-[var(--text-primary)]">Comptes de démonstration</p>
-            <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-              Un clic remplit le formulaire (mot de passe <code className="font-mono">demo</code>).
-            </p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-              {comptesDemo.map(({ email, role }) => (
-                <button
-                  key={email}
-                  type="button"
-                  onClick={() => remplirDemo(email)}
-                  className="group flex flex-1 items-center justify-between gap-2 rounded-[var(--radius-chip)] border border-[var(--border-soft)] bg-[var(--bg-input)] px-3 py-2 text-left transition-[border-color,box-shadow] hover:border-[var(--accent-gold)] hover:shadow-[var(--shadow-card-hover)]"
-                >
-                  <span>
-                    <span className="block text-xs font-bold text-[var(--text-primary)]">{email.split("@")[0]}</span>
-                    <span className="block text-[11px] text-[var(--text-muted)]">{role}</span>
-                  </span>
-                  <MousePointerClick
-                    size={15}
-                    aria-hidden="true"
-                    className="shrink-0 text-[var(--text-muted)] transition-colors group-hover:text-[var(--accent-gold)]"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </motion.section>
     </div>
