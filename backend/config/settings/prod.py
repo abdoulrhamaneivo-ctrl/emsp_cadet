@@ -1,7 +1,7 @@
 """Configuration de production : Render, Neon et Cloudinary."""
 
 import os
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
@@ -37,20 +37,54 @@ if not DATABASE_URL:
     raise ImproperlyConfigured("DATABASE_URL doit pointer vers PostgreSQL Neon.")
 DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)}
 
-if not (
-    os.environ.get("CLOUDINARY_URL")
-    or all(
-        os.environ.get(cle)
-        for cle in (
-            "CLOUDINARY_CLOUD_NAME",
-            "CLOUDINARY_API_KEY",
-            "CLOUDINARY_API_SECRET",
-        )
+cloudinary_cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip()
+cloudinary_api_key = os.environ.get("CLOUDINARY_API_KEY", "").strip()
+cloudinary_api_secret = os.environ.get("CLOUDINARY_API_SECRET", "").strip()
+cloudinary_url = os.environ.get("CLOUDINARY_URL", "").strip()
+
+if all((cloudinary_cloud_name, cloudinary_api_key, cloudinary_api_secret)):
+    cloudinary_credentials = (
+        cloudinary_cloud_name,
+        cloudinary_api_key,
+        cloudinary_api_secret,
     )
-):
+elif cloudinary_url:
+    parsed_cloudinary_url = urlparse(cloudinary_url)
+    cloudinary_credentials = (
+        parsed_cloudinary_url.hostname,
+        unquote(parsed_cloudinary_url.username or ""),
+        unquote(parsed_cloudinary_url.password or ""),
+    )
+    if (
+        parsed_cloudinary_url.scheme != "cloudinary"
+        or not all(cloudinary_credentials)
+    ):
+        raise ImproperlyConfigured(
+            "CLOUDINARY_URL doit contenir un nom de cloud, une clé et un secret valides."
+        )
+else:
     raise ImproperlyConfigured(
         "CLOUDINARY_URL (ou CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET) doit être configuré."
     )
+
+# Cloudinary Python donne la priorité à CLOUDINARY_CLOUD_NAME sur
+# CLOUDINARY_URL. Si Render contient des variables individuelles incomplètes,
+# cela masque alors le secret présent dans l'URL. En résolvant les identifiants
+# ici puis en les fournissant explicitement aux deux intégrations Django, on
+# évite cette configuration partielle tout en gardant les secrets hors du code.
+CLOUDINARY = {
+    "cloud_name": cloudinary_credentials[0],
+    "api_key": cloudinary_credentials[1],
+    "api_secret": cloudinary_credentials[2],
+    "secure": True,
+}
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": cloudinary_credentials[0],
+    "API_KEY": cloudinary_credentials[1],
+    "API_SECRET": cloudinary_credentials[2],
+    "SECURE": True,
+    "PREFIX": "emsp-connect",
+}
 
 INSTALLED_APPS = [
     *INSTALLED_APPS,
@@ -78,8 +112,6 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
-
-CLOUDINARY_STORAGE = {"SECURE": True, "PREFIX": "emsp-connect"}
 
 CORS_ALLOWED_ORIGINS = [FRONT_ORIGIN]
 CORS_ALLOW_CREDENTIALS = True
