@@ -1,0 +1,248 @@
+/* Unified dark palette and the campus photo treatment. */
+html.dark {
+  color-scheme: dark;
+  --bg-page: #0e1711;
+  --bg-panel: #152119;
+  --bg-panel-alt: #1c2c22;
+  --text-primary: #edf4ef;
+  --text-muted: #b2c1b7;
+  --border-soft: #304338;
+  --border-structural: #465a4c;
+  --bg-input: #1b2a20;
+  --hover-bg: #22372a;
+  --accent-green: #77d396;
+  --accent-gold: #ffce45;
+  --danger: #ff938b;
+  --danger-solid: #b3261e;
+  --shadow-panel: 0 10px 32px -12px rgba(0, 0, 0, .52), 0 2px 8px rgba(0, 0, 0, .28);
+  --shadow-card: 0 4px 18px -6px rgba(0, 0, 0, .44), 0 1px 3px rgba(0, 0, 0, .25);
+  --shadow-card-hover: 0 14px 34px -10px rgba(0, 0, 0, .58), 0 3px 10px rgba(0, 0, 0, .3);
+
+  --emsp-cream: #edf4ef;
+  --emsp-cream-alt: #1c2c22;
+  --emsp-green-luminous: #77d396;
+}
+
+html.dark body {
+  color: var(--text-primary);
+  background: var(--bg-page);
+}
+
+html.dark .app {
+  --bg: #0e1711;
+  --sf: #152119;
+  --sf2: #1c2c22;
+  --ink: #edf4ef;
+  --mut: #b2c1b7;
+  --line: #304338;
+  --line2: #465a4c;
+  --pri: #77d396;
+  --pri2: #9ce2b2;
+  --pri-s: #203a29;
+  --acc-s: #40381f;
+  --ok: #78d59a;
+  --ok-s: #1e3a28;
+  --warn: #f3c26b;
+  --warn-s: #3e311c;
+  --err: #ff938b;
+  --err-s: #492522;
+  --info: #9cbffd;
+  --info-s: #22334d;
+  --paper: #142119;
+  --forest: #0b2c1b;
+  --wood: #8a6330;
+  --chalk: #ffe272;
+  --sh1: 0 3px 8px rgba(0, 0, 0, .28), 0 12px 28px rgba(0, 0, 0, .22);
+  --sh2: 0 6px 14px rgba(0, 0, 0, .32), 0 24px 48px rgba(0, 0, 0, .38);
+}
+
+html.dark .app .paper {
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(rgba(119, 211, 150, .035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(119, 211, 150, .035) 1px, transparent 1px);
+}
+
+html.dark .app #communaute {
+  background-image:
+    linear-gradient(rgba(14, 23, 17, .82), rgba(14, 23, 17, .88)),
+    url("/images/community-background.svg");
+  background-size: cover, cover;
+  background-position: center;
+}
+
+html.dark .app #evenements {
+  background-image:
+    linear-gradient(rgba(14, 23, 17, .82), rgba(14, 23, 17, .88)),
+    url("/images/campus-horizon.svg");
+  background-size: cover, min(1600px, 100vw) auto;
+  background-position: center, center bottom;
+}
+
+html.dark .app .hero2::before { opacity: .18; }
+
+html.dark .app :is(
+  .tile, .authcard, .authaside, .dlg, .demo, .net, .network-visual,
+  .pcard3, .evc, .ticket, .arrow, .chip, .inp, .dots3, .bub2.l,
+  .car, .mcal i, .chipf, .dashboard-event, .dashboard-empty, .dashboard-note,
+  .dashboard-shortcut, .dashboard-conversation, .community-points > div
+) {
+  color: var(--ink);
+  background-color: var(--sf);
+  border-color: var(--line);
+}
+
+html.dark .app .side {
+  background: #111d15;
+  border-color: var(--line);
+}
+
+html.dark .app :is(.ph0, .top, .tabbar, .mmenu) {
+  color: var(--ink);
+  background: rgba(17, 29, 21, .97);
+  border-color: var(--line);
+}
+
+html.dark .app :is(input, select, textarea, .inp) {
+  color: var(--ink);
+  background-color: var(--bg-input);
+  border-color: var(--line2);
+}
+
+html.dark .app .chip.on {
+  color: #0b2113;
+  background: var(--pri);
+  border-color: var(--pri);
+}
+
+html.dark .app .btn.pri {
+  color: #fff;
+  background: #216d40;
+  border-color: #2a8050;
+}
+
+html.dark .app .ni.on {
+  color: #0b2113;
+  background: var(--pri);
+}
+
+html.dark .app .badge.pri {
+  color: #b8edc7;
+  background: #203a29;
+}
+
+html.dark .app .dotb {
+  background: var(--sf2);
+  border-color: var(--line2);
+}
+
+html.dark .app .dotb.on {
+  background: var(--acc);
+  border-color: var(--ink);
+}
+
+html.dark .app :is(.bt.a, .bt.b, .bt.c, .bt.d, .bt.f) {
+  color: var(--ink);
+  border-color: var(--line2);
+}
+
+html.dark .app .bt.a { background: #1b3324; }
+html.dark .app .bt.b { background: #332e1d; }
+html.dark .app :is(.bt.c, .bt.d, .bt.f) { background: var(--sf); }
+html.dark .app .bt.e { background: var(--forest); border-color: var(--line2); }
+html.dark .app .bt.e p { color: #d5e4d9; }
+
+html.dark .app .foot {
+  color: #d2ded6;
+  background: #09140d;
+}
+
+html.dark .app .mq {
+  color: #f4f8f5;
+  background: #0b3d22;
+}
+
+html.dark .app .cta3 {
+  color: #fff;
+  background: #1c6339;
+  border-color: #91b49c;
+}
+
+html.dark .app .concept-opportunity { background: #314438; }
+html.dark .app .network-node { color: var(--ink); background: var(--sf2); border-color: var(--line2); }
+html.dark .app .network-node small { color: var(--mut); }
+html.dark .app .dhero-badge,
+html.dark .app .rail-badge {
+  color: #fff;
+  background: rgba(8, 24, 15, .78);
+  border: 1px solid rgba(255, 255, 255, .28);
+  backdrop-filter: blur(8px);
+}
+
+html.dark .app .toast,
+html.dark .app .adm {
+  color: #f3f7f4;
+  background-color: #0b1910;
+}
+
+/* Hero photograph layered over the original animated campus illustration. */
+.app .campus-photo-card {
+  position: absolute;
+  z-index: 2;
+  top: 43%;
+  right: -8px;
+  width: min(250px, 55%);
+  margin: 0;
+  padding: 8px 8px 30px;
+  color: #17301f;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 18px 38px rgba(8, 22, 13, .3);
+  transform: rotate(4deg);
+  animation: rise2 .8s .5s var(--ease) both;
+  transition: transform .35s var(--spring);
+}
+
+.app .campus-photo-card:hover { transform: rotate(1deg) translateY(-4px); }
+.app .campus-photo-card img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; }
+.app .campus-photo-card figcaption { padding: 8px 4px 0; font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; }
+
+/* Genuine EMSP moments from the user's Photos folder. */
+.app .life-section { padding: 84px 0; background: var(--bg); }
+.app .life-section-heading { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr); gap: 36px; align-items: end; margin-bottom: 30px; }
+.app .life-section-heading h2 { margin: 12px 0 0; font-size: clamp(34px, 5vw, 62px); line-height: 1.02; }
+.app .life-section-heading .lead { margin: 0 0 4px; max-width: 460px; color: var(--mut); font-size: 17px; }
+.app .life-gallery { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: clamp(130px, 15vw, 190px); gap: 12px; }
+.app .life-photo { position: relative; min-width: 0; min-height: 0; margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; background: var(--sf); box-shadow: var(--sh1); }
+.app .life-photo:first-child { grid-column: span 2; grid-row: span 2; }
+.app .life-photo:nth-child(n + 6) { grid-column: span 2; }
+.app .life-photo img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .7s var(--ease), filter .35s var(--ease); }
+.app .life-photo::after { position: absolute; inset: 30% 0 0; content: ""; pointer-events: none; background: linear-gradient(transparent, rgba(5, 18, 10, .76)); }
+.app .life-photo figcaption { position: absolute; z-index: 1; right: 12px; bottom: 12px; left: 12px; display: flex; align-items: center; gap: 9px; color: #fff; font-size: 13px; font-weight: 600; line-height: 1.25; text-shadow: 0 1px 3px rgba(0, 0, 0, .35); }
+.app .life-photo-index { display: grid; width: 28px; height: 28px; flex: none; place-items: center; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; background: rgba(8,24,15,.55); font-size: 10px; }
+.app .life-photo:hover img { transform: scale(1.055); }
+.app .life-photo:focus-within { outline: 3px solid var(--pri); outline-offset: 3px; }
+
+html.dark .app .life-section { background: var(--bg); }
+html.dark .app .campus-photo-card { color: #17301f; background: #fff; }
+
+@media (max-width: 760px) {
+  .app .life-section { padding: 64px 0; }
+  .app .life-section-heading { grid-template-columns: 1fr; gap: 14px; }
+  .app .life-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: clamp(120px, 25vw, 180px); }
+}
+
+@media (max-width: 520px) {
+  .app .campus-photo-card { top: 43%; right: 0; width: min(206px, 58%); }
+  .app .life-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 150px; gap: 9px; }
+  .app .life-photo:first-child { grid-column: span 2; grid-row: span 2; }
+  .app .life-photo:nth-child(n + 6) { grid-column: span 1; }
+  .app .life-photo figcaption { right: 8px; bottom: 8px; left: 8px; gap: 6px; font-size: 11px; }
+  .app .life-photo-index { width: 24px; height: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app .campus-photo-card { animation: none; }
+  .app .life-photo img { transition: none; }
+}

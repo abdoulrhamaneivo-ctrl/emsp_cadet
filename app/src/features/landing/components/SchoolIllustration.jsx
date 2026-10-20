@@ -18,7 +18,7 @@ export default function SchoolIllustration({ reducedMotion = false }) {
     <div
       className="stage"
       role="img"
-      aria-label="Illustration animée du campus EMSP, de ses bâtiments, arbres et étudiants"
+      aria-label="Photo de la communauté EMSP superposée à une illustration animée du campus"
       onPointerMove={bouger}
       onPointerLeave={reinitialiser}
     >
@@ -93,6 +93,10 @@ export default function SchoolIllustration({ reducedMotion = false }) {
           </svg>
         </div>
       </div>
+      <figure className="campus-photo-card" aria-hidden="true">
+        <img src="/images/emsp/campus-groupe.webp" alt="" fetchPriority="high" />
+        <figcaption>La communauté EMSP</figcaption>
+      </figure>
       <div className="px6 campus-note-wrap">
         <div className="note hand" style={{ position: "relative" }}>Bienvenue à l’EMSP !</div>
       </div>

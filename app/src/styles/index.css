@@ -2,6 +2,7 @@
 @import "./globals.css";
 @import "./animations.css";
 @import "./platform.css";
+@import "./theme-polish.css";
 
 /*
  * Pont Tailwind v4 : expose la palette EMSP aux utilitaires

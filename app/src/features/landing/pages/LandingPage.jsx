@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import PlatformRail from "../components/PlatformRail";
+import PhotoGallery from "../components/PhotoGallery";
 import SchoolIllustration from "../components/SchoolIllustration";
 import StoryCarousel from "../components/StoryCarousel";
 
@@ -56,6 +57,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <PhotoGallery />
 
       <section className="sc2" id="concept">
         <div className="wrap">
