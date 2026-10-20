@@ -10,7 +10,7 @@ import { authApi } from "@shared/api/auth";
 
 /**
  * Page Mot de passe oublié — P04 (doc 02 §4, doc 16 §4).
- * Demande de réinitialisation par email @emsp.int.
+ * Demande de réinitialisation par e-mail.
  */
 export default function MotDePasseOubliePage() {
   const navigate = useNavigate();
@@ -90,7 +90,7 @@ export default function MotDePasseOubliePage() {
                       <Input
                         type="email"
                         autoComplete="email"
-                        placeholder="prenom.nom@emsp.int"
+                        placeholder="prenom.nom@exemple.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className={cx(

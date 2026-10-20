@@ -5,6 +5,7 @@ import { http, HttpResponse } from "msw";
 import ConnexionPage from "./pages/ConnexionPage";
 import { AuthProvider } from "@app/providers/Auth";
 import { server } from "@shared/mocks/server";
+import InscriptionPage from "./pages/InscriptionPage";
 
 beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
 afterEach(() => server.resetHandlers());
@@ -24,8 +25,18 @@ function renderConnexion() {
   );
 }
 
+function renderInscription() {
+  return render(
+    <MemoryRouter initialEntries={["/inscription"]}>
+      <Routes>
+        <Route path="/inscription" element={<InscriptionPage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
 function remplir(email, motDePasse) {
-  fireEvent.change(screen.getByLabelText(/E-mail institutionnel/), {
+  fireEvent.change(screen.getByLabelText(/Adresse e-mail/), {
     target: { value: email },
   });
   fireEvent.change(screen.getByLabelText(/Mot de passe/), {
@@ -74,7 +85,7 @@ describe("Connexion (doc 02 §5)", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "E-mail ou mot de passe incorrect",
     );
-    expect(screen.getByLabelText(/E-mail institutionnel/).value).toBe("ivo.abdoul@emsp.int");
+    expect(screen.getByLabelText(/Adresse e-mail/).value).toBe("ivo.abdoul@emsp.int");
   });
 
   it("succès : session résolue puis redirection vers la destination demandée", async () => {
@@ -107,5 +118,18 @@ describe("Connexion (doc 02 §5)", () => {
   it("ne propose aucun compte de démonstration prérempli", () => {
     renderConnexion();
     expect(screen.queryByRole("button", { name: /ivo\.abdoul/ })).toBeNull();
+  });
+});
+
+describe("Inscription", () => {
+  it("accepte une adresse valide en dehors du domaine emsp.int", async () => {
+    renderInscription();
+    fireEvent.change(screen.getByLabelText(/Adresse e-mail/), {
+      target: { value: "personne@gmail.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Continuer" }));
+
+    expect(await screen.findByRole("heading", { name: "Ton profil" })).toBeInTheDocument();
+    expect(screen.queryByText("Adresse e-mail invalide")).toBeNull();
   });
 });

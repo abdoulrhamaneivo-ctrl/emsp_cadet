@@ -51,7 +51,7 @@ Le code utilise `niveauEtude:"L1|L2|L3"`, `candidatureAineOuverte:boolean`, `isA
 
 | § cahier | Fonctionnalité | Routes front | Spec détaillée | Phase |
 |---|---|---|---|---|
-| §3.1 | Inscription / auth (@emsp.int) | `/inscription`, `/connexion`, `/mot-de-passe-oublie`, `/reinitialiser-mot-de-passe/:uid/:token`, `/verifier-email/:uid/:token` | ✅ construites (adapter validation email domaine) | 1 |
+| §3.1 | Inscription / auth (adresse e-mail valide, domaine libre) | `/inscription`, `/connexion`, `/mot-de-passe-oublie`, `/reinitialiser-mot-de-passe/:uid/:token`, `/verifier-email/:uid/:token` | ✅ construites (validation format + unicité) | 1 |
 | §3.2 | Annuaire + recherche + suggestion auto | `/annuaire`, `/annuaire/:parrainId` (fiche) | **Doc 04** | 1 |
 | §3.3 | Mise en relation (demandes) | `/mes-demandes` (dual-role), gestion depuis fiche | **Doc 05** | 1 |
 | §3.4 | Messagerie privée post-acceptation | `/messagerie`, `/messagerie/:conversationId` | **Doc 08** | 2 |
@@ -84,10 +84,9 @@ Le code utilise `niveauEtude:"L1|L2|L3"`, `candidatureAineOuverte:boolean`, `isA
 - Endpoint `/api/parrains/?disponible=true` (défaut du filtre).
 - Toggle avancé dans la barre de filtres : « Inclure les Aînés complets » (OFF par défaut) — utile aux admins et transparence, masqué aux cadets simples ? NON : cohérence produit, le toggle est accessible à tous mais désactivé pour cadets ayant déjà un binôme (inutile).
 
-**RG4 — Seul un email du domaine école permet de s'inscrire.**
-- Validation zod côté client AVANT soumission : regex `@emsp.int$` (config `VITE_APP_DOMAIN`).
-- Erreur inline immédiate pendant la saisie (onChange debounced 400ms), pas seulement au submit : « Utilise ton adresse EMSP (@emsp.int) ».
-- Champ prérenseigné suggérant le suffixe `@emsp.int` (input group).
+**RG4 — Toute adresse e-mail valide peut servir à créer un compte.**
+- Validation du format côté client et serveur, puis vérification de l'unicité ; aucun domaine n'est imposé.
+- L'adresse est normalisée en minuscules à l'inscription.
 
 **RG5 — Le rôle ne change que par un administrateur.**
 - `/profil` : champ rôle en lecture seule avec verrou, tooltip « Modifiable uniquement par l'administration ».
@@ -113,7 +112,7 @@ Le code utilise `niveauEtude:"L1|L2|L3"`, `candidatureAineOuverte:boolean`, `isA
 - RG2 (max 5) s'applique UNIQUEMENT aux cadets que tu portes.
 
 **RG10 — Les Alumni restent membres à part entière (nouveau, besoin réel EMSP).**
-- Définition : ancien étudiant ayant fini son cursus (fin de L3). Son `@emsp.int` est conservé (H1 doc 14), le statut basculé par l'ADMIN en transition annuelle (doc 12) avec `anneePromotion`.
+- Définition : ancien étudiant ayant fini son cursus (fin de L3). Son adresse de compte est conservée, le statut basculé par l'ADMIN en transition annuelle (doc 12) avec `anneePromotion`.
 - Capacités : il GARDE tout l'équipement étudiant (fil/commentaires, événements, RDV si binôme vivant, cercles selon relations actives) ; sa candidature Aîné (RG8) demeure disponible — un diplômé est le devancier naturel.
 - Signature visuelle : chip « ALUMNI · Promo {année} » sur fiche/cartes (StatutChip, doc 14).
 - Privilège exclusif : publication des Offres stage/alternance/emploi sur `/offres` (max 5 ouvertes simultanées), lisible par tous (doc 14).
@@ -183,7 +182,7 @@ Badges et avis n'ONT PAS de route dédiée (cf. cahier §3.8 « affichés sur le
  * @property {number} id
  * @property {string} prenom
  * @property {string} nom
- * @property {string} email            // doit finir par @emsp.int (RG4)
+ * @property {string} email            // adresse de connexion valide, domaine libre
  * @property {boolean} isAdmin                  // RG5 : accès administration (RO)
  * @property {"L1"|"L2"|"L3"|"M1"|"M2"|"alumni"} niveauEtude  // RG7/RG10/RG-doc15 : parcours complet
  * @property {"master"|"alumni"|"inconnu"} intentionAnneeSuivante  // déclaratif fin de cycle (doc 15)
@@ -273,7 +272,7 @@ Score de fiabilité (§3.6) : calcul backend = moyenne des notes ; exposition : 
 ## 6. Parcours utilisateurs canoniques
 
 ### P1 — Cadet de bout en bout (chemin heureux)
-1. `/inscription` (rôle Cadet, email @emsp.int — RG4) → `/verifier-email/:uid/:token`
+1. `/inscription` (rôle Cadet, adresse e-mail valide de tout domaine — RG4) → `/verifier-email/:uid/:token`
 2. `/accueil` vide d'engagement → hero affiche progression onboarding (photo, attentes, rechercher un Aîné)
 3. `/annuaire` → suggestion auto en tête (même filière §3.2) → filtres → fiche `/annuaire/:id`
 4. CTA « Demander ce parrain » (contrôles RG1+RG3) → confirmation → toast + redirection `/mes-demandes` (onglet Envoyées)

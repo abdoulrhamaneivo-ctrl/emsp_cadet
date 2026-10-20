@@ -7,7 +7,7 @@
 
 **EMSP Connect v2** est une plateforme de parrainage étudiant (Cadets L1–L3 / Ainés) pour l'École Multinationale des Postes d'Abidjan (EMSP).
 
-- **Domaine** : `@emsp.int` only
+- **E-mail de connexion** : toute adresse valide, sans restriction de domaine
 - **Rôles** : Filleul (Cadet), Parrain (Aîné), Administrateur
 - **Objectif** : Remplacer les processus manuels par une plateforme web fiable, mobile-first
 

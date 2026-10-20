@@ -9,7 +9,7 @@
  * @property {number} id
  * @property {string} prenom
  * @property {string} nom
- * @property {string} email            // doit finir par @emsp.int (RG4)
+ * @property {string} email            // adresse de connexion, domaine libre
  * @property {boolean} isAdmin                  // RG5 : accès administration (RO)
  * @property {"L1"|"L2"|"L3"|"M1"|"M2"|"alumni"} niveauEtude  // RG7/RG10/RG15
  * @property {"master"|"alumni"|"inconnu"} intentionAnneeSuivante  // déclaratif fin de cycle (doc 15)

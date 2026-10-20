@@ -33,7 +33,7 @@ backend/
 ├── manage.py
 ├── config/                   # settings/, urls.py, asgi.py, consumers racine
 │   └── settings/{base,dev}.py
-├── comptes/                  # User @emsp.int, JWT, suspension (423)
+├── comptes/                  # User identifie par e-mail, JWT, suspension (423)
 ├── messagerie/               # Conversation, Message, consumers WS
 └── rendezvous/               # RendezVous + machine à états
 ```
@@ -101,7 +101,7 @@ Le message temps réel est **publié depuis le viewset REST** (source de vérit�
 
 ## 5. Modèles (apps `messagerie`, `rendezvous`, `comptes`)
 
-- **comptes.User** (AbstractUser) : `email` unique = identifiant (`@emsp.int` validé au signup — le back ne crée que ça en T3b) ; `prenom`, `nom`, `filiere`, `classe`, `est_suspendu` (+ `fin_suspension`) → toute requête d'un compte suspendu : **423** `{motif, fin}` (RG11, doc 19 §4.1).
+- **comptes.User** (AbstractUser) : adresse e-mail unique, validée par format et sans restriction de domaine ; `prenom`, `nom`, `filiere`, `classe`, `est_suspendu` (+ `fin_suspension`) → toute requête d'un compte suspendu : **423** `{motif, fin}` (RG11, doc 19 §4.1).
 - **messagerie.Conversation** : `type` (prive/groupe_famille), `participants` M2M, `titre_groupe`, `icone_code`, `proprietaire_id` (groupes). Contrainte : max 1 conversation privée par paire (index fonctionnel ou validation).
 - **messagerie.Message** : `conversation` FK, `auteur` FK, `contenu` (1..2000, trim), `date_envoi` (auto), **`idempotency_key` unique (contrainte avec `(conversation, auteur)`)** — c'est le support de la règle zéro doublon.
 - **messagerie.Lecture** : `(conversation, utilisateur, dernier_message_lu_id)` — alimente `nonLus` (count des messages postérieurs à la lecture, sans l'auteur = moi).
@@ -149,4 +149,3 @@ Points d'attention : cookies `SameSite=Strict` ⇒ front et API **même origine*
 [ ] doc 20 §10 « Backend T3b » écrite + SKILL.md emsp-connect-project mis à jour
 [ ] Rituel git : feat/t3-comm-backend → commit signé → merge --no-ff → tag t3b-backend
 ```
-

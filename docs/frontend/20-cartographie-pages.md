@@ -200,11 +200,11 @@ Backend `backend/` fondé ex nihilo : Django 5 + DRF + Channels (uv, Python 3.13
 
 ### 9.7 Tranche T3c « Connexion » (P02 — doc 02 §5)
 
-Page réelle sur la route placeholder : feature `src/features/authentification/` (schemaConnexion zod RG4 `@emsp.int`, ConnexionPage split panel vert kente / formulaire crème, comptes de démo cliquables, toggle œil). `authApi.connexion` pose l'access **en mémoire** puis `session()` résout l'utilisateur ; garde inversée dans PublicShell (authentifié → `state.from` | `/messagerie`, zéro boucle) ; AuthProvider : `initialUser !== undefined` (un test peut figer l'invité avec `null`) ; mocks MSW alignés au contrat réel (`{email, password}` → `{access, utilisateur}`, 401 francisé). Backend : `JetonConnexionSerializer` (`no_active_account` en français).
+Page réelle sur la route placeholder : feature `src/features/authentification/` (schemaConnexion zod : format e-mail valide, domaine libre; RG4, ConnexionPage split panel vert kente / formulaire crème, comptes de démo cliquables, toggle œil). `authApi.connexion` pose l'access **en mémoire** puis `session()` résout l'utilisateur ; garde inversée dans PublicShell (authentifié → `state.from` | `/messagerie`, zéro boucle) ; AuthProvider : `initialUser !== undefined` (un test peut figer l'invité avec `null`) ; mocks MSW alignés au contrat réel (`{email, password}` → `{access, utilisateur}`, 401 francisé). Backend : `JetonConnexionSerializer` (`no_active_account` en français).
 
 **Pièges T3c (leçons)** —
 - `TOKEN_OBTAIN_SERIALIZER` ne s'applique qu'aux vues **génériques** DRF — une vue custom doit importer le serializer francisé directement (test 401 rouge sinon).
-- **Zod v4 rapporte TOUTES les issues** : prendre la PREMIÈRE par champ (sinon le refine « utilise ton adresse @emsp.int » écrase « requis » sur un champ vide).
+- **Zod v4 rapporte TOUTES les issues** : prendre la PREMIÈRE par champ pour préserver les messages de format et de champ requis.
 - `kente-pattern` porte `opacity` + `mask-image` : TOUJOURS une couche `absolute inset-0` dédiée — posé sur la section, il masque aussi le texte (recette annuaire T1).
 - Les `VITE_*` sont figés au **démarrage** de Vite : toute modif d'env exige un redémarrage du dev server (une instance d'un jour = page « mystère » en invité).
 - Captures : attendre la fin du fade-out du drawer (~500 ms) sinon un voile sombre couvre la capture (course d'animation, pas un bug d'app — vérifié dans le DOM : backdrop `opacity-0` au repos).

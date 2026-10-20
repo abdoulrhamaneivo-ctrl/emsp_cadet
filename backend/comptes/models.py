@@ -1,11 +1,11 @@
-"""Comptes — User @emsp.int, binôme Cadet/Aîné, suspension RG11 (doc 21 §5)."""
+"""Comptes — utilisateur identifié par e-mail, binôme Cadet/Aîné, suspension RG11."""
 
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
 
 class GestionnaireUtilisateur(BaseUserManager):
-    """Manager sans username — l'identifiant est l'email @emsp.int."""
+    """Manager sans username — l'identifiant est l'adresse e-mail."""
 
     use_in_migrations = True
 
@@ -26,7 +26,7 @@ class GestionnaireUtilisateur(BaseUserManager):
 
 
 class User(AbstractUser):
-    """Identifiant = email @emsp.int (jamais de username public)."""
+    """Identifiant = adresse e-mail (jamais de username public)."""
 
     class Niveau(models.TextChoices):
         L1 = "L1", "L1"

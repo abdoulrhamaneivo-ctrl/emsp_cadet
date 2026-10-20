@@ -4,7 +4,7 @@ import Avatar from "@shared/components/Avatar";
 
 /**
  * Section identité (doc 11 §4) : avatar XL avec badge caméra (upload photo),
- * prénom/nom éditables, email affiché avec suffixe verrouillé (RG4 — jamais
+ * prénom/nom éditables, email affiché en lecture seule (jamais
  * modifiable ici).
  */
 export default function SectionIdentite({ moi, surPrenom, surNom, surPhoto, chargementPhoto }) {

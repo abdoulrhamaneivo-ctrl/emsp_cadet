@@ -142,12 +142,6 @@ class ProfilMoiSerializer(serializers.ModelSerializer):
             )
         return valeur
 
-    def validate_email(self, valeur):
-        # RG4 : l'email reste @emsp.int (champ read_only mais double barrière).
-        if not valeur.lower().endswith("@emsp.int"):
-            raise serializers.ValidationError("Adresse @emsp.int requise.")
-        return valeur
-
     def validate(self, attributs):
         # RG7 garde (voir ci-dessus) + validation de l'intention (doc 15).
         intention = attributs.get("intention_annee_suivante")
@@ -233,8 +227,6 @@ class InscriptionSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         value = value.strip().lower()
-        if not value.endswith("@emsp.int"):
-            raise serializers.ValidationError("Utilise ton adresse e-mail @emsp.int.")
         if User.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("Un compte utilise déjà cette adresse.")
         return value

@@ -36,7 +36,7 @@ GET   /api/me/visibilite-annuaire/ // {visible:boolean, motifs:string[]}
 
 Règles hard :
 1. **RG5** : pas de changement de rôle depuis cette page ; `isAdmin` n'apparaît même pas ici (form ro ignoré).
-2. **RG4** : email modifiable uniquement vers un autre `@emsp.int` (validateur live + re-vérification backend).
+2. **RG4** : l'adresse e-mail du compte est en lecture seule après l'inscription ; le domaine n'est pas restreint.
 3. **RG7/RG10** : `PATCH candidatureAineOuverte:true` avec `niveauEtude:"L1"` → 403. L'UI le bloque AVANT (toggle disabled). Éligibles : L2, L3, M1, M2 ET alumni (le diplômé reste un devancier naturel).
 4. **RG8** : fermer la candidature ≠ casser les binômes : les cadets actifs restent accompagnés, l'Aîné disparaît seulement de l'annuaire et ne reçoit plus de nouvelles demandes (message explicite dans la modale de bascule).
 5. **RG7bis (promotion)** : changer `niveauEtude` L1→L2 ouvre la POSSIBILITÉ ; l'app propose ensuite (toast action) d'ouvrir la candidature — jamais d'ouverture automatique.
@@ -78,7 +78,7 @@ src/features/profil/
 ║ h1 "Mon profil"     [Preview publique toggle] ║
 ╠ SECTION IDENTITE (panel opaque) ═══════════════
 ║ [Avatar XL camera-badge] Prénom NOM · email   ║
-║ @emsp.int (suffixe verrouillé icon Lock)      ║
+║ adresse e-mail (lecture seule, icon Lock)    ║
 ╠ SECTION ACADEMIQUE ════════════════════════════
 ║ Classe select | Filière select                ║
 │ NIVEAU select L1/L2/L3/M1/M2 (hint « Tu      ║

@@ -10,7 +10,7 @@ import { authApi } from "@shared/api/auth";
 
 /**
  * Page Inscription — P03 (doc 02 §4, doc 16 §4).
- * Création de compte @emsp.int avec validation RG4 (casquettes).
+ * Création de compte avec une adresse e-mail valide (casquettes).
  */
 export default function InscriptionPage() {
   const navigate = useNavigate();
@@ -42,8 +42,10 @@ export default function InscriptionPage() {
 
   function validerEtape1() {
     const erreurs = {};
-    if (!form.email) erreurs.email = "Email requis";
-    else if (!form.email.endsWith("@emsp.int")) erreurs.email = "Utilise ton email @emsp.int";
+    if (!form.email.trim()) erreurs.email = "Adresse e-mail requise";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      erreurs.email = "Adresse e-mail invalide";
+    }
     setErreurs(erreurs);
     return Object.keys(erreurs).length === 0;
   }
@@ -83,7 +85,7 @@ export default function InscriptionPage() {
     setSoumission(true);
     try {
       await authApi.inscription({
-        email: form.email.trim(),
+        email: form.email.trim().toLowerCase(),
         prenom: form.prenom.trim(),
         nom: form.nom.trim(),
         classe: form.classe,
@@ -191,7 +193,7 @@ export default function InscriptionPage() {
                 {etape === 1 ? "Créer ton compte" : etape === 2 ? "Ton profil" : etape === 3 ? "Ton rôle" : "C'est fait !"}
               </h1>
               <p className="mt-1 text-sm text-[var(--text-muted)]">
-                {etape === 1 ? "Utilise ton email @emsp.int officiel" : etape === 2 ? "Infos visibles par ton futur aîné" : etape === 3 ? "Cadet = cherche un aîné / Aîné = aide un cadet" : "Ton compte est prêt"}
+                {etape === 1 ? "Utilise une adresse e-mail valide" : etape === 2 ? "Infos visibles par ton futur aîné" : etape === 3 ? "Cadet = cherche un aîné / Aîné = aide un cadet" : "Ton compte est prêt"}
               </p>
             </div>
 
@@ -230,13 +232,13 @@ export default function InscriptionPage() {
                   <>
                     <div className="space-y-2">
                       <label className="flex flex-col gap-1">
-                        <span className="text-xs font-semibold text-[var(--text-muted)]">Email @emsp.int *</span>
+                        <span className="text-xs font-semibold text-[var(--text-muted)]">Adresse e-mail *</span>
                         <div className="relative">
                           <Mail size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
                           <input
                             type="email"
                             autoComplete="email"
-                            placeholder="prenom.nom@emsp.int"
+                            placeholder="prenom.nom@exemple.com"
                             value={form.email}
                             onChange={(e) => setForm({ ...form, email: e.target.value })}
                             className={cx(

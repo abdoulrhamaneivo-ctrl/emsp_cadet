@@ -47,7 +47,7 @@ def test_patch_champs_autorises(api, users):
 def test_patch_email_immuable(api, users):
     _client(users.ivo).patch("/api/me/", {"email": "pirate@evil.com"}, format="json")
     users.ivo.refresh_from_db()
-    assert users.ivo.email == "ivo@emsp.int"  # RG4, read_only
+    assert users.ivo.email == "ivo@emsp.int"  # Adresse e-mail en lecture seule.
 
 
 def test_ouverture_candidature_l1_422(api, users):

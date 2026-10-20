@@ -24,7 +24,7 @@ Intégrer les **Alumni** comme catégorie de membres pleine plutôt qu'après-co
 
 | # | Hypothèse | Conséquence si fausse |
 |---|---|---|
-| H1 | L'adresse `@emsp.int` est CONSERVÉE après le diplôme → connexion inchangée (RG4 intact) | Flux d'invitation admin par email externe à créer (V2, hors périmètre front immédiat) |
+| H1 | L'adresse de compte est conservée après le diplôme → connexion inchangée | Flux d'invitation admin : les comptes peuvent utiliser toute adresse e-mail valide |
 | H2 | Le passage étudiant → alumni n'intervient qu'en FIN DE CYCLE (fin L3 ou M2), via la transition admin annuelle (doc 15) où l'intention déclarée de l'étudiant (Master/Alumni) oriente la proposition — pas de sortie en cours de cursus | Si l'école veut des sorties anticipées (abandon) : flux admin séparé à cadrer |
 | H3 | Aucune route séparée « alumni » : mêmes espaces, statut rendu par chips/badges | Replier un espace alumni isolé casserait la chaîne verticale (anti-objectif) |
 

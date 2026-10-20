@@ -172,12 +172,12 @@ export default function ConnexionPage() {
           )}
 
           <form onSubmit={soumettre} noValidate className="mt-6 flex flex-col gap-5">
-            <FormField label="E-mail institutionnel" htmlFor="connexion-email" required error={erreurs.email}>
+            <FormField label="Adresse e-mail" htmlFor="connexion-email" required error={erreurs.email}>
               <Input
                 id="connexion-email"
                 type="email"
                 autoComplete="email"
-                placeholder="prenom.nom@emsp.int"
+                placeholder="prenom.nom@exemple.com"
                 value={champs.email}
                 onChange={poser("email")}
                 invalid={Boolean(erreurs.email)}
