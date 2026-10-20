@@ -8,6 +8,7 @@ import { AuthProvider } from "@app/providers/Auth";
 import { server } from "@shared/mocks/server";
 import InscriptionPage from "./pages/InscriptionPage";
 import PublicShell from "@layout/shells/PublicShell";
+import ProtectedShell from "@layout/shells/ProtectedShell";
 
 vi.mock("@app/providers/Theme", () => ({
   useTheme: () => ({ theme: "light", toggleTheme: vi.fn() }),
@@ -67,6 +68,38 @@ function remplir(email, motDePasse) {
 }
 
 describe("Connexion (doc 02 §5)", () => {
+  it("termine le chargement en invité quand le refresh et la session répondent 401", async () => {
+    let refreshCalls = 0;
+    let sessionCalls = 0;
+    server.use(
+      http.post("*/api/auth/refresh/", () => {
+        refreshCalls += 1;
+        return HttpResponse.json({ detail: "Session expirée." }, { status: 401 });
+      }),
+      http.get("*/api/auth/session/", () => {
+        sessionCalls += 1;
+        return HttpResponse.json({ detail: "Non authentifié." }, { status: 401 });
+      }),
+    );
+
+    render(
+      <MemoryRouter initialEntries={["/annuaire"]}>
+        <AuthProvider>
+          <Routes>
+            <Route element={<ProtectedShell />}>
+              <Route path="/annuaire" element={<p>ANNUAIRE-PROTÉGÉ</p>} />
+            </Route>
+            <Route path="/connexion" element={<p>CONNEXION-ATTEINTE</p>} />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("CONNEXION-ATTEINTE")).toBeInTheDocument();
+    expect(refreshCalls).toBe(1);
+    expect(sessionCalls).toBe(1);
+  });
+
   it("laisse le serveur vérifier une adresse externe pour le compte administrateur", async () => {
     let emailRecu;
     server.use(

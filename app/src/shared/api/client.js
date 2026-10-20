@@ -37,6 +37,22 @@ apiClient.interceptors.request.use((config) => {
 
 let rafraichissementEnCours = null;
 
+// Les points d'entrée de session peuvent renvoyer 401 sans que cela signifie
+// qu'une requête métier doit être rejouée. En particulier, réessayer /refresh/
+// sur son propre 401 crée une boucle infinie au premier chargement invité.
+const SANS_TENTATIVE_DE_REFRESH = new Set([
+  "/api/auth/refresh/",
+  "/api/auth/session/",
+  "/api/auth/connexion/",
+  "/api/auth/inscription/",
+  "/api/auth/verifier-email/",
+  "/api/auth/renvoyer-confirmation/",
+  "/api/auth/mot-de-passe-oublie/",
+  "/api/auth/verifier-lien-reinitialisation/",
+  "/api/auth/reinitialiser-mot-de-passe/",
+  "/api/auth/deconnexion/",
+]);
+
 apiClient.interceptors.response.use(
   (reponse) => reponse,
   async (erreur) => {
@@ -48,7 +64,12 @@ apiClient.interceptors.response.use(
     }
 
     // 401 : un seul essai de refresh par salve de requêtes
-    if (response?.status === 401 && !config.__rejoue) {
+    const chemin = String(config?.url ?? "").split("?")[0];
+    if (
+      response?.status === 401 &&
+      !config?.__rejoue &&
+      !SANS_TENTATIVE_DE_REFRESH.has(chemin)
+    ) {
       try {
         rafraichissementEnCours =
           rafraichissementEnCours ||
