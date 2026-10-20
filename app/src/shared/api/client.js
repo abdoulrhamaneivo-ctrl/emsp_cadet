@@ -19,6 +19,21 @@ export const apiClient = axios.create({
  */
 let jetonMemoire = null;
 
+// Ces routes portent leurs propres informations d'authentification (cookie
+// httpOnly ou données du formulaire). Un ancien access dans Authorization ne
+// doit pas empêcher le refresh, la déconnexion ou un parcours public.
+const SANS_JETON_BEARER = new Set([
+  "/api/auth/connexion/",
+  "/api/auth/refresh/",
+  "/api/auth/inscription/",
+  "/api/auth/verifier-email/",
+  "/api/auth/renvoyer-confirmation/",
+  "/api/auth/mot-de-passe-oublie/",
+  "/api/auth/verifier-lien-reinitialisation/",
+  "/api/auth/reinitialiser-mot-de-passe/",
+  "/api/auth/deconnexion/",
+]);
+
 export function definirJeton(jeton) {
   jetonMemoire = jeton;
 }
@@ -29,8 +44,12 @@ export function obtenirJeton() {
 }
 
 apiClient.interceptors.request.use((config) => {
-  if (jetonMemoire) {
+  const chemin = String(config.url ?? "").split("?")[0];
+  if (jetonMemoire && !SANS_JETON_BEARER.has(chemin)) {
     config.headers.Authorization = `Bearer ${jetonMemoire}`;
+  } else if (SANS_JETON_BEARER.has(chemin)) {
+    // Écarte aussi un éventuel Authorization fourni par défaut par Axios.
+    delete config.headers.Authorization;
   }
   return config;
 });

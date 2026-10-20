@@ -26,6 +26,17 @@ def test_refresh_sans_corps_renvoie_un_access(api, users):
     assert "access" in reponse.json()
 
 
+def test_refresh_ignore_un_bearer_incorrect_et_utilise_le_cookie(api, users):
+    _connecter(api, "ivo@emsp.int")
+    refresh = api.cookies["refresh_token"].value
+    api.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh}")
+
+    reponse = api.post("/api/auth/refresh/")
+
+    assert reponse.status_code == 200
+    assert "access" in reponse.json()
+
+
 def test_acces_sans_token_refuse(api, users):
     assert api.get("/api/conversations/").status_code == 401
 

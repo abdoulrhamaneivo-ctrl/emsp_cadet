@@ -24,6 +24,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from .authentication import IgnorerBearerOptionnelAuthentication
 from .models import User
 from .permissions import EstActif
 from .serializers import InscriptionSerializer
@@ -248,6 +249,7 @@ def _envoyer_confirmation_changement(user):
 
 class InscriptionView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_email"
 
@@ -286,6 +288,7 @@ class InscriptionView(APIView):
 
 class VerifierEmailView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_email"
 
@@ -320,6 +323,7 @@ class VerifierEmailView(APIView):
 
 class RenvoyerConfirmationView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_email"
 
@@ -340,6 +344,7 @@ class RenvoyerConfirmationView(APIView):
 
 class DemanderReinitialisationView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_email"
 
@@ -364,6 +369,7 @@ class VerifierLienReinitialisationView(APIView):
     """Vérifie un lien avant d'afficher le formulaire de nouveau mot de passe."""
 
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_password"
 
@@ -386,6 +392,7 @@ class VerifierLienReinitialisationView(APIView):
 
 class ReinitialiserMotDePasseView(APIView):
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "auth_password"
 

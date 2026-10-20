@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 
+from .authentication import IgnorerBearerOptionnelAuthentication
 from .serializers import JetonConnexionSerializer
 
 
@@ -28,6 +29,7 @@ class ConnexionView(APIView):
     """
 
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
 
     def post(self, request):
         # JetonConnexionSerializer : message d'échec 401 francisé (doc 02 §5).
@@ -49,6 +51,7 @@ class RafraichirView(APIView):
     """
 
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
 
     def post(self, request):
         token = request.COOKIES.get(settings.SIMPLE_JWT_REFRESH_COOKIE)
@@ -74,6 +77,7 @@ class DeconnexionView(APIView):
     """POST /api/auth/deconnexion/ — révoque le refresh (blacklist) + purge le cookie."""
 
     permission_classes = [AllowAny]
+    authentication_classes = [IgnorerBearerOptionnelAuthentication]
 
     def post(self, request):
         token = request.COOKIES.get(settings.SIMPLE_JWT_REFRESH_COOKIE)

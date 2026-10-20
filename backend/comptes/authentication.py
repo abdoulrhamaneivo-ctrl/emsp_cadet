@@ -1,7 +1,23 @@
 """JWT qui révoque immédiatement les accès après un changement de mot de passe."""
 
+from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
+
+class IgnorerBearerOptionnelAuthentication(BaseAuthentication):
+    """Ignore l'ancien bearer sur les routes publiques et garde le statut 401.
+
+    Ces endpoints authentifient leur requête avec un cookie httpOnly, un lien
+    signé ou les identifiants du formulaire. Un header Bearer expiré ou d'un
+    autre type ne doit pas bloquer leur traitement.
+    """
+
+    def authenticate(self, request):
+        return None
+
+    def authenticate_header(self, request):
+        return "Bearer"
 
 
 class PasswordChangeJWTAuthentication(JWTAuthentication):
