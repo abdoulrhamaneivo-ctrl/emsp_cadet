@@ -24,6 +24,7 @@ export function useModifierProfil() {
     mutationFn: profilApi.modifier,
     onSuccess: (donnees) => {
       client.setQueryData(["me"], donnees);
+      client.invalidateQueries({ queryKey: ["preferences-ia"] });
       client.invalidateQueries({ queryKey: ["visibilite-annuaire"] });
       // Le niveau/vitrine changent ce que voient l'annuaire et le parrainage.
       client.invalidateQueries({ queryKey: ["mon-parrainage"] });

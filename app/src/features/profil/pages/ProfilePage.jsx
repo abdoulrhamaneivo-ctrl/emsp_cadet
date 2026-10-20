@@ -71,6 +71,10 @@ export default function ProfilePage() {
   const surChamp = (champ, valeur) => setForm({ ...moi, [champ]: valeur });
 
   const dirty = Boolean(form);
+  const preferencesLocales = moi.preferencesIA ?? preferencesIA ?? {};
+  const changerPreferenceIA = (cle, valeur) => {
+    surChamp("preferencesIA", { ...preferencesLocales, [cle]: valeur });
+  };
   const enregistrer = () => {
     const payload = {
       prenom: moi.prenom,
@@ -83,6 +87,7 @@ export default function ProfilePage() {
       projets: (moi.projets ?? []).map((s) => s.trim()).filter(Boolean),
       pointsForts: (moi.pointsForts ?? []).map((s) => s.trim()).filter(Boolean),
       pointsFaibles: (moi.pointsFaibles ?? []).map((s) => s.trim()).filter(Boolean),
+      preferencesIA: moi.preferencesIA ?? preferencesIA ?? {},
     };
     const resultat = schemaIdentite.safeParse(payload);
     if (!resultat.success) {
@@ -176,21 +181,21 @@ export default function ProfilePage() {
         </h2>
         <p className="text-sm text-[var(--text-muted)] mb-4">
           L'IA ne propose, l'humain dispose (RG12.1). Tes données privées ne sont jamais analysées
-          (RG12.2). Consentement révocable à tout moment.
+          (RG12.2). Consentement révocable à tout moment. Enregistre ton profil pour appliquer tes choix.
         </p>
         <div className="flex flex-col gap-3">
           <ToggleConsentementIA
             label="Matching enrichi"
             description="Suggestions de parrains classées par similarité attentes↔vitrine (IA-2)"
-            checked={preferencesIA?.matchingEnrichi ?? false}
-            onChange={(e) => surChamp("preferencesIA", { ...moi.preferencesIA, matchingEnrichi: e.target.checked })}
+            checked={preferencesLocales.matchingEnrichi ?? false}
+            onChange={(checked) => changerPreferenceIA("matchingEnrichi", checked)}
             desactive={false}
           />
           <ToggleConsentementIA
             label="Copilot de profil"
             description="Aide à rédiger attentes, ambitions, projets à partir de mots-clés (IA-3)"
-            checked={preferencesIA?.copilot ?? false}
-            onChange={(e) => surChamp("preferencesIA", { ...moi.preferencesIA, copilot: e.target.checked })}
+            checked={preferencesLocales.copilot ?? false}
+            onChange={(checked) => changerPreferenceIA("copilot", checked)}
             desactive={false}
           />
         </div>

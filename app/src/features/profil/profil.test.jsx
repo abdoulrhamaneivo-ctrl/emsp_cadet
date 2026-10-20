@@ -26,6 +26,7 @@ const moiBase = {
   projets: ["un projet"],
   pointsForts: ["fort 1", "fort 2"],
   pointsFaibles: ["faible 1"],
+  preferencesIA: { matchingEnrichi: false, copilot: false },
   photoUrl: null,
 };
 
@@ -44,9 +45,11 @@ function renderProfil(user) {
 }
 
 function mockMoi(overrides = {}, visibilite = { visible: false, motifs: ["photo"] }) {
+  const preferencesIA = overrides.preferencesIA ?? moiBase.preferencesIA;
   server.use(
     http.get("*/api/me/", () => HttpResponse.json({ ...moiBase, ...overrides })),
     http.get("*/api/me/visibilite-annuaire/", () => HttpResponse.json(visibilite)),
+    http.get("*/api/me/preferences-ia/", () => HttpResponse.json(preferencesIA)),
   );
 }
 
@@ -106,6 +109,31 @@ describe("Profil (doc 11)", () => {
     fireEvent.click(screen.getByRole("button", { name: /Enregistrer/ }));
     await waitFor(() =>
       expect(recu).toMatchObject({ attentes: "Apprendre le subnetting et la config réseau." }),
+    );
+  });
+
+  it("affiche un switch visible et enregistre les consentements IA avec le profil", async () => {
+    let recu = null;
+    const preferencesIA = { matchingEnrichi: false, copilot: false };
+    mockMoi({ preferencesIA });
+    server.use(
+      http.patch("*/api/me/", async ({ request }) => {
+        recu = await request.json();
+        return HttpResponse.json({ ...moiBase, ...recu });
+      }),
+    );
+    renderProfil({ id: 1, prenom: "Ivo", nom: "Abdoul", classe: "L2", isAdmin: false });
+
+    const matching = await screen.findByRole("switch", { name: "Matching enrichi" });
+    expect(matching).not.toBeChecked();
+    fireEvent.click(matching);
+    expect(matching).toBeChecked();
+
+    fireEvent.click(await screen.findByRole("button", { name: /Enregistrer/ }));
+    await waitFor(() =>
+      expect(recu).toMatchObject({
+        preferencesIA: { matchingEnrichi: true, copilot: false },
+      }),
     );
   });
 
